@@ -1,0 +1,39 @@
+name: Feature or improvement proposal
+description: Propose a useful change to behavior, tooling, or documentation.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search [existing issues](https://github.com/gleniosp/fleetforge/issues) and
+        review the [roadmap](https://github.com/gleniosp/fleetforge/blob/main/docs/roadmap.md).
+        Maintainers will assess the idea and its scope. You may link an exploratory
+        PR from your fork to help validate the issue; acceptance is decided in review.
+        See the [contribution guide](https://github.com/gleniosp/fleetforge/blob/main/CONTRIBUTING.md).
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe who encounters the problem, their goal, and the current limitation.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What change would help?
+      description: Describe the desired behavior or improvement. A complete implementation plan is optional.
+    validations:
+      required: false
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and related work
+      description: Share existing workarounds, relevant issues, or other approaches you considered.
+    validations:
+      required: false
+  - type: textarea
+    id: validation
+    attributes:
+      label: Supporting example or PR
+      description: Link a small example or exploratory PR if you have one, and explain what it demonstrates or leaves unresolved.
+    validations:
+      required: false

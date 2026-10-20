@@ -1,0 +1,49 @@
+name: Bug report
+description: Report unexpected behavior in the current implementation, tooling, or documentation.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search [existing issues](https://github.com/gleniosp/fleetforge/issues) first.
+        Describe a problem with the current project; maintainers will assess its
+        validity and scope. Remove credentials and private data from examples.
+        See the [contribution guide](https://github.com/gleniosp/fleetforge/blob/main/CONTRIBUTING.md).
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: What happened?
+      description: Describe the failure and the part of FleetForge it affects.
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: What did you expect?
+      description: Explain the result you expected and link relevant documentation if useful.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: How can we reproduce it?
+      description: Provide the smallest example, commands, inputs, or document path. For intermittent failures, describe the conditions and frequency.
+      placeholder: |
+        1. Start from...
+        2. Run or open...
+        3. Observe...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Revision and environment
+      description: Share the source revision (git rev-parse --short HEAD), OS/architecture, and relevant tool versions. Include only what applies to this report.
+    validations:
+      required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add sanitized output, screenshots, workarounds, or related issues that clarify the failure.
+    validations:
+      required: false

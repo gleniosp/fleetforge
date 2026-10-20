@@ -1,0 +1,46 @@
+name: Delivery task
+description: Plan a focused implementation, design, documentation, experiment, or verification slice.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for a focused delivery task. Use the proposal form when the
+        problem or approach still needs discussion. Maintainers validate scope and
+        assign task IDs, requirement mappings, priority, milestone, and native blockers.
+        Delivery follows the [working agreement](https://github.com/gleniosp/fleetforge/blob/main/docs/working-agreement.md).
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome and scope
+      description: Describe the concrete result and boundaries of one reviewable slice.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List observable results, including essential tests, configuration, and documentation.
+      placeholder: "- [ ] Observable result"
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation plan
+      description: Describe the behavior and failure checks needed to support acceptance, or the question and stopping condition for an experiment.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and requirements
+      description: Link known prerequisite issues and owning requirements or contracts. Maintainers align these with native blockers and task metadata.
+    validations:
+      required: false
+  - type: textarea
+    id: documentation
+    attributes:
+      label: Documentation and evidence owners
+      description: Identify affected documents and where reproducible evidence should live.
+    validations:
+      required: false

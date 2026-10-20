@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Contribution guidance
+    url: https://github.com/gleniosp/fleetforge/blob/main/CONTRIBUTING.md
+    about: Read how to propose issues, submit fork-based PRs, and work with maintainer review.
