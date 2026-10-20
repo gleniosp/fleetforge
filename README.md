@@ -46,9 +46,9 @@ requirements to issues and intended verification. [ADRs](docs/adr/README.md)
 explain decisions; [journals](docs/README.md#reading-design-and-evidence) record
 factual evidence.
 
-Use an agreed issue for substantial changes and follow the [delivery
-policy](docs/README.md#delivery-boundary), including branch names such as
+Use an agreed issue for substantial changes and follow the [working
+agreement](docs/working-agreement.md), including branch names such as
 `docs/85-consolidate-architecture` and normally one PR per issue. The maintainer
-owns approval and merge. Full contributor instructions, licensing, and
-executable setup remain bootstrap deliveries; their presence is not implied
-here.
+owns approval and merge. [CONTRIBUTING.md](CONTRIBUTING.md) is the contributor
+entry point; [AGENTS.md](AGENTS.md) routes agent instructions and repository
+skills. Licensing and executable setup remain bootstrap deliveries.
