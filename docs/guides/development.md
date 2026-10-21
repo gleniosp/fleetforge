@@ -72,12 +72,36 @@ system satisfying that baseline.
 ```sh
 pixi run --locked -e build cargo build --workspace --locked
 pixi run --locked -e build cargo run --locked -p fleetforge-agent
+pixi run --locked -e build cargo run --locked -p fleetforge-agent -- --help
+pixi run --locked -e build cargo run --locked -p fleetforge-agent -- --version
+pixi run --locked -e dev cargo test --workspace --locked
 pixi run --locked -e dev cargo fmt --all -- --check
 pixi run --locked -e dev cargo clippy --workspace --all-targets --locked -- -D warnings
 ```
 
 The bootstrap diagnostic prints its compiled package version and platform:
 `fleetforge-agent 0.1.0 (x86_64-linux; bootstrap diagnostic)`.
+
+The executable accepts either no arguments or one of the following options:
+
+| Invocation | Standard output | Exit code |
+| --- | --- | --- |
+| `fleetforge-agent` | Package version and compiled architecture/OS as above | 0 |
+| `fleetforge-agent --help` | Usage, default behavior and supported options | 0 |
+| `fleetforge-agent --version` | `fleetforge-agent 0.1.0` | 0 |
+| Unsupported or extra argument | Empty; stderr identifies the unexpected argument and points to `--help` | 2 |
+| Output write or flush failure | May be partial; stderr reports the I/O error when writable | 1 |
+
+Successful invocations leave stderr empty. Options cannot be combined or
+repeated. The diagnostic exits after printing; it starts no operational agent.
+The `--` in the examples passes the following arguments to the executable
+through Cargo. Cargo itself can also print build/run progress on stderr.
+The integration tests invoke the built executable directly and assert output,
+stderr and exit status for successful commands and invalid inputs, including
+non-UTF-8 arguments on Unix.
+Output failures, including a closed stdout pipe, return 1 without panicking.
+If stderr also fails, the exit status still signals failure. Regression tests
+cover closed pipes on Unix and failing stdout/stderr with Linux `/dev/full`.
 
 The virtual Cargo workspace uses edition 2024, resolver 3 and one package at
 `apps/agent`. Package metadata and lints are explicitly inherited; unsafe code

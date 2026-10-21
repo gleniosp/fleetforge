@@ -14,6 +14,17 @@ without public internet.
 The repository provides design contracts and a reproducible development
 toolchain. Fleet operation is not implemented yet.
 
+Build and invoke the bootstrap diagnostic from the repository root:
+
+```sh
+pixi run --locked -e build cargo run --locked -p fleetforge-agent
+pixi run --locked -e build cargo run --locked -p fleetforge-agent -- --help
+pixi run --locked -e build cargo run --locked -p fleetforge-agent -- --version
+```
+
+See the [development guide](docs/guides/development.md) for prerequisites,
+CLI behavior and validation commands.
+
 ## Planned MVP
 
 - One local Rust/Tokio authority and three independent device agents with SQLite.
