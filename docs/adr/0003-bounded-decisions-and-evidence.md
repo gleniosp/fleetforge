@@ -2,7 +2,7 @@
 
 - **Status:** Accepted engineering policy.
 - **Date:** 2026-10-19
-- **Updated:** 2026-10-20
+- **Updated:** 2026-10-21
 
 ## Context
 
@@ -15,7 +15,18 @@ slice.
 ## Decision
 
 Before relying on tool behavior or generating technical configuration, consult
-its current stable official documentation. For an important uncertainty:
+its current stable official documentation. For every package manager, always
+consult its latest official documentation and check compatibility with the
+version used by the project. Start with the documented minimal configuration.
+Inspect existing and transitive dependencies and host prerequisites before
+adding a direct package;
+each addition needs a present requirement or a demonstrated gap, with a clear
+development, build or runtime role.
+
+Rely on documented tool behavior. Routine locked installs, builds and checks
+validate the repository's configuration and integration; they do not require a
+separate experiment report. Use an experiment when a consequential uncertainty,
+competing approaches or an observed failure needs investigation. For that case:
 
 1. State one concrete question and why the active milestone needs it.
 2. Identify a small viable set of approaches, including the proposed default.
@@ -24,6 +35,10 @@ its current stable official documentation. For an important uncertainty:
 5. Record setup, commands, inputs, versions, observations, and failure evidence.
 6. Recommend a decision, including limits and revisit conditions.
 7. Update the owning ADR/specification, implementation/tests, and GitHub scope.
+
+State what a check establishes and why it is needed. Repeat clean-environment
+validation when affected toolchain, environment or host requirements change;
+do not repeatedly audit a package manager's internal installation mechanisms.
 
 Introduce checks and diagnostics with each capability. Tests must assert actual
 behavior: workload response/identity, environment path, persisted

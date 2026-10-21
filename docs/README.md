@@ -18,13 +18,12 @@ edit history and reasons for revisions in journals, issues, PRs and Git history.
 | [GitHub milestones](https://github.com/gleniosp/fleetforge/milestones) | Delivery grouping, milestone exit criteria, and progress |
 | [Working agreement](working-agreement.md) | Task selection, delivery permissions, review/commit/publication flow, issue sizing, and milestone exit |
 | [Contributing](../CONTRIBUTING.md) | Public issue validation, fork/PR submissions, and optional global GitHub CLI usage |
-| [Journals](#reading-design-and-evidence) | Factual implementation/review evidence and limitations |
+| [Guides](guides/) | Supported setup and workflows |
+| [Experiments](experiments/) | Reproducible investigation of bounded technical questions |
+| [Journals](journal/) | Dated implementation/review evidence and limitations |
 
-Specifications will be introduced alongside the behavior they define.
-Experiments will record focused uncertainties when their milestones need
-evidence. Guides will document real commands and workflows once available. Blog
-drafts may explain verified milestone results without becoming requirements or
-task trackers.
+Specifications accompany the behavior they define. Blog drafts may explain
+verified milestone results without becoming requirements or task trackers.
 
 ## Reading design and evidence
 
@@ -34,10 +33,6 @@ task trackers.
   validation experiment and, when significant, its own ADR.
 - **Implemented** means the behavior exists in the relevant code/configuration.
 - **Verified** requires linked evidence of an appropriate check or actual behavior.
-
-Evidence journals: [foundation review](journal/2026-10-19-foundation-design.md),
-[architecture consolidation](journal/2026-10-20-architecture-consolidation.md),
-and [task delivery guidance](journal/2026-10-20-task-delivery.md).
 
 Requirements describe expected behavior. The traceability table describes
 intended verification, not passing tests. GitHub owns current work state; avoid

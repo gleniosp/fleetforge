@@ -11,10 +11,8 @@ without public internet.
 
 ## Current state
 
-This repository contains accepted product and architecture contracts. The agent,
-authority, releases, console, toolchain, and automated product tests are
-planned. There is no runnable fleet or installation command yet. Historical
-review evidence is recorded separately from design and implementation claims.
+The repository provides design contracts and a reproducible development
+toolchain. Fleet operation is not implemented yet.
 
 ## Planned MVP
 
@@ -51,4 +49,4 @@ agreement](docs/working-agreement.md), including branch names such as
 `docs/85-consolidate-architecture` and normally one PR per issue. The maintainer
 owns approval and merge. [CONTRIBUTING.md](CONTRIBUTING.md) is the contributor
 entry point; [AGENTS.md](AGENTS.md) routes agent instructions and repository
-skills. Licensing and executable setup remain bootstrap deliveries.
+skills.
