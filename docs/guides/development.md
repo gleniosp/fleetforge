@@ -14,6 +14,7 @@ rejects other minor versions. A working HTTPS CA certificate store and network
 access to conda-forge are required for a fresh installation. Minimal Ubuntu
 containers need `ca-certificates`. Git is needed to clone and review changes.
 Docker is optional, for reproducing the clean-container experiment.
+The cleanup task uses the host's POSIX `sh`.
 
 No host Rust, rustup, C compiler, Python, prek or Commitizen installation is
 required. The host supplies the kernel, glibc and basic Unix shell utilities.
@@ -46,8 +47,10 @@ Select an environment explicitly with `-e dev` or `-e build`. Both share the
 inherits the implicit default feature. Pixi's implicit `default` environment is
 empty; it is not another supported toolchain environment. Unqualified arbitrary
 commands can still resolve host executables through `PATH`, so always use the
-explicit environment for Cargo commands. Future canonical tasks can select their
-own environment. There is no planned dev/default divergence or duplicated toolset.
+explicit environment for arbitrary Cargo commands. Canonical tasks select their
+own environments as described in the [task reference](tasks.md). The empty
+default environment contains the root task aliases, whose dependencies run
+tools in `dev` or `build`; it does not duplicate the development toolset.
 
 Git is a host prerequisite used by prek and Commitizen as well as by the
 contributor. It is not installed or version-pinned by this workspace.
@@ -68,6 +71,27 @@ C library. The clean experiment verifies Ubuntu 24.04 userspace, not every
 system satisfying that baseline.
 
 ## Build and inspect the bootstrap package
+
+Use the canonical task interface for routine development:
+
+```sh
+pixi run --locked check
+pixi run --locked build
+pixi run --locked format-check
+pixi run --locked lint
+pixi run --locked test
+pixi run --locked agent-run
+pixi run --locked agent-run -- --help
+pixi run --locked agent-run -- --version
+```
+
+`check` aggregates formatting inspection, Clippy and tests for all implemented
+components. The [task reference](tasks.md) owns every task's tools, scope,
+environment, mutation and exit behavior, including explicit `format`/`fix`
+commands, agent invocation and safe generated-build cleanup. `agent-run`
+builds as needed and forwards arguments after `--` to the executable. Run
+canonical tasks without `-e`;
+use the explicit environment when invoking arbitrary tools directly:
 
 ```sh
 pixi run --locked -e build cargo build --workspace --locked

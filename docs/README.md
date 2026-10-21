@@ -19,6 +19,7 @@ edit history and reasons for revisions in journals, issues, PRs and Git history.
 | [Working agreement](working-agreement.md) | Task selection, delivery permissions, review/commit/publication flow, issue sizing, and milestone exit |
 | [Contributing](../CONTRIBUTING.md) | Public issue validation, fork/PR submissions, and optional global GitHub CLI usage |
 | [Guides](guides/) | Supported setup and workflows |
+| [Task reference](guides/tasks.md) | Canonical task tools, scopes, environments, mutation and exit behavior |
 | [Experiments](experiments/) | Reproducible investigation of bounded technical questions |
 | [Journals](journal/) | Dated implementation/review evidence and limitations |
 
