@@ -89,6 +89,11 @@ sources and lockfiles; format/fix are explicitly mutating. Cleaning must
 preserve operational state. Add tasks and packages only when they perform
 meaningful work.
 
+Keep pre-commit source/configuration checks separate from test execution, with
+all-suite and focused app/service test entry points. The
+[task ownership decision](../adr/0001-pixi-cargo-and-task-ownership.md) defines
+their boundaries.
+
 **Acceptance:** a contributor can clone, install the locked environment, build
 and invoke the executable, and reproduce formatting, linting, tests, and CI.
 Bootstrap requires no SQLite, peer networking, web app, deployment engine, or

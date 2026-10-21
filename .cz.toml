@@ -1,0 +1,4 @@
+[tool.commitizen]
+name = "cz_conventional_commits"
+# Permit Git-generated merge subjects; validate revert/fixup/squash subjects normally.
+allowed_prefixes = ["Merge "]

@@ -126,6 +126,9 @@ Conventional Commit subjects: `<type>(<optional-scope>): <description>`, with a
 short imperative description and a body when rationale is needed. Typical
 types are `feat`, `fix`, `docs`, `refactor`, `test`, `build`, `ci`, and `chore`;
 use `!` or a `BREAKING CHANGE:` footer only for an actual breaking change.
+Keep each commit coherent and independently understandable. Include an issue
+reference such as `Refs #6` in the body when useful; the complete delivery's PR
+owns issue closure.
 
 Before publication, discover the repository's current default branch, compare
 the complete branch diff and commit series against that base, inspect staged,
