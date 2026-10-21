@@ -35,8 +35,11 @@ the initial project packages; use rustfmt and Clippy without blanket pedantic
 policies.
 
 The lint feature supplies prek and Commitizen to dev. `prek.toml` owns project
-hooks; pre-commit checks source/configuration, commit-msg validates Conventional
-Commits. CI runs the same checks plus commit-range validation. Add Ruff
+hooks; pre-commit runs `check` for source/configuration, commit-msg validates
+Conventional Commits. `check` aggregates non-mutating formatting, lint and
+configuration validation without test execution. `test` aggregates all
+implemented test suites, with focused tasks for each implemented app/service.
+CI runs checks, tests, builds and commit-range validation separately. Add Ruff
 lint/format and mypy with Python code, and frontend tooling with SvelteKit. Put
 Python tool settings in `pyproject.toml`. Minimal EditorConfig defaults help
 editors; language formatters remain authoritative, and supported editor
@@ -92,13 +95,12 @@ The lint feature groups lint/format tasks and contributor validation tools.
 Component-prefixed task names identify language scope; introduce separate
 language features only when actual composition needs justify them.
 
-Build/run/cleanup tasks belong to default and are inherited by dev. Aggregates
-that combine test and lint work belong to dev's environment-local tasks. Use
-`pixi run --locked build` or `agent-run` for normal application work, and
-`pixi run --locked -e dev check` for development validation. Explicitly declare
-default's solve-group membership without adding another named build
-environment. Git remains a host prerequisite, including for subprocesses of
-contributor tools.
+Build/run/cleanup tasks belong to default and are inherited by dev. The lint
+feature owns `check` and component check aggregates; the test feature owns
+`test` and focused test tasks. Explicitly declare default's solve-group
+membership without adding another named build environment. The
+[task reference](../guides/tasks.md) owns exact commands and routing; the
+[development guide](../guides/development.md) owns setup and host prerequisites.
 
 Use Pixi's platform defaults unless a demonstrated dependency or supported host
 requires an explicit virtual package override. Exact tool pins make upgrades

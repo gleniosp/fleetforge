@@ -116,6 +116,14 @@ consistency, and the diff; follow [docs/AGENTS.md](docs/AGENTS.md). Use availabl
 tools and record their actual commands and limits. Temporary review helpers do
 not become supported project tooling merely because a journal mentions them.
 
+## Commit messages
+
+Follow the [commit-writing convention](docs/working-agreement.md#review-commits-and-publication);
+for example, `build(hooks): validate commit messages`. Install the local hooks
+using the [development guide](docs/guides/development.md#local-hooks-and-commit-validation).
+The [task reference](docs/guides/tasks.md#hooks-and-commit-messages) owns manual
+message/history checks, checker exemptions and staged-content behavior.
+
 ## Evidence and permissions
 
 Use [ADR 0003](docs/adr/0003-bounded-decisions-and-evidence.md) for bounded

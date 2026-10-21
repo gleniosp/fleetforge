@@ -30,6 +30,7 @@ description = "Clean fixed repository target/; refuse a symlink"
 # Cargo supplies Rust test support; no additional test package is needed.
 test = { depends-on = ["rust-test"], description = "Run all implemented component tests" }
 rust-test = { cmd = "cargo test --workspace --locked", description = "Run workspace unit, integration and documentation tests" }
+agent-test = { cmd = "cargo test --locked -p fleetforge-agent", description = "Run the agent package's unit, integration and documentation tests" }
 
 [feature.lint.dependencies]
 prek = "=0.5.6"
@@ -37,7 +38,9 @@ commitizen = "=4.19.2"
 
 [feature.lint.tasks]
 # rustfmt and Clippy are already included in the default Rust package.
-lint = { depends-on = ["rust-lint"], description = "Lint all implemented components" }
+check = { depends-on = ["format-check", "lint"], description = "Check repository formatting, lints and configuration without running tests" }
+rust-check = { depends-on = ["rust-format-check", "rust-lint"], description = "Check Rust formatting and lints without running tests" }
+lint = { depends-on = ["rust-lint", "hooks-validate"], description = "Lint all implemented components and validate hook configuration" }
 format = { depends-on = ["rust-format"], description = "Rewrite source formatting; review the resulting diff" }
 format-check = { depends-on = ["rust-format-check"], description = "Check source formatting without rewriting files" }
 fix = { depends-on = ["rust-fix"], description = "Apply lint suggestions with Cargo's Git safety checks" }
@@ -45,16 +48,13 @@ rust-lint = { cmd = "cargo clippy --workspace --all-targets --locked -- -D warni
 rust-format = { cmd = "cargo fmt --all", description = "Format all workspace Rust source with rustfmt" }
 rust-format-check = { cmd = "cargo fmt --all -- --check", description = "Check all workspace Rust source with rustfmt" }
 rust-fix = { cmd = "cargo clippy --fix --workspace --all-targets --locked -- -D warnings", description = "Apply Clippy/compiler suggestions; refuse dirty or staged work" }
+hooks-install = { cmd = "prek install", description = "Install the configured pre-commit and commit-msg Git shims" }
+hooks-check = { cmd = "prek run --all-files --stage pre-commit", description = "Run check-only hooks against the current working tree" }
+hooks-validate = { cmd = "prek validate-config prek.toml", description = "Validate the sole project hook configuration" }
+commit-check = { cmd = "cz check --commit-msg-file", description = "Validate one commit message file; pass its path as an argument" }
+commit-check-range = { cmd = "cz check --rev-range", description = "Validate committed messages; pass an explicit Git revision range" }
 
 [environments]
 # Declare default only to keep shared package versions aligned with dev.
 default = { solve-group = "toolchain" }
-
-[environments.dev]
-features = ["test", "lint"]
-solve-group = "toolchain"
-
-[environments.dev.tasks]
-# Aggregates belong to the environment that composes both checking features.
-check = { depends-on = ["rust-check"], description = "Check all implemented components without rewriting source or locks" }
-rust-check = { depends-on = ["rust-format-check", "rust-lint", "rust-test"], description = "Check Rust formatting, lints and tests" }
+dev = { features = ["test", "lint"], solve-group = "toolchain" }

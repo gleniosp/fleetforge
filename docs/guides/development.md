@@ -15,6 +15,8 @@ access to conda-forge are required for a fresh installation. Minimal Ubuntu
 containers need `ca-certificates`. Git is needed to clone and review changes.
 Docker is optional, for reproducing the clean-container experiment.
 The cleanup task uses the host's POSIX `sh`.
+Installed Git hooks also need Pixi on `PATH`; their entries activate the locked
+dev tools explicitly.
 
 No host Rust, rustup, C compiler, Python, prek or Commitizen installation is
 required. The host supplies the kernel, glibc and basic Unix shell utilities.
@@ -83,28 +85,21 @@ pixi run --locked build
 pixi run --locked -e dev format-check
 pixi run --locked -e dev lint
 pixi run --locked -e dev test
+pixi run --locked -e dev agent-test
 pixi run --locked agent-run
 pixi run --locked agent-run -- --help
 pixi run --locked agent-run -- --version
 ```
 
-`check` aggregates formatting inspection, Clippy and tests for all implemented
-components. The [task reference](tasks.md) owns every task's tools, scope,
-environment, mutation and exit behavior, including explicit `format`/`fix`
+`check` aggregates formatting inspection, Clippy and hook configuration
+validation. Run `test` separately for all implemented test suites, or
+`agent-test` for the agent package alone. Complete local validation runs both
+`check` and `test`. The [task reference](tasks.md) owns every task's tools,
+scope, environment, mutation and exit behavior, including explicit `format`/`fix`
 commands, agent invocation and safe generated-build cleanup. `agent-run`
 builds as needed and forwards arguments after `--` to the executable. Run
-build/run tasks in default and checking tasks in dev. Equivalent direct tool
-commands are:
-
-```sh
-pixi run --locked cargo build --workspace --locked
-pixi run --locked cargo run --locked -p fleetforge-agent
-pixi run --locked cargo run --locked -p fleetforge-agent -- --help
-pixi run --locked cargo run --locked -p fleetforge-agent -- --version
-pixi run --locked -e dev cargo test --workspace --locked
-pixi run --locked -e dev cargo fmt --all -- --check
-pixi run --locked -e dev cargo clippy --workspace --all-targets --locked -- -D warnings
-```
+build/run tasks in default and checking tasks in dev. Underlying tool commands
+are listed in the task reference.
 
 The bootstrap diagnostic prints its compiled package version and platform:
 `fleetforge-agent 0.1.0 (x86_64-linux; bootstrap diagnostic)`.
@@ -141,6 +136,21 @@ Native Cargo output is under `target/debug/` or `target/release/`;
 `cargo run` locates it automatically.
 Checks can create these outputs but must preserve tracked source and lockfiles.
 Formatting checks above only inspect files; `cargo fmt --all` rewrites source.
+
+## Local hooks and commit validation
+
+After installing `dev`, install both local Git hook stages and run the checks:
+
+```sh
+pixi run --locked -e dev hooks-install
+pixi run --locked -e dev hooks-check
+```
+
+These install the pre-commit and commit-msg stages, then run the source checks.
+The [task reference](tasks.md#hooks-and-commit-messages) owns hook scope,
+installation behavior, staged-content handling and manual message/history
+commands. Follow the [commit-writing convention](../working-agreement.md#review-commits-and-publication)
+when preparing commits. GitHub Actions integration is owned by #7.
 
 ## Locks and deliberate upgrades
 
