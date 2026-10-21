@@ -1,0 +1,11 @@
+[package]
+name = "fleetforge-agent"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+description = "FleetForge agent bootstrap diagnostic"
+
+[lints]
+workspace = true

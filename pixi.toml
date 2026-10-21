@@ -1,0 +1,18 @@
+[workspace]
+name = "fleetforge"
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+requires-pixi = ">=0.82.0,<0.83"
+
+[feature.rust.dependencies]
+# Includes Cargo, rustfmt, Clippy and the native Linux linker dependencies.
+rust = "=1.98.1"
+
+[feature.development.dependencies]
+prek = "=0.5.6"
+commitizen = "=4.19.2"
+
+[environments]
+# Select dev or build explicitly; Pixi's implicit default feature stays empty.
+dev = { features = ["rust", "development"], solve-group = "toolchain", no-default-feature = true }
+build = { features = ["rust"], solve-group = "toolchain", no-default-feature = true }

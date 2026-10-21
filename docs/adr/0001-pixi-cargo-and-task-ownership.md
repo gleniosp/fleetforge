@@ -1,8 +1,8 @@
 # ADR 0001 — Pixi, Cargo, and task ownership
 
-- **Status:** Accepted design; configuration and executable validation pending.
+- **Status:** Accepted.
 - **Date:** 2026-10-19
-- **Updated:** 2026-10-20
+- **Updated:** 2026-10-21
 - **Requirement:** [MVP-01](../product/requirements.md#mvp-01--engineering-foundation)
 - **Delivery:** [M0-03](https://github.com/gleniosp/fleetforge/issues/3),
   [M0-05](https://github.com/gleniosp/fleetforge/issues/5),
@@ -27,7 +27,7 @@ dev-only tools.
 Cargo owns Rust dependencies/builds/tests. Start with a virtual workspace and
 one meaningful `fleetforge-agent` executable, Rust edition 2024 and explicit
 resolver 3. Pin a compatible stable toolchain through Pixi after a
-clean-environment experiment; do not introduce a competing rustup toolchain
+clean-environment build check; do not introduce a competing rustup toolchain
 path. Share metadata/lints and inherit them explicitly. Forbid unsafe code in
 the initial project packages; use rustfmt and Clippy without blanket pedantic
 policies.
@@ -39,6 +39,11 @@ lint/format and mypy with Python code, and frontend tooling with SvelteKit. Put
 Python tool settings in `pyproject.toml`. Minimal EditorConfig defaults help
 editors; language formatters remain authoritative, and supported editor
 properties must agree with them.
+
+Git is a host prerequisite for repository development and CI, including prek
+and Commitizen subprocesses. The asset/device identity and agent deployment
+design has no runtime Git requirement. Device workload dependencies belong in
+their separate release environments.
 
 Pixi resolves, locks and installs environments. Evaluate pixi-pack for packaging
 where useful; it is not required by this decision. FleetForge owns desired
@@ -70,11 +75,25 @@ would duplicate policy. The chosen boundary adds Pixi resolution and routing to
 learn, but keeps tooling, source builds, and deployment inputs reproducible and
 inspectable.
 
-Exact tool versions, package availability, platform requirements, and hook
-behavior must be tested before claiming support. Initially target Linux x86-64
-only. Extract additional crates/environments when actual dependency or component
-differences justify them, rather than copying a prospective final directory
-tree.
+The root toolchain targets Linux x86_64. Use the native `rust` package.
+It supplies the Rust tools, Linux linker configuration and transitive compiler
+driver/sysroot dependencies needed to link Rust executables without a host C
+toolchain. The target-specific `rust_linux-64` activation package is unnecessary
+for the native build. Avoid redundant direct dependencies for those implementation
+packages; their resolved versions belong in `pixi.lock`.
+
+`dev` contains Rust and contributor checks; `build` contains Rust without those
+checks. Keep Pixi's implicit default feature/environment empty and select named
+environments explicitly. No duplicate development environment or future
+split is needed. Both named environments use the same solve group.
+Git remains a host prerequisite, including for subprocesses of contributor tools.
+
+Use Pixi's platform defaults unless a demonstrated dependency or supported host
+requires an explicit virtual package override. Exact tool pins make upgrades
+deliberate; host prerequisites and commands belong to the development guide,
+while the experiment records observed versions and compatibility limits.
+Extract additional crates/environments when actual dependency or component
+needs justify them.
 
 ## Evidence and revisit conditions
 
@@ -84,10 +103,14 @@ feature/environment composition; [Pixi
 install](https://pixi.prefix.dev/latest/reference/cli/pixi/install/) describes
 locked/offline installation options; [Cargo workspace
 documentation](https://doc.rust-lang.org/cargo/reference/workspaces.html) describes
-explicit virtual-workspace resolver and inheritance behavior. These establish
-available mechanisms, not that FleetForge configuration exists or passes checks.
+explicit virtual-workspace resolver and inheritance behavior. These describe
+the mechanisms used by the root configuration.
 
-Validate the complete toolset with host compiler shims unavailable, a fresh
-locked install, and executable checks. Revisit package/version/routing decisions
-when that experiment fails or an implemented component has materially different
-needs.
+The [toolchain experiment](../experiments/0001-pixi-toolchain.md) records fresh
+locked installation, tool paths and builds with host compilers absent,
+manifest/lock drift rejection and inherited lint enforcement. The initial
+package reports its compiled version/platform to demonstrate linked execution;
+stable CLI behavior belongs to #4. The [development guide](../guides/development.md)
+owns current commands and upgrade semantics. Revisit package/version/routing
+decisions when this experiment fails, Pixi changes its lock/activation behavior,
+or an implemented component has materially different needs.

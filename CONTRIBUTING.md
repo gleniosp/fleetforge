@@ -106,15 +106,10 @@ flow for unsupported contribution paths. Check the current
 and [permission reference](https://docs.github.com/en/rest/authentication/permissions-required-for-fine-grained-personal-access-tokens)
 for the operation you intend to perform.
 
-## Current development setup
+## Development setup
 
-The repository currently contains design contracts and contributor guidance.
-There is no supported installation, product executable, canonical validation
-command, hook setup, or CI workflow yet. Locked Pixi/Cargo environments and
-commands belong to [#3](https://github.com/gleniosp/fleetforge/issues/3),
-[#5](https://github.com/gleniosp/fleetforge/issues/5),
-[#6](https://github.com/gleniosp/fleetforge/issues/6), and
-[#7](https://github.com/gleniosp/fleetforge/issues/7).
+Follow the [development guide](docs/guides/development.md) to install the locked
+Linux x86_64 Pixi/Cargo toolchain and build the agent bootstrap diagnostic.
 
 For documentation changes, inspect links and heading fragments, current contract
 consistency, and the diff; follow [docs/AGENTS.md](docs/AGENTS.md). Use available
