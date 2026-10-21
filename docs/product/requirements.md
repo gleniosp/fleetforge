@@ -77,8 +77,11 @@ Provide root Pixi and virtual Cargo workspaces, one meaningful Rust executable,
 reproducible toolchain/lockfiles, canonical tasks, GitHub Actions, license,
 contribution/agent conventions, initial ADRs, and GitHub-linked planning.
 
-Use separate Pixi `dev` and `build` environments with shared toolchain features.
-Development includes Pixi-managed prek and Commitizen. Use `prek.toml`, local
+Put essential build/run dependencies and tasks in Pixi's default feature.
+The default environment builds/runs the application; `dev` inherits that
+feature and adds `test` and `lint` features with their tools and tasks. Keep
+shared versions aligned through one solve group. Development includes
+Pixi-managed prek and Commitizen in `lint`. Use `prek.toml`, local
 pre-commit and commit-msg hooks, and matching CI validation. Introduce Ruff
 linting/formatting and mypy with the first Python code; keep them out of
 deployed workloads. Rust uses rustfmt and Clippy. Checks must preserve tracked

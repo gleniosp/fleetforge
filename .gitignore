@@ -1,2 +1,3 @@
+# Pixi environments and Cargo build output; retain source and both lockfiles.
 /.pixi/
 /target/

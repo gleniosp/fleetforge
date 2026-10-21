@@ -4,6 +4,14 @@
 [MVP-01](../product/requirements.md#mvp-01--engineering-foundation).
 **Decision:** [ADR 0001](../adr/0001-pixi-cargo-and-task-ownership.md).
 
+The results below record the original #3 `dev`/`build` composition. The
+maintainer-approved #5 revision moves the essential toolchain to default and
+composes `test`/`lint` in dev. The current
+[verification script](../../experiments/pixi-toolchain/verify.sh) follows that
+composition; its fresh reference-container rerun is recorded in the
+[composition journal](../journal/2026-10-21-pixi-feature-composition.md).
+Historical inputs, package hashes and observations below are preserved.
+
 ## Question and stopping condition
 
 Can native conda-forge Rust provide the compiler, formatter, linter and linker
