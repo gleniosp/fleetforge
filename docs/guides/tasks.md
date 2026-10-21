@@ -2,12 +2,13 @@
 
 The root [Pixi manifest](../../pixi.toml) is the task entry point, under
 [ADR 0001](../adr/0001-pixi-cargo-and-task-ownership.md). Run tasks with
-`pixi run --locked TASK`, without `-e`; for example:
+`pixi run --locked TASK` for build/run, and `pixi run --locked -e dev TASK`
+for development checks; for example:
 
 ```sh
-pixi run --locked check
+pixi run --locked -e dev check
 pixi run --locked build
-pixi run --locked rust-lint
+pixi run --locked -e dev rust-lint
 ```
 
 All tasks below were introduced in **M0, issue #5**. Root tasks cover every
@@ -15,7 +16,7 @@ implemented component, currently the Rust workspace at `apps/agent`. They do
 not claim to check documentation, Python, frontend code, hooks or CI. Add those
 checks with their owning deliveries. `check` and `rust-check` aggregate real
 formatting, lint and test checks; Clippy and tests also compile the code.
-`build` remains a separately available build in its smaller environment.
+`build` uses the default environment's essential toolchain.
 
 ## Commands and scopes
 
@@ -25,15 +26,15 @@ root and use the pinned Pixi-provided Cargo/toolchain.
 
 | Task names | Underlying command or dependencies | Scope and result | Environment | Mutation |
 | --- | --- | --- | --- | --- |
-| `check` / `rust-check` | `rust-format-check`, `rust-lint`, `rust-test` | Aggregate workspace validation | `dev` dependencies | Generated output only |
+| `check` / `rust-check` | `rust-format-check`, `rust-lint`, `rust-test` | Aggregate workspace validation | `dev` | Generated output only |
 | `lint` / `rust-lint` | `cargo clippy --workspace --all-targets --locked -- -D warnings` | Compiler and Clippy lints for all workspace targets; warnings fail | `dev` | Generated output only |
 | `format` / `rust-format` | `cargo fmt --all` | rustfmt for all workspace Rust source | `dev` | Rewrites source |
 | `format-check` / `rust-format-check` | `cargo fmt --all -- --check` | rustfmt inspection of all workspace Rust source; differences fail | `dev` | No source changes |
 | `fix` / `rust-fix` | `cargo clippy --fix --workspace --all-targets --locked -- -D warnings` | Apply available compiler/Clippy suggestions to all workspace targets | `dev` | Rewrites source; may create build output |
 | `test` / `rust-test` | `cargo test --workspace --locked` | Workspace unit, integration and documentation tests | `dev` | Generated output only |
-| `build` / `rust-build` | `cargo build --workspace --locked` | Workspace default-profile compilation and linking | `build` | Generated output only |
-| `agent-run` | `cargo run --locked -p fleetforge-agent --` | Build as needed, then invoke the bootstrap CLI with forwarded arguments | `build` | Generated output only; the current CLI prints and exits |
-| `clean` / `rust-clean` | Host `sh`, then `cargo --config 'build.build-dir="target"' clean --locked --target-dir target` | Remove only repository `target/`; reject a symlink at that path | `build` | Deletes generated build output |
+| `build` / `rust-build` | `cargo build --workspace --locked` | Workspace default-profile compilation and linking | `default` | Generated output only |
+| `agent-run` | `cargo run --locked -p fleetforge-agent --` | Build as needed, then invoke the bootstrap CLI with forwarded arguments | `default` | Generated output only; the current CLI prints and exits |
+| `clean` / `rust-clean` | Host `sh`, then `cargo --config 'build.build-dir="target"' clean --locked --target-dir target` | Remove only repository `target/`; reject a symlink at that path | `default` | Deletes generated build output |
 
 Tasks return zero on success and nonzero on tool, task, environment or lock
 failure. Aggregate tasks propagate dependency failures. A formatter difference,
@@ -50,22 +51,34 @@ including unsuccessful checks. Environment installation, Cargo caches and
 ignored build output can change. See the [development guide](development.md)
 for installation, host prerequisites and deliberate lock upgrades.
 
-## Environment routing
+## Feature and environment composition
 
-Root aliases and the `rust-check` aggregate live in Pixi's implicit `default`
-environment. It has no packages and runs no tool commands; every dependency
-that executes tools explicitly selects `dev` or `build`. The component
-commands live in the shared Rust feature and set `default-environment` for
-direct calls such as `pixi run --locked rust-build`. This avoids an environment
-selection prompt and keeps root build/clean independent of contributor tools.
+| Owner | Dependencies | Tasks |
+| --- | --- | --- |
+| Default feature | Native Rust toolchain and its transitive linker requirements | `build`, `rust-build`, `agent-run`, `clean`, `rust-clean` |
+| `test` feature | None beyond inherited Cargo test support | `test`, `rust-test` |
+| `lint` feature | prek and Commitizen; rustfmt/Clippy are already bundled with Rust | `lint`, `format`, `format-check`, `fix` and their `rust-*` counterparts |
+| `dev` environment | Inherits default and composes `test` plus `lint` | `check`, `rust-check` aggregate the feature tasks |
 
-Use canonical tasks without an environment override. `dev` and `build` exclude
-the default feature, so root aliases and `rust-check` are unavailable with
-`-e dev` or `-e build`. For arbitrary tool commands, continue to choose the
-environment explicitly, for example `pixi run --locked -e build cargo run
---locked -p fleetforge-agent`. Pixi's task working directory is the workspace
-root even when invoked from a component directory. `agent-run` accepts
-executable arguments after `--`:
+The default feature provides essential build/run tools and tasks to the normal
+default environment. Dev inherits those and adds the test/lint features. Both
+use the `toolchain` solve group; declaring default explicitly only assigns its
+group. Default excludes prek/Commitizen and their transitive contributor
+packages. Rust's bundled test, formatter and lint tools do not require separate
+direct dependencies. The root workspace supplies build/run tooling; workload
+releases retain their separate runtime manifests and locks.
+
+Use `pixi run --locked build` and `pixi run --locked agent-run` for application
+work. Use `pixi run --locked -e dev check`, `test`, `lint` or `format-check` for
+validation. Build/run/clean are inherited by dev too; their component commands
+default to the default environment, and build/clean aliases explicitly route
+their dependency there. Dev-only task names can also be called without `-e`:
+Pixi selects their sole owning environment. No extra named test, lint, build or
+language environment is required. Task ownership follows the feature that
+provides the capability; component prefixes identify the code scope.
+
+Pixi tasks run from the workspace root even when invoked from a component
+directory. `agent-run` accepts executable arguments after `--`:
 
 ```sh
 pixi run --locked agent-run
@@ -82,11 +95,12 @@ scopes.
 
 The [official Pixi task documentation](https://pixi.prefix.dev/latest/workspace/advanced_tasks/)
 describes aliases, dependency environments, working directories and command
-defaults; [run](https://pixi.prefix.dev/latest/reference/cli/pixi/run/)
-documents the outer lock check. This configuration is validated with Pixi
-0.82.1, within the project's required 0.82.x series. In that version, aliases
-without a command cannot set `default-environment`; their tool-bearing
-dependencies select it instead.
+defaults; the [manifest reference](https://pixi.prefix.dev/latest/reference/pixi_manifest/#the-feature-and-environments-tables)
+describes default-feature inheritance, solve groups and environment-local
+tasks. [Run](https://pixi.prefix.dev/latest/reference/cli/pixi/run/) documents
+the outer lock check. This configuration is validated with Pixi 0.82.1, within
+the project's required 0.82.x series. Commandless aliases inherit their calling
+environment unless a dependency explicitly selects another environment.
 
 ## Mutation and cleanup
 

@@ -28,7 +28,7 @@ From the repository root:
 
 ```sh
 pixi install --locked -e dev
-pixi install --locked -e build
+pixi install --locked
 pixi run --locked -e dev rustc --version
 pixi run --locked -e dev cargo --version
 pixi run --locked -e dev cargo fmt --version
@@ -39,18 +39,21 @@ pixi run --locked -e dev cz version
 
 | Environment | Purpose | Features |
 | --- | --- | --- |
-| `dev` | Daily development and contributor checks | Rust plus prek and Commitizen |
-| `build` | Compile and link without installing contributor checks | Rust |
+| `default` | Build and invoke the application | Default feature: essential Rust build/run tooling |
+| `dev` | Daily development and contributor checks | Default feature plus `test` and `lint`; adds prek and Commitizen |
 
-Select an environment explicitly with `-e dev` or `-e build`. Both share the
-`toolchain` solve group, keeping shared package versions identical. Neither
-inherits the implicit default feature. Pixi's implicit `default` environment is
-empty; it is not another supported toolchain environment. Unqualified arbitrary
-commands can still resolve host executables through `PATH`, so always use the
-explicit environment for arbitrary Cargo commands. Canonical tasks select their
-own environments as described in the [task reference](tasks.md). The empty
-default environment contains the root task aliases, whose dependencies run
-tools in `dev` or `build`; it does not duplicate the development toolset.
+Commands without `-e` normally use `default`. Use `-e dev` for development
+validation. Both environments share the `toolchain` solve group, keeping shared
+package versions identical. Default is declared explicitly only to assign that
+group; dev automatically inherits the default feature's dependencies and tasks.
+There is no separate `build` environment. The task reference owns
+[feature/task composition](tasks.md#feature-and-environment-composition).
+
+Test support, rustfmt and Clippy are bundled with the default Rust package.
+The `test` feature therefore initially needs only tasks; `lint` owns its tasks
+and the additional contributor packages. Unqualified arbitrary commands can
+still resolve host executables through `PATH`; use the documented Pixi-provided
+tools rather than relying on undeclared host packages.
 
 Git is a host prerequisite used by prek and Commitizen as well as by the
 contributor. It is not installed or version-pinned by this workspace.
@@ -75,11 +78,11 @@ system satisfying that baseline.
 Use the canonical task interface for routine development:
 
 ```sh
-pixi run --locked check
+pixi run --locked -e dev check
 pixi run --locked build
-pixi run --locked format-check
-pixi run --locked lint
-pixi run --locked test
+pixi run --locked -e dev format-check
+pixi run --locked -e dev lint
+pixi run --locked -e dev test
 pixi run --locked agent-run
 pixi run --locked agent-run -- --help
 pixi run --locked agent-run -- --version
@@ -90,14 +93,14 @@ components. The [task reference](tasks.md) owns every task's tools, scope,
 environment, mutation and exit behavior, including explicit `format`/`fix`
 commands, agent invocation and safe generated-build cleanup. `agent-run`
 builds as needed and forwards arguments after `--` to the executable. Run
-canonical tasks without `-e`;
-use the explicit environment when invoking arbitrary tools directly:
+build/run tasks in default and checking tasks in dev. Equivalent direct tool
+commands are:
 
 ```sh
-pixi run --locked -e build cargo build --workspace --locked
-pixi run --locked -e build cargo run --locked -p fleetforge-agent
-pixi run --locked -e build cargo run --locked -p fleetforge-agent -- --help
-pixi run --locked -e build cargo run --locked -p fleetforge-agent -- --version
+pixi run --locked cargo build --workspace --locked
+pixi run --locked cargo run --locked -p fleetforge-agent
+pixi run --locked cargo run --locked -p fleetforge-agent -- --help
+pixi run --locked cargo run --locked -p fleetforge-agent -- --version
 pixi run --locked -e dev cargo test --workspace --locked
 pixi run --locked -e dev cargo fmt --all -- --check
 pixi run --locked -e dev cargo clippy --workspace --all-targets --locked -- -D warnings

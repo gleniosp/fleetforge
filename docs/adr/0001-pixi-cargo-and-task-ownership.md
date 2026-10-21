@@ -18,11 +18,13 @@ ownership.
 
 ## Decision
 
-Root `pixi.toml` is the canonical tooling/task entry point. Use composable
-features for a shared Rust toolchain and contributor tools, with named `dev` and
-`build` environments and explicit default-feature/task routing. Keep common
-package versions aligned with an appropriate solve group. Build excludes
-dev-only tools.
+Root `pixi.toml` is the canonical tooling/task entry point. The default feature
+owns essential root build/run dependencies and their tasks. The normal default
+environment builds and invokes the application. The named `dev` environment
+inherits the default feature and composes `test` and `lint` features, which own
+their respective dependencies and tasks. Both environments share the
+`toolchain` solve group, keeping common package versions identical. Default
+build/run excludes contributor-only packages.
 
 Cargo owns Rust dependencies/builds/tests. Start with a virtual workspace and
 one meaningful `fleetforge-agent` executable, Rust edition 2024 and explicit
@@ -32,7 +34,7 @@ path. Share metadata/lints and inherit them explicitly. Forbid unsafe code in
 the initial project packages; use rustfmt and Clippy without blanket pedantic
 policies.
 
-The dev environment includes prek and Commitizen. `prek.toml` owns project
+The lint feature supplies prek and Commitizen to dev. `prek.toml` owns project
 hooks; pre-commit checks source/configuration, commit-msg validates Conventional
 Commits. CI runs the same checks plus commit-range validation. Add Ruff
 lint/format and mypy with Python code, and frontend tooling with SvelteKit. Put
@@ -82,11 +84,21 @@ toolchain. The target-specific `rust_linux-64` activation package is unnecessary
 for the native build. Avoid redundant direct dependencies for those implementation
 packages; their resolved versions belong in `pixi.lock`.
 
-`dev` contains Rust and contributor checks; `build` contains Rust without those
-checks. Keep Pixi's implicit default feature/environment empty and select named
-environments explicitly. No duplicate development environment or future
-split is needed. Both named environments use the same solve group.
-Git remains a host prerequisite, including for subprocesses of contributor tools.
+The default feature currently needs only the native Rust package. Its bundled
+Cargo test support, rustfmt and Clippy remain installed in both environments;
+separating task ownership does not require redundant direct packages. The test
+feature initially contains real test tasks without additional dependencies.
+The lint feature groups lint/format tasks and contributor validation tools.
+Component-prefixed task names identify language scope; introduce separate
+language features only when actual composition needs justify them.
+
+Build/run/cleanup tasks belong to default and are inherited by dev. Aggregates
+that combine test and lint work belong to dev's environment-local tasks. Use
+`pixi run --locked build` or `agent-run` for normal application work, and
+`pixi run --locked -e dev check` for development validation. Explicitly declare
+default's solve-group membership without adding another named build
+environment. Git remains a host prerequisite, including for subprocesses of
+contributor tools.
 
 Use Pixi's platform defaults unless a demonstrated dependency or supported host
 requires an explicit virtual package override. Exact tool pins make upgrades

@@ -1,5 +1,9 @@
 # Canonical task and editor validation
 
+This records the initial task delivery. The subsequent maintainer-approved
+default/test/lint composition and its rerun evidence are in the
+[composition journal](2026-10-21-pixi-feature-composition.md).
+
 - **Date:** 2026-10-21
 - **Delivery:** [M0-05, issue #5](https://github.com/gleniosp/fleetforge/issues/5)
 - **Source:** Working tree on `build/5-canonical-pixi-tasks`, based on

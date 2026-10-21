@@ -4,35 +4,18 @@ channels = ["conda-forge"]
 platforms = ["linux-64"]
 requires-pixi = ">=0.82.0,<0.83"
 
-[feature.rust.dependencies]
+[dependencies]
 # Includes Cargo, rustfmt, Clippy and the native Linux linker dependencies.
 rust = "=1.98.1"
 
 [tasks]
-# Aliases run no tools in the empty default environment; dependencies pin the
-# environment that actually executes each command.
-check = { depends-on = ["rust-check"], description = "Check all implemented components without rewriting source or locks" }
-lint = { depends-on = [{ task = "rust-lint", environment = "dev" }], description = "Lint all implemented components" }
-format = { depends-on = [{ task = "rust-format", environment = "dev" }], description = "Rewrite source formatting; review the resulting diff" }
-format-check = { depends-on = [{ task = "rust-format-check", environment = "dev" }], description = "Check source formatting without rewriting files" }
-fix = { depends-on = [{ task = "rust-fix", environment = "dev" }], description = "Apply lint suggestions with Cargo's Git safety checks" }
-test = { depends-on = [{ task = "rust-test", environment = "dev" }], description = "Run all implemented component tests" }
-build = { depends-on = [{ task = "rust-build", environment = "build" }], description = "Build all implemented components" }
-clean = { depends-on = [{ task = "rust-clean", environment = "build" }], description = "Remove only repository target/ build output" }
+# Build/run tasks belong to the default feature, inherited by dev.
+build = { depends-on = [{ task = "rust-build", environment = "default" }], description = "Build all implemented components" }
+clean = { depends-on = [{ task = "rust-clean", environment = "default" }], description = "Remove only repository target/ build output" }
+rust-build = { cmd = "cargo build --workspace --locked", default-environment = "default", description = "Build the Rust workspace in the default environment" }
+agent-run = { cmd = "cargo run --locked -p fleetforge-agent --", default-environment = "default", description = "Build and run the agent bootstrap CLI; forward arguments to the executable" }
 
-rust-check = { depends-on = [{ task = "rust-format-check", environment = "dev" }, { task = "rust-lint", environment = "dev" }, { task = "rust-test", environment = "dev" }], description = "Check Rust formatting, lints and tests" }
-
-[feature.rust.tasks]
-# Defaults select the toolchain for direct component task invocation.
-rust-lint = { cmd = "cargo clippy --workspace --all-targets --locked -- -D warnings", default-environment = "dev", description = "Run Clippy on all workspace targets, denying warnings" }
-rust-format = { cmd = "cargo fmt --all", default-environment = "dev", description = "Format all workspace Rust source with rustfmt" }
-rust-format-check = { cmd = "cargo fmt --all -- --check", default-environment = "dev", description = "Check all workspace Rust source with rustfmt" }
-rust-fix = { cmd = "cargo clippy --fix --workspace --all-targets --locked -- -D warnings", default-environment = "dev", description = "Apply Clippy/compiler suggestions; refuse dirty or staged work" }
-rust-test = { cmd = "cargo test --workspace --locked", default-environment = "dev", description = "Run workspace unit, integration and documentation tests" }
-rust-build = { cmd = "cargo build --workspace --locked", default-environment = "build", description = "Build the Rust workspace in the build environment" }
-agent-run = { cmd = "cargo run --locked -p fleetforge-agent --", default-environment = "build", description = "Build and run the agent bootstrap CLI; forward arguments to the executable" }
-
-[feature.rust.tasks.rust-clean]
+[tasks.rust-clean]
 cmd = ["sh", "-eu", "-c", '''
 if test -L target; then
     echo 'Refusing to clean symlinked target/' >&2
@@ -40,14 +23,38 @@ if test -L target; then
 fi
 exec cargo --config 'build.build-dir="target"' clean --locked --target-dir target
 ''']
-default-environment = "build"
+default-environment = "default"
 description = "Clean fixed repository target/; refuse a symlink"
 
-[feature.development.dependencies]
+[feature.test.tasks]
+# Cargo supplies Rust test support; no additional test package is needed.
+test = { depends-on = ["rust-test"], description = "Run all implemented component tests" }
+rust-test = { cmd = "cargo test --workspace --locked", description = "Run workspace unit, integration and documentation tests" }
+
+[feature.lint.dependencies]
 prek = "=0.5.6"
 commitizen = "=4.19.2"
 
+[feature.lint.tasks]
+# rustfmt and Clippy are already included in the default Rust package.
+lint = { depends-on = ["rust-lint"], description = "Lint all implemented components" }
+format = { depends-on = ["rust-format"], description = "Rewrite source formatting; review the resulting diff" }
+format-check = { depends-on = ["rust-format-check"], description = "Check source formatting without rewriting files" }
+fix = { depends-on = ["rust-fix"], description = "Apply lint suggestions with Cargo's Git safety checks" }
+rust-lint = { cmd = "cargo clippy --workspace --all-targets --locked -- -D warnings", description = "Run Clippy on all workspace targets, denying warnings" }
+rust-format = { cmd = "cargo fmt --all", description = "Format all workspace Rust source with rustfmt" }
+rust-format-check = { cmd = "cargo fmt --all -- --check", description = "Check all workspace Rust source with rustfmt" }
+rust-fix = { cmd = "cargo clippy --fix --workspace --all-targets --locked -- -D warnings", description = "Apply Clippy/compiler suggestions; refuse dirty or staged work" }
+
 [environments]
-# Select dev or build explicitly; Pixi's implicit default feature stays empty.
-dev = { features = ["rust", "development"], solve-group = "toolchain", no-default-feature = true }
-build = { features = ["rust"], solve-group = "toolchain", no-default-feature = true }
+# Declare default only to keep shared package versions aligned with dev.
+default = { solve-group = "toolchain" }
+
+[environments.dev]
+features = ["test", "lint"]
+solve-group = "toolchain"
+
+[environments.dev.tasks]
+# Aggregates belong to the environment that composes both checking features.
+check = { depends-on = ["rust-check"], description = "Check all implemented components without rewriting source or locks" }
+rust-check = { depends-on = ["rust-format-check", "rust-lint", "rust-test"], description = "Check Rust formatting, lints and tests" }

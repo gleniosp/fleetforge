@@ -47,7 +47,7 @@ dpkg-query -W ca-certificates
 snapshot > /tmp/original.sha256
 pixi install --locked --all
 
-for environment in dev build; do
+for environment in default dev; do
     pixi run --locked -e "$environment" bash -eu -c '
         for tool in rustc cargo rustfmt cargo-clippy; do
             path=$(command -v "$tool")
@@ -62,7 +62,7 @@ for environment in dev build; do
         rustfmt --version
         cargo clippy --version
         "$linker" --version
-        if [ "$PIXI_ENVIRONMENT_NAME" = build ]; then
+        if [ "$PIXI_ENVIRONMENT_NAME" = default ]; then
             ! command -v prek
             ! command -v cz
             ! command -v python
@@ -85,26 +85,26 @@ done
 
 pixi run --locked -e dev cargo fmt --all -- --check
 pixi run --locked -e dev cargo clippy --workspace --all-targets --locked --offline -- -D warnings
-pixi run --locked -e build cargo build --workspace --release --locked --offline
-output=$(pixi run --locked -e build cargo run --locked --offline -p fleetforge-agent)
+pixi run --locked cargo build --workspace --release --locked --offline
+output=$(pixi run --locked cargo run --locked --offline -p fleetforge-agent)
 test "$output" = 'fleetforge-agent 0.1.0 (x86_64-linux; bootstrap diagnostic)'
 snapshot > /tmp/validated.sha256
 cmp /tmp/original.sha256 /tmp/validated.sha256
 
 # Test drift on disposable copies only, including all source/lockfile hashes.
 sed -i 's/rust = "=1.98.1"/rust = "=1.98.0"/' pixi.toml
-expect_failure 'not up.to.date|out.of.date' pixi install --locked -e build
-expect_failure 'not up.to.date|out.of.date' pixi run --locked -e build cargo build --locked
+expect_failure 'not up.to.date|out.of.date' pixi install --locked
+expect_failure 'not up.to.date|out.of.date' pixi run --locked cargo build --locked
 cp /source/pixi.toml pixi.toml
 
 sed -i 's/version = "0.1.0"/version = "0.1.1"/' Cargo.toml
 expect_failure 'lock.*needs to be updated|cannot update.*lock' \
-    pixi run --locked -e build cargo build --workspace --locked --offline
+    pixi run --locked cargo build --workspace --locked --offline
 cp /source/Cargo.toml Cargo.toml
 
 printf 'fn main() { unsafe {} }\n' > apps/agent/src/main.rs
 expect_failure 'usage of an.*unsafe.*block' \
-    pixi run --locked -e build cargo check --workspace --locked --offline
+    pixi run --locked cargo check --workspace --locked --offline
 cp /source/apps/agent/src/main.rs apps/agent/src/main.rs
 
 snapshot > /tmp/restored.sha256
