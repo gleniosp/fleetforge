@@ -61,36 +61,30 @@ were changed or private reporting endpoint advertised.
 
 ## Validation
 
-Used Linux x86_64, Pixi 0.82.1, Cargo 1.98.1, prek 0.5.6, Python 3.14.4, and
-the already available PyYAML 6.0.3. Commands and results:
+Used Linux x86_64, Pixi 0.82.1, Cargo 1.98.1, and prek 0.5.6. Commands and
+results:
 
 | Command | Result |
 | --- | --- |
-| `cmp LICENSE /tmp/fleetforge-apache-2.0.txt` | Exact match to downloaded Apache text |
+| `curl -fsSL https://www.apache.org/licenses/LICENSE-2.0.txt \| cmp - LICENSE` | Exact match to Apache's published license text |
 | `pixi run --locked cargo metadata --locked --format-version 1 --no-deps` | Agent resolves `Apache-2.0`, publication remains disabled, zero external Cargo dependencies |
 | `pixi run --locked -e dev hooks-check` | Passed repository formatting, Clippy, and hook configuration checks |
-| `python3 /tmp/fleetforge-issue8-review.py` | Passed changed/new file endings, Markdown links/fragments/fences, form/chooser structures, and license metadata consistency |
 | `git diff --check` | Passed |
 | `git diff --exit-code -- Cargo.lock pixi.lock` | Passed; both lockfiles unchanged |
 
-The hook command initially failed because the sandbox could not write
-`~/.cache/prek/prek.log`. Re-ran the same command with the specific environment
-approval and it passed. The temporary Python helper checks all changed and new
-files, including untracked policies/forms. It parses YAML/TOML, verifies form
-IDs and required-input types, checks the bug reproduction field remains
-required, resolves local links/fragments and GitHub source links into this
-checkout, and compares the license and resolved metadata. The helper and
-downloaded references are local review aids under `/tmp`, not supported project
-tools or new development dependencies.
+An initial hook run was blocked by the sandbox's access to prek's log cache; the
+same repository command passed after access was granted. Manually reviewed the
+changed documents, form structure and required fields, and local link targets.
+The forms have not been rendered by GitHub.
 
-Manually reviewed every changed/new policy and form, the complete tracked diff,
-and the examples for credential/private-data content and unsupported security
-claims. Reviewed the security-report flow: an ordinary bug retains reproduction
-fields; a sensitive finding uses the initial-contact form without posting its
-details; further sensitive evidence waits for an agreed private route. Reviewed
-that provenance obligations retain upstream licenses and notices rather than
-claiming that Apache-2.0 covers dependencies. The new conduct text is original
-project policy rather than an attributed external conduct template.
+Manually reviewed the changed policies and examples for credential/private-data
+content and unsupported security claims. Reviewed the security-report flow: an
+ordinary bug retains reproduction fields; a sensitive finding uses the
+initial-contact form without posting its details; further sensitive evidence
+waits for an agreed private route. Reviewed that provenance obligations retain
+upstream licenses and notices rather than claiming that Apache-2.0 covers
+dependencies. The conduct text is original project policy rather than an
+attributed external conduct template.
 
 ## Limits and handoff
 

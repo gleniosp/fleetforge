@@ -83,9 +83,11 @@ runtime evidence; do not add speculative future infrastructure or no-op tasks.
 
 A review-ready delivery contains its complete code, essential tests,
 migrations/configuration, documentation, and necessary decisions/evidence.
-Run relevant validation, including meaningful failure cases for the behavior,
-and record exact commands, inputs/versions, results, source revision, and limits
-in the owning repository evidence and PR. Identify uncommitted work as the
+Run validation relevant to the change, including meaningful failure cases, and
+report only checks actually performed. Record reproducible commands, repository
+inputs, versions, results, source revision, and limits in the owning evidence and
+PR. Do not cite temporary paths or files absent from the repository as validation
+evidence; label manual review explicitly. Identify uncommitted work as the
 working tree based on a known revision rather than inventing a future commit ID.
 Report unavailable checks or failed assumptions explicitly. A ready PR must
 contain everything required to move to dependent work after merge; a draft may
