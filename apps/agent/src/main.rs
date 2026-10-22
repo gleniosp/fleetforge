@@ -19,7 +19,6 @@ enum Action {
 }
 
 fn main() -> io::Result<ExitCode> {
-    let unused_ci_sentinel = 1;
     let mut arguments = std::env::args_os().skip(1);
     let action = match arguments.next() {
         None => Action::Diagnostic,
@@ -63,4 +62,9 @@ fn invalid_argument(argument: &OsStr) -> io::Result<ExitCode> {
     )?;
     stderr.flush()?;
     Ok(ExitCode::from(2))
+}
+
+#[test]
+fn ci_failure_sentinel() {
+    panic!("CI controlled test failure sentinel");
 }
