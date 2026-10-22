@@ -61,3 +61,15 @@ agreement](docs/working-agreement.md), including branch names such as
 owns approval and merge. [CONTRIBUTING.md](CONTRIBUTING.md) is the contributor
 entry point; [AGENTS.md](AGENTS.md) routes agent instructions and repository
 skills.
+
+## License and community
+
+Copyright 2026 FleetForge contributors. FleetForge's original code,
+documentation, and configuration are licensed under the
+[Apache License, Version 2.0](LICENSE), unless a file states otherwise.
+Third-party materials retain their own licenses; see the
+[provenance and distribution guidance](THIRD_PARTY.md).
+
+Read the [security policy](SECURITY.md) before reporting a suspected
+vulnerability and the [code of conduct](CODE_OF_CONDUCT.md) for participation
+and reporting expectations.

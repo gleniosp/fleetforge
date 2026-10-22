@@ -8,6 +8,10 @@ body:
         problem or approach still needs discussion. Maintainers validate scope and
         assign task IDs, requirement mappings, priority, milestone, and native blockers.
         Delivery follows the [working agreement](https://github.com/gleniosp/fleetforge/blob/main/docs/working-agreement.md).
+        Keep credentials, personal data, and private fleet/network details out of
+        this form and attachments. Follow the
+        [security policy](https://github.com/gleniosp/fleetforge/blob/main/SECURITY.md)
+        before posting suspected vulnerability details.
   - type: textarea
     id: outcome
     attributes:

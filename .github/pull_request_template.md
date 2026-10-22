@@ -4,7 +4,7 @@
 
 ## Change
 
-<!-- Describe the problem and resulting behavior. For an exploratory PR, explain how it helps validate the issue and what remains uncertain. -->
+<!-- Describe the problem and resulting behavior. For an exploratory PR, explain how it helps validate the issue and what remains uncertain. For new or changed third-party material, include source, version, license/notices and modifications under THIRD_PARTY.md. Keep secrets and private data out of the diff, description and attachments; follow SECURITY.md for suspected vulnerabilities. -->
 
 ## Validation
 
