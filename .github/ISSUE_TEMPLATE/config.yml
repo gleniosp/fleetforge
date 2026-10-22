@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Security reporting policy
-    url: https://github.com/gleniosp/fleetforge/blob/main/SECURITY.md
-    about: Read how to request security contact through an issue without posting sensitive details.
+  - name: Report a vulnerability privately
+    url: https://github.com/gleniosp/fleetforge/security/advisories/new
+    about: Submit a confidential security report to maintainers. Do not use public issues for vulnerabilities.
   - name: Contribution guidance
     url: https://github.com/gleniosp/fleetforge/blob/main/CONTRIBUTING.md
     about: Read how to propose issues, submit fork-based PRs, and work with maintainer review.
