@@ -18,7 +18,8 @@ enum Action {
     Version,
 }
 
-fn main()->io::Result<ExitCode>{
+fn main() -> io::Result<ExitCode> {
+    let unused_ci_sentinel = 1;
     let mut arguments = std::env::args_os().skip(1);
     let action = match arguments.next() {
         None => Action::Diagnostic,
