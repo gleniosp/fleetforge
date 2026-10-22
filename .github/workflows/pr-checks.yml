@@ -1,0 +1,55 @@
+name: PR checks
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-checks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Repository checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out the pull request
+        id: checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install locked Pixi environments
+        uses: prefix-dev/setup-pixi@ad1da6449d9e506fd127fd67ab2d054a769f6a94 # v0.11.2
+        with:
+          pixi-version: v0.82.1
+          environments: dev default
+          locked: true
+          cache: false
+
+      - name: Check proposed commit messages
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: pixi run --locked -e dev commit-check-range "$PR_BASE..$PR_HEAD"
+
+      - name: Run all-file hooks
+        run: pixi run --locked -e dev hooks-check
+
+      - name: Run tests
+        run: pixi run --locked -e dev test
+
+      - name: Build
+        run: pixi run --locked build
+
+      - name: Check tracked-file stability
+        if: ${{ always() && steps.checkout.outcome == 'success' }}
+        run: |
+          git diff --exit-code
+          git diff --cached --exit-code

@@ -158,9 +158,18 @@ or enable auto-merge. Select another task when asked after merge.
 Issues own scope, native blockers, priority, and acceptance checklists. Keep
 blocker text and native links aligned when authorized scope changes. Validation
 commands/results, delivery summaries, and change feedback belong in repository
-evidence and PRs, not issue comments. Record only evidenced checklist completion;
-an implemented issue stays open until its default-branch PR containing
-`Closes #N` merges. Never close it manually.
+evidence and PRs, not issue comments. Record only evidenced checklist completion.
+
+Before raising or updating a PR, reconcile every corresponding issue's
+description, acceptance and validation checklists, and dependencies with the
+agreed delivered scope. Before marking the PR ready for final maintainer review,
+all applicable issue checklist items must be completed and checked with evidence.
+Do not check unsupported items or remove unfinished requirements merely to make
+the checklist pass; keep incomplete work explicit in a draft PR. Include a
+separate `Closes #<issue-number>` in the default-branch PR body for every fully
+delivered issue. The number identifies the issue, not the PR. GitHub closes the
+issue when the maintainer merges the PR; approval alone does not close it.
+Keep the issue open until that merge and never close it manually.
 
 Milestone completion requires every scoped delivery and its exit evidence, not
 just no remaining unchecked boxes. Inspect merged deliveries, requirement
