@@ -2,6 +2,11 @@
 
 **Local-first, Pixi-native robot software lifecycle management.**
 
+> **Heavy development:** FleetForge is under active development. Interfaces,
+> setup, and plans may change, and breaking changes are expected. Much of the
+> planned functionality is not implemented yet; see [Current state](#current-state)
+> for what exists today.
+
 An operator declares which software a robot should run. A Rust/Tokio agent on
 each managed device durably accepts authorized intent, prepares software with
 Pixi, supervises the workload, verifies health, and owns local recovery.
