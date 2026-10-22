@@ -17,7 +17,10 @@ edit history and reasons for revisions in journals, issues, PRs and Git history.
 | [GitHub issues](https://github.com/gleniosp/fleetforge/issues) | Live task scope, dependencies, priority, checklists, and review/merge progress |
 | [GitHub milestones](https://github.com/gleniosp/fleetforge/milestones) | Delivery grouping, milestone exit criteria, and progress |
 | [Working agreement](working-agreement.md) | Task selection, delivery permissions, review/commit/publication flow, issue sizing, and milestone exit |
-| [Contributing](../CONTRIBUTING.md) | Public issue validation, fork/PR submissions, and optional global GitHub CLI usage |
+| [Contributing](../CONTRIBUTING.md) | Public issue validation, fork/PR submissions, project decision ownership, and optional global GitHub CLI usage |
+| [License](../LICENSE) and [third-party guidance](../THIRD_PARTY.md) | Original project license and provenance/notice responsibilities for contributions and distributions |
+| [Security policy](../SECURITY.md) | Supported scope, vulnerability reporting route, and reporting-service limits |
+| [Code of conduct](../CODE_OF_CONDUCT.md) | Participation, conduct reports, and provisional maintainer-owned moderation |
 | [Guides](guides/) | Supported setup and workflows |
 | [Task reference](guides/tasks.md) | Canonical task tools, scopes, environments, mutation and exit behavior |
 | [Experiments](experiments/) | Reproducible investigation of bounded technical questions |

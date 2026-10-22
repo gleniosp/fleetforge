@@ -8,6 +8,11 @@ body:
         review the [roadmap](https://github.com/gleniosp/fleetforge/blob/main/docs/roadmap.md).
         Maintainers will assess the idea and its scope. You may link an exploratory
         PR from your fork to help validate the issue; acceptance is decided in review.
+        Use sanitized or synthetic examples; exclude credentials, personal data,
+        and private fleet/network details from text and attachments. Suspected
+        vulnerabilities follow the
+        [security policy](https://github.com/gleniosp/fleetforge/blob/main/SECURITY.md)
+        before any details are posted here.
         See the [contribution guide](https://github.com/gleniosp/fleetforge/blob/main/CONTRIBUTING.md).
   - type: textarea
     id: problem
@@ -34,6 +39,6 @@ body:
     id: validation
     attributes:
       label: Supporting example or PR
-      description: Link a small example or exploratory PR if you have one, and explain what it demonstrates or leaves unresolved.
+      description: Give a small sanitized example of the current limitation or link an exploratory PR. Explain what it demonstrates or leaves unresolved.
     validations:
       required: false

@@ -6,7 +6,11 @@ body:
       value: |
         Search [existing issues](https://github.com/gleniosp/fleetforge/issues) first.
         Describe a problem with the current project; maintainers will assess its
-        validity and scope. Remove credentials and private data from examples.
+        validity and scope. Remove tokens, passwords, private keys, personal data,
+        and private fleet/network details from examples and attachments.
+        For suspected vulnerabilities or exposed credentials, follow the
+        [security policy](https://github.com/gleniosp/fleetforge/blob/main/SECURITY.md)
+        and use the security contact form without sensitive details.
         See the [contribution guide](https://github.com/gleniosp/fleetforge/blob/main/CONTRIBUTING.md).
   - type: textarea
     id: actual-behavior

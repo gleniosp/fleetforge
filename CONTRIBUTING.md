@@ -19,6 +19,15 @@ sanitized output when available. Maintainers assess validity, scope, priority,
 and dependencies and may request more information. Contributors do not need to
 assign internal task IDs, requirement IDs, milestones, or priority labels.
 
+Issue forms and PRs are public reporting surfaces when the repository is public;
+repository visibility is not a substitute for a private reporting channel.
+Remove tokens, passwords, private keys, personal data, and private fleet or
+network details from reports, logs, screenshots, archives, and Git history.
+Use synthetic examples where possible. Follow [SECURITY.md](SECURITY.md) for
+suspected vulnerabilities, including accidental credential exposure, before
+posting technical details. The [code of conduct](CODE_OF_CONDUCT.md) covers
+participation and conduct concerns.
+
 Discuss substantial changes before investing in implementation. You can also
 open a linked draft or exploratory PR to help validate the issue and demonstrate
 an approach while that discussion is ongoing. Maintainers evaluate both the
@@ -157,6 +166,29 @@ helps structure those records. Consult the agreement's
 [permissions and upstream policy](docs/working-agreement.md#permissions-and-upstream-collaboration)
 before external or privileged actions.
 
-Licensing, distribution provenance, and contributor safety policy are owned by
-[#8](https://github.com/gleniosp/fleetforge/issues/8); this guide does not
-establish a license grant or a vulnerability reporting service.
+## Licensing and provenance
+
+Submit only material you have the right to contribute. Contributions intended
+for inclusion in FleetForge are under the project's
+[Apache-2.0 license](LICENSE), unless explicitly stated otherwise and accepted
+by the maintainer; see section 5 of that license. Preserve third-party terms and
+attribution rather than presenting external work as original project work.
+Follow [THIRD_PARTY.md](THIRD_PARTY.md) for source, dependency, image, and release
+input provenance and the information reviewers need. Flag uncertain permissions
+before asking for inclusion.
+
+## Project decisions and conduct
+
+The repository maintainer, [gleniosp](https://github.com/gleniosp), decides issue
+scope, contribution acceptance, and project policy. The
+[working agreement](docs/working-agreement.md) owns the delivery and review
+process. Ordinary technical or policy questions belong in a focused issue or
+PR; explain the reason for a proposed change and allow others to disagree
+respectfully. Maintainers should explain material decisions in the relevant
+discussion without exposing private reports.
+
+The [code of conduct](CODE_OF_CONDUCT.md) owns conduct expectations, reporting,
+and the limits of the provisional enforcement process. The
+[security policy](SECURITY.md) owns vulnerability reporting and current support
+limits. These policies may be refined as the project and maintainer capacity
+grow; they do not promise a staffed reporting service.

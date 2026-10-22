@@ -1,0 +1,22 @@
+name: Security concern (initial contact)
+description: Request maintainer contact without disclosing sensitive vulnerability details.
+title: "Security contact request"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Read the [security policy](https://github.com/gleniosp/fleetforge/blob/main/SECURITY.md).
+        This is an ordinary GitHub issue visible to everyone with repository
+        access and public when the repository is public. It is not confidential.
+        Do not include exploit instructions, sensitive reproductions, tokens,
+        passwords, private keys, personal data, private fleet/network details,
+        or attachments containing them. Request contact and wait for the
+        maintainer to agree a private route before sharing sensitive details.
+  - type: textarea
+    id: contact-request
+    attributes:
+      label: Contact request
+      description: A request for maintainer contact is enough. Optionally name the affected component and source revision if safe to share. Keep vulnerability details out of this issue and its title.
+      value: I would like to report a security concern. Please arrange a private follow-up route.
+    validations:
+      required: true
