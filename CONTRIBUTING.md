@@ -124,6 +124,30 @@ using the [development guide](docs/guides/development.md#local-hooks-and-commit-
 The [task reference](docs/guides/tasks.md#hooks-and-commit-messages) owns manual
 message/history checks, checker exemptions and staged-content behavior.
 
+## PR checks and maintainer review
+
+Every PR targeting `main` runs the **PR checks / Repository checks** job, including
+documentation-only PRs. It installs locked tools without restored caches, checks
+all files through prek, runs tests/builds and validates proposed commit messages.
+The [development guide](docs/guides/development.md#pr-checks)
+documents the runner, revision selection and local reproduction.
+Inspect failures in the Actions step logs.
+For fork PRs, a maintainer may need to approve the workflow run first.
+
+Recommended `main` rules are to require a PR, require the **Repository checks**
+status check from GitHub Actions, require the branch to be up to date, and
+require maintainer review of the final diff. Configure approving-review counts
+for the available maintainers; GitHub prevents authors from approving their
+own PRs. The working agreement's local review and maintainer-controlled merge
+still apply to a sole maintainer's own PR. Dismiss stale approvals when the
+reviewed code changes. These are recommendations for maintainer configuration;
+the workflow does not change repository rules or enable auto-merge.
+
+A green check establishes automated validation, not approval of scope,
+provenance, security claims or milestone completion. Maintainers review those
+and decide whether to merge under the
+[working agreement](docs/working-agreement.md#review-commits-and-publication).
+
 ## Evidence and permissions
 
 Use [ADR 0003](docs/adr/0003-bounded-decisions-and-evidence.md) for bounded

@@ -150,7 +150,49 @@ These install the pre-commit and commit-msg stages, then run the source checks.
 The [task reference](tasks.md#hooks-and-commit-messages) owns hook scope,
 installation behavior, staged-content handling and manual message/history
 commands. Follow the [commit-writing convention](../working-agreement.md#review-commits-and-publication)
-when preparing commits. GitHub Actions integration is owned by #7.
+when preparing commits.
+
+## PR checks
+
+[PR checks](../../.github/workflows/pr-checks.yml) runs for PRs targeting `main`,
+including documentation-only changes. One **Repository checks** job uses the
+hosted Ubuntu 24.04 x86_64 runner and Pixi 0.82.1. Actions use full commit-SHA
+pins; the workflow grants only `contents: read` and does not persist checkout
+credentials. Fork workflows may need maintainer approval to run.
+
+Setup installs the locked `dev` and `default` environments with caching disabled.
+The job then runs the canonical tasks:
+
+```sh
+pixi run --locked -e dev commit-check-range "$PR_BASE..$PR_HEAD"
+pixi run --locked -e dev hooks-check
+pixi run --locked -e dev test
+pixi run --locked build
+```
+
+`hooks-check` runs formatting, Clippy and hook-configuration checks through
+`check`; it does not execute tests. The separate `test` and `build` tasks
+exercise the workspace tests and the default build environment.
+
+Full checkout history supports commit validation from the event's base SHA to
+its proposed head SHA. This includes proposed side-branch commits and uses the
+existing `Merge ` message exemption for real merge commits. Source checks use
+GitHub's merge checkout; its synthetic merge message is outside that range.
+PRs have an existing base, so root-commit handling is unnecessary here.
+
+After validation, `git diff --exit-code` and `git diff --cached --exit-code`
+reject tracked changes to source, configuration or locks, including index
+changes. This step also runs after failures when checkout succeeded. Ignored
+build/environment outputs are expected. GitHub's normal step logs contain
+command output and failure diffs; there is no separate diagnostic artifact.
+Superseded runs are cancelled and jobs have a 30-minute timeout.
+
+For local reproduction, install both locked environments, set `PR_BASE` and
+`PR_HEAD` to an explicit nonempty PR revision range, and run the commands above.
+The [delivery journal](../journal/2026-10-22-github-actions.md) records local
+success/failure validation and the remaining hosted-run verification. See the
+[contribution policy](../../CONTRIBUTING.md#pr-checks-and-maintainer-review)
+for recommended required checks and maintainer review.
 
 ## Locks and deliberate upgrades
 

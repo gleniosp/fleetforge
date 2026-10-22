@@ -173,8 +173,9 @@ messages have no prefix exemption. Empty messages fail. Syntax validation does
 not assess whether a subject is imperative or a commit is coherent; reviewers
 own those checks under the [working agreement](../working-agreement.md#review-commits-and-publication).
 
-All-file hooks do not supply a commit message or audit history. CI's owning
-delivery (#7) runs hooks, tests, builds and `commit-check-range` separately,
+All-file hooks do not supply a commit message or audit history. The
+[PR checks workflow](development.md#pr-checks) introduced by #7 runs
+hooks, tests, builds and `commit-check-range` separately,
 avoiding a duplicate `check` invocation. Range validation needs the actual base,
 proposed head and sufficient history. `BASE..HEAD` excludes the base; a single
 revision such as `HEAD` checks
