@@ -37,7 +37,11 @@ jobs:
         env:
           PR_BASE: ${{ github.event.pull_request.base.sha }}
           PR_HEAD: ${{ github.event.pull_request.head.sha }}
-        run: pixi run --locked -e dev commit-check-range "$PR_BASE..$PR_HEAD"
+        run: |
+          # Temporary validation fixture: keep invalid messages out of published history.
+          tree=$(git rev-parse "$PR_HEAD^{tree}")
+          invalid_head=$(printf 'controlled invalid commit message\n' | git -c user.name='CI validation fixture' -c user.email='ci-fixture@example.invalid' commit-tree "$tree" -p "$PR_HEAD")
+          pixi run --locked -e dev commit-check-range "$PR_BASE..$invalid_head"
 
       - name: Run all-file hooks
         run: pixi run --locked -e dev hooks-check

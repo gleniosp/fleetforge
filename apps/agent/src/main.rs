@@ -63,8 +63,3 @@ fn invalid_argument(argument: &OsStr) -> io::Result<ExitCode> {
     stderr.flush()?;
     Ok(ExitCode::from(2))
 }
-
-#[test]
-fn ci_failure_sentinel() {
-    panic!("CI controlled test failure sentinel");
-}
