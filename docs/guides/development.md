@@ -9,10 +9,11 @@ records versions, clean installation and failure evidence.
 
 Use Linux x86_64. Ubuntu 24.04 is the reference distribution. Install
 [Pixi](https://pixi.prefix.dev/latest/installation/)
-0.82.x separately; 0.82.0 is the validated bootstrap version and the manifest
-rejects other minor versions. A working HTTPS CA certificate store and network
-access to conda-forge are required for a fresh installation. Minimal Ubuntu
-containers need `ca-certificates`. Git is needed to clone and review changes.
+0.82.x separately; 0.82.1 is the validated contributor workflow version.
+The manifest rejects other minor versions. A working HTTPS CA certificate store
+and network access to conda-forge are required for a fresh installation.
+Minimal Ubuntu containers need `ca-certificates`. Git is needed to clone and
+review changes.
 Docker is optional, for reproducing the clean-container experiment.
 The cleanup task uses the host's POSIX `sh`.
 Installed Git hooks also need Pixi on `PATH`; their entries activate the locked
@@ -26,7 +27,15 @@ deployment or ROS runtime support matrix.
 
 ## Install and inspect
 
-From the repository root:
+Clone the repository, or substitute your fork's URL when contributing through
+a fork:
+
+```sh
+git clone https://github.com/gleniosp/fleetforge.git
+cd fleetforge
+```
+
+From that repository root, install and inspect the locked tools:
 
 ```sh
 pixi install --locked -e dev
@@ -101,6 +110,10 @@ builds as needed and forwards arguments after `--` to the executable. Run
 build/run tasks in default and checking tasks in dev. Underlying tool commands
 are listed in the task reference.
 
+For a fresh contributor walkthrough, install both environments above, run
+`check`, `test`, `build` and the three `agent-run` invocations, then install and
+check the local hooks below.
+
 The bootstrap diagnostic prints its compiled package version and platform:
 `fleetforge-agent 0.1.0 (x86_64-linux; bootstrap diagnostic)`.
 
@@ -128,7 +141,8 @@ cover closed pipes on Unix and failing stdout/stderr with Linux `/dev/full`.
 The virtual Cargo workspace uses edition 2024, resolver 3 and one package at
 `apps/agent`. Package metadata and lints are explicitly inherited; unsafe code
 is forbidden and standard Clippy lints are enabled. Packages are unpublished
-(`publish = false`); licensing is owned by #8.
+(`publish = false`) and inherit the repository's
+[Apache-2.0 license](../../LICENSE).
 
 Builds write to ignored `target/` and environments to ignored `.pixi/`.
 Cargo uses its normal user cache (`CARGO_HOME`, otherwise `~/.cargo`).
@@ -190,7 +204,7 @@ Superseded runs are cancelled and jobs have a 30-minute timeout.
 For local reproduction, install both locked environments, set `PR_BASE` and
 `PR_HEAD` to an explicit nonempty PR revision range, and run the commands above.
 The [delivery journal](../journal/2026-10-22-github-actions.md) records local
-success/failure validation and the remaining hosted-run verification. See the
+and hosted success/failure validation. See the
 [contribution policy](../../CONTRIBUTING.md#pr-checks-and-maintainer-review)
 for recommended required checks and maintainer review.
 

@@ -8,6 +8,10 @@ requirement.
 
 ## MVP delivery and verification
 
+The [bootstrap exit record](journal/2026-10-22-bootstrap-exit.md) supplies fresh
+contributor setup, CI comparison and foundation-scope evidence for the
+engineering-foundation portion of MVP-01 and NFR-03.
+
 [M0-10 (#85)](https://github.com/gleniosp/fleetforge/issues/85) owns the design
 baseline for all MVP IDs. [M8-01
 (#45)](https://github.com/gleniosp/fleetforge/issues/45) and [M8-04
