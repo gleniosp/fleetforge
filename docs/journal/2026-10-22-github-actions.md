@@ -103,9 +103,9 @@ Reviewed all changed Markdown links/fragments, fences, final newlines, full
 workflow/task routing and diff whitespace. Both source lockfiles retain their
 original bytes. No source-repository staging or commits occurred.
 
-## Remaining verification
+## Limits at the initial local handoff
 
-No workflow has been published or run on GitHub. Hosted action execution,
+At the initial local handoff, no workflow had been published or run on GitHub. Hosted action execution,
 actual event payloads, fork workflow approval and cancellation remain
 unverified. The fresh-cache Ubuntu container establishes command behavior,
 not equivalence to GitHub's hosted runner image. Setup's final multi-environment
@@ -116,3 +116,69 @@ controlled formatting/lint/test/commit-message failures from hosted runs before
 claiming issue #7's hosted validation complete. Inspect their ordinary Actions
 logs and restore valid inputs. Required-check/review recommendations are in the
 contribution policy; repository settings remain maintainer-owned.
+
+
+## Hosted failure validation and restoration — 2026-10-22
+
+The maintainer authorized committing/pushing deliberate faults and restoring the
+working state. Each fault used a separate valid Conventional Commit and was
+pushed only after the preceding run completed and its failure logs were
+inspected. The hosted workflow produced:
+
+| Case | Source revision | Hosted run | Observed result |
+| --- | --- | --- | --- |
+| Formatting | `bf20578fb749436e0ce138f81c2b933f10a8d0f3` | [39762257245](https://github.com/gleniosp/fleetforge/actions/runs/39762257245) | failure: Hooks rejected the malformed `main` signature |
+| Lint | `eb444758e8c73a23354cc98c57f99122c16fe82a` | [39762534171](https://github.com/gleniosp/fleetforge/actions/runs/39762534171) | failure: Hooks rejected `unused_ci_sentinel` under denied warnings |
+| Test | `94955f03c5953771d3c189187f519e68fc94a802` | [39762617179](https://github.com/gleniosp/fleetforge/actions/runs/39762617179) | failure: Hooks passed; tests rejected the deliberate panic |
+| Commit message | `a93d9c2edd4c6f967bef3dbcc00b2a15161a54d2` | [39762690839](https://github.com/gleniosp/fleetforge/actions/runs/39762690839) | failure: Commit-range validation rejected an invalid runner-only commit |
+| Restored working state | `4d9e0f672f337edc67ffca953664ca0216749fff` | [39762762788](https://github.com/gleniosp/fleetforge/actions/runs/39762762788) | success: Every job step passed |
+
+Formatting changed only the `main` signature to `fn main()->io::Result<ExitCode>{`.
+The lint case restored formatting and inserted `let unused_ci_sentinel = 1;`.
+The test case removed that variable and appended a formatted test that panicked
+with `CI controlled test failure sentinel`. The commit-message case restored
+application source and temporarily changed only the workflow's range-check
+script: `git commit-tree` created an unreachable child of `PR_HEAD` with subject
+`controlled invalid commit message`, and `commit-check-range` checked the base
+to that child. It failed with that subject in the log. The invalid commit
+existed only inside the runner; every published commit has a valid message.
+
+For each failure, inspected `gh run view RUN_ID --json status,conclusion,headSha,jobs,url`
+and `gh run view RUN_ID --log-failed`. Asserted that the job concluded `failure`,
+that exactly the expected validation step failed, and that its log contained the
+injected diagnostic. The other steps followed normal failure/skip behavior;
+the tracked-file stability check still passed. Temporary drivers, JSON receipts
+and downloaded failure logs remain under
+`/tmp/fleetforge-hosted-fault-validation` for this local review.
+
+Fault commits used command-scoped `git -c core.hooksPath=/dev/null commit` so
+the intentionally invalid source could reach hosted validation. This did not
+change hook configuration. The restoration commit used normal Git commit
+behavior. No force push or published-history rewrite was used.
+
+The restoration run passed checkout, locked Pixi environment installation,
+commit-range validation over all published fault/restoration commits, hooks,
+tests, build and stability. Confirmed restoration with:
+
+```sh
+git diff --exit-code 7b7ad03 HEAD -- apps/agent/src/main.rs .github/workflows/pr-checks.yml pixi.toml pixi.lock Cargo.lock
+```
+
+The command returned zero before the documentation commit. The temporary source
+and workflow faults are absent from the final PR diff. This hosted evidence
+supersedes the initial hosted-verification gap above. Fork workflow approval
+and cancellation were not separately exercised.
+
+## Issue synchronization rule
+
+Updated the owning [working agreement](../working-agreement.md#github-state-and-milestone-exit)
+to require issue descriptions, acceptance/validation checklists and dependencies
+to match the delivered scope when raising/updating a PR. Before final review,
+all applicable items require evidenced completion, and each fully delivered
+issue requires its own `Closes #<issue-number>` in the default-branch PR body.
+GitHub closes issues on merge. Existing root instructions and the PR skill
+already require this owner; no policy copy was added to another instruction file.
+
+Reviewed the full branch diff, documentation links/fragments, final newlines and
+`git diff --check`. The final documentation commit is validated by the PR's
+latest hosted run, linked from its Validation section.
