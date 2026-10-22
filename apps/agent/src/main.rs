@@ -18,7 +18,7 @@ enum Action {
     Version,
 }
 
-fn main() -> io::Result<ExitCode> {
+fn main()->io::Result<ExitCode>{
     let mut arguments = std::env::args_os().skip(1);
     let action = match arguments.next() {
         None => Action::Diagnostic,
