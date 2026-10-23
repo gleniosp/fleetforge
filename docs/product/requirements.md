@@ -62,7 +62,7 @@ There are three scopes:
 | Trust | Registry authorization, detached Ed25519 signatures, protected agent/workload OS boundaries |
 | Lifecycle | Separate preparation, controlled stop/start, health verification, recovery and explicit rollback |
 | Interface | Authenticated local API with bounded stored-projection polling; SvelteKit/TypeScript console |
-| Simulation/platform | Docker Compose, Linux x86_64, Ubuntu 24.04 reference container; actual RoboStack/Pixi combination must be validated |
+| Device runtime/simulation | Managed agent/workloads and Docker Compose: Linux x86_64, Ubuntu 24.04 reference container; actual RoboStack/Pixi combination must be validated |
 | Visibility | Bounded logs/events, source freshness, desired/accepted/active/outcome and per-device partial results |
 
 The [architecture](../architecture/overview.md) owns identity, trust, protocol
@@ -77,11 +77,25 @@ Provide root Pixi and virtual Cargo workspaces, one meaningful Rust executable,
 reproducible toolchain/lockfiles, canonical tasks, GitHub Actions, license,
 contribution/agent conventions, initial ADRs, and GitHub-linked planning.
 
-Put essential build/run dependencies and tasks in Pixi's default feature.
-The default environment builds/runs the application; `dev` inherits that
-feature and adds `test` and `lint` features with their tools and tasks. Keep
-shared versions aligned through one solve group. Development includes
-Pixi-managed prek and Commitizen in `lint`. Use `prek.toml`, local
+Keep contributor-host support separate from asset/device runtime support.
+Target mainstream Linux x86_64/ARM64, Apple Silicon macOS and Windows
+through WSL2 for developer/maintainer workflows, subject to explicit dependency
+and host prerequisite limits. The current supported configuration and evidence
+live in the [development guide](../guides/development.md#host-prerequisites).
+Operational agents/workloads and MVP simulation remain Linux x86_64 only;
+[FUT-08](../architecture/future.md#fut-08--production-device-platforms) owns
+future device-platform expansion. Native compilation/testing of shared code or
+the bootstrap diagnostic does not establish device runtime support. Scope
+runtime-specific packages and tasks separately as components arrive.
+
+Use the implicit default, lint and test Pixi features. Default owns shared tools
+and build/run/clean; lint owns repository checks and setup; test owns tests. Device-prefixed aggregates and app/service leaves belong
+to Linux target tables in those same features. Host and device environments both
+select lint/test and inherit default; device restricts execution to Linux x86_64.
+Repository check never implicitly invokes device checks, even on Linux. Keep
+commands environment-free and versions aligned through one solve group.
+Build/check environments are separate
+from deployed workload runtimes. Use `prek.toml`, local
 pre-commit and commit-msg hooks, and matching CI validation. Introduce Ruff
 linting/formatting and mypy with the first Python code; keep them out of
 deployed workloads. Rust uses rustfmt and Clippy. Checks must preserve tracked

@@ -3,60 +3,59 @@ name = "fleetforge"
 license = "Apache-2.0"
 license-file = "LICENSE"
 channels = ["conda-forge"]
-platforms = ["linux-64"]
-requires-pixi = ">=0.82.0,<0.83"
+platforms = ["linux-64", "linux-aarch64", "osx-arm64"]
+requires-pixi = ">=0.83.0"
 
+# Shared compiler tools; device commands are explicitly named and Linux-only.
 [dependencies]
-# Includes Cargo, rustfmt, Clippy and the native Linux linker dependencies.
 rust = "=1.98.1"
 
-[tasks]
-# Build/run tasks belong to the default feature, inherited by dev.
-build = { depends-on = [{ task = "rust-build", environment = "default" }], description = "Build all implemented components" }
-clean = { depends-on = [{ task = "rust-clean", environment = "default" }], description = "Remove only repository target/ build output" }
-rust-build = { cmd = "cargo build --workspace --locked", default-environment = "default", description = "Build the Rust workspace in the default environment" }
-agent-run = { cmd = "cargo run --locked -p fleetforge-agent --", default-environment = "default", description = "Build and run the agent bootstrap CLI; forward arguments to the executable" }
+[target.linux-64.tasks]
+device-build = { depends-on = ["agent-build"] }
+agent-build = "cargo build --locked -p fleetforge-agent"
+agent-run = "cargo run --locked -p fleetforge-agent --"
 
-[tasks.rust-clean]
-cmd = ["sh", "-eu", "-c", '''
-if test -L target; then
+[target.linux-64.tasks.device-clean]
+cmd = ["sh", "-eu", "-c", '''if test -L target; then
     echo 'Refusing to clean symlinked target/' >&2
     exit 1
 fi
 exec cargo --config 'build.build-dir="target"' clean --locked --target-dir target
 ''']
-default-environment = "default"
-description = "Clean fixed repository target/; refuse a symlink"
-
-[feature.test.tasks]
-# Cargo supplies Rust test support; no additional test package is needed.
-test = { depends-on = ["rust-test"], description = "Run all implemented component tests" }
-rust-test = { cmd = "cargo test --workspace --locked", description = "Run workspace unit, integration and documentation tests" }
-agent-test = { cmd = "cargo test --locked -p fleetforge-agent", description = "Run the agent package's unit, integration and documentation tests" }
 
 [feature.lint.dependencies]
-prek = "=0.5.6"
+prek = "=0.5.7"
 commitizen = "=4.19.2"
 
 [feature.lint.tasks]
-# rustfmt and Clippy are already included in the default Rust package.
-check = { depends-on = ["format-check", "lint"], description = "Check repository formatting, lints and configuration without running tests" }
-rust-check = { depends-on = ["rust-format-check", "rust-lint"], description = "Check Rust formatting and lints without running tests" }
-lint = { depends-on = ["rust-lint", "hooks-validate"], description = "Lint all implemented components and validate hook configuration" }
-format = { depends-on = ["rust-format"], description = "Rewrite source formatting; review the resulting diff" }
-format-check = { depends-on = ["rust-format-check"], description = "Check source formatting without rewriting files" }
-fix = { depends-on = ["rust-fix"], description = "Apply lint suggestions with Cargo's Git safety checks" }
-rust-lint = { cmd = "cargo clippy --workspace --all-targets --locked -- -D warnings", description = "Run Clippy on all workspace targets, denying warnings" }
-rust-format = { cmd = "cargo fmt --all", description = "Format all workspace Rust source with rustfmt" }
-rust-format-check = { cmd = "cargo fmt --all -- --check", description = "Check all workspace Rust source with rustfmt" }
-rust-fix = { cmd = "cargo clippy --fix --workspace --all-targets --locked -- -D warnings", description = "Apply Clippy/compiler suggestions; refuse dirty or staged work" }
-hooks-install = { cmd = "prek install", description = "Install the configured pre-commit and commit-msg Git shims" }
-hooks-check = { cmd = "prek run --all-files --stage pre-commit", description = "Run check-only hooks against the current working tree" }
-hooks-validate = { cmd = "prek validate-config prek.toml", description = "Validate the sole project hook configuration" }
-commit-check = { cmd = "cz check --commit-msg-file", description = "Validate one commit message file; pass its path as an argument" }
-commit-check-range = { cmd = "cz check --rev-range", description = "Validate committed messages; pass an explicit Git revision range" }
+setup = { depends-on = ["hooks-install"], description = "Install contributor tools and Git hooks" }
+check = { cmd = "prek run --all-files --stage pre-commit", description = "Run repository hooks; exclude device checks and tests" }
+hooks-install = "prek install"
+hooks-validate = "prek validate-config prek.toml"
+commit-check = "cz check --commit-msg-file"
+commit-check-range = "cz check --rev-range"
+
+[feature.lint.target.linux-64.tasks]
+device-check = { depends-on = ["device-format-check", "device-lint"] }
+device-format-check = { depends-on = ["agent-format-check"] }
+device-format = { depends-on = ["agent-format"] }
+device-lint = { depends-on = ["agent-lint"] }
+device-fix = { depends-on = ["agent-fix"] }
+agent-check = { depends-on = ["agent-format-check", "agent-lint"] }
+agent-format-check = "cargo fmt -p fleetforge-agent -- --check"
+agent-format = "cargo fmt -p fleetforge-agent"
+agent-lint = "cargo clippy --locked -p fleetforge-agent --all-targets -- -D warnings"
+agent-fix = "cargo clippy --fix --locked -p fleetforge-agent --all-targets -- -D warnings"
+
+# Cargo supplies test execution; no additional test package is needed.
+[feature.test]
+# No host test suite exists yet; add real test tasks with host components.
+
+[feature.test.target.linux-64.tasks]
+device-test = { depends-on = ["agent-test"] }
+agent-test = "cargo test --locked -p fleetforge-agent"
 
 [environments]
-# Declare default only to keep shared package versions aligned with dev.
 default = { solve-group = "toolchain" }
-dev = { features = ["test", "lint"], solve-group = "toolchain" }
+host = { features = ["lint", "test"], solve-group = "toolchain" }
+device = { features = ["lint", "test"], platforms = ["linux-64"], solve-group = "toolchain" }

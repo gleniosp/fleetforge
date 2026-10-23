@@ -197,6 +197,25 @@ freshness rules. The UI exposes independent liveness, health,
 desired/accepted/active/outcome, last contact and partial results; reconnect is
 not proof of fresh source health.
 
+## Developer hosts and device runtimes
+
+Contributor builds/checks and managed device execution have independent platform
+contracts. Root Pixi tooling supports mainstream developer/maintainer hosts;
+the [development guide](../guides/development.md#host-prerequisites) owns the
+current matrix, prerequisites and evidence limits. The bootstrap diagnostic can
+compile/run natively on contributor hosts without granting operational agent
+support on those platforms.
+
+Managed agents, deployed workloads and the MVP Compose simulation target Linux
+x86_64 (`linux-64`), with Ubuntu 24.04 as the reference userspace. Keep Linux-only
+runtime dependencies, platform-specific supervision/state implementations and
+integration checks in their owning component/runtime environments and target
+scopes. Do not let a device limitation restrict all shared contributor tooling.
+Cross-compilation or a Linux VM/container is an explicit workflow, not an
+implicit consequence of choosing a developer host. Production device-platform
+expansion remains [FUT-08](future.md#fut-08--production-device-platforms), with
+Linux ARM64 (`linux-aarch64`) prioritized before other device platforms.
+
 ## Simulation and robotics evidence
 
 Use Linux x86_64 with Ubuntu 24.04 as the reference container. Real headless ROS

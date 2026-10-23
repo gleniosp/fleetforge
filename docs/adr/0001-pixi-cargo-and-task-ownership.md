@@ -13,12 +13,33 @@ managers need clear ownership.
 
 ## Decision
 
-Root [pixi.toml](../../pixi.toml) owns tooling and task definitions. Its default
-feature/environment provides essential build/run tools; `dev` inherits default
-and composes `test` and `lint`. One solve group aligns shared versions. Use the
-native Rust package and its transitive linker dependencies for Linux x86_64;
-avoid redundant activation/compiler packages and virtual-package overrides
-without a demonstrated need. Exact pins make upgrades deliberate.
+Root [pixi.toml](../../pixi.toml) owns tooling and task definitions. The implicit
+default feature owns shared tools and build/run/clean; lint owns repository
+formatting/linting and contributor setup; test owns tests. The same features'
+Linux target tables own device-prefixed aggregates and app/service leaves.
+Distinct task names preserve host/device check scope on Linux without separate
+device features. Host and device select lint/test alongside default; device
+restricts platforms to linux-64. One solve group aligns shared versions.
+The [task reference](../guides/tasks.md#pixi-configuration-conventions) owns
+configuration conventions. Repository validation uses Prek built-ins in check-only
+mode; device Rust formatting/linting uses rustfmt/Clippy.
+Use the
+native Rust package, its transitive Linux linker dependencies and explicit
+host SDK/linker prerequisites on macOS; avoid redundant activation/compiler packages and virtual-package overrides
+without a demonstrated need. Exact dependency pins make upgrades deliberate.
+Use the host-installed Pixi executable with a minimum version constraint; CI
+pins that minimum to verify compatibility.
+
+The root workspace platform list describes contributor hosts, independently of
+managed device runtimes. Use native host build/test/check jobs for contributor
+portability. Keep device-only dependencies and integration tasks scoped to
+Linux x86_64 in their owning runtime manifests/environments/targets as they are
+implemented. A native bootstrap diagnostic build does not imply operational
+agent support. The [architecture platform boundary](../architecture/overview.md#developer-hosts-and-device-runtimes)
+owns the runtime contract; the [development guide](../guides/development.md#host-prerequisites)
+owns current contributor-host limits. Windows contributors use Ubuntu on WSL2,
+sharing the Linux toolchain; native Windows builds and their separate tooling
+are outside the supported workflow.
 
 Cargo owns Rust dependencies, builds and tests through a virtual workspace.
 Inherit shared metadata/lints explicitly, forbid unsafe project code, and use
@@ -28,7 +49,10 @@ edition, resolver and package defaults.
 
 Prek and Commitizen belong to contributor tooling. Pre-commit checks formatting,
 lints and configuration; tests execute separately with all-suite and focused
-app/service entry points. CI checks, tests, builds and validates commit ranges.
+app/service entry points. Validate contributor tooling and contributor-source
+checks on every supported developer host. Keep device-source formatting, lint,
+build and tests in the supported device matrix, currently Linux x86_64. Native Pixi target aggregates exclude device checks on other hosts; CI separates contributor and device
+jobs and does not start a long-running agent/demo.
 Add Ruff/mypy and `pyproject.toml` settings with Python code, frontend tools with
 SvelteKit, and other task families only with real workflows. Language formatters
 own code layout; shared editor defaults must agree with them.
@@ -60,7 +84,10 @@ justify overrides. Current commands and constraints belong to the
 ## Evidence and revisit conditions
 
 The [toolchain experiment](../experiments/0001-pixi-toolchain.md) owns observed
-versions, clean builds and lock-drift/lint failure evidence. Official
+versions, clean builds and lock-drift/lint failure evidence. The
+[contributor platform journal](../journal/2026-10-23-developer-host-platforms.md)
+records multi-platform resolution, host prerequisites and native execution
+limits. Official
 [Pixi environments](https://pixi.prefix.dev/latest/workspace/multi_environment/),
 [locked installation](https://pixi.prefix.dev/latest/reference/cli/pixi/install/)
 and [Cargo workspaces](https://doc.rust-lang.org/cargo/reference/workspaces.html)

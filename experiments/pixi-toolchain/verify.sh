@@ -16,7 +16,7 @@ test "$(command -v git)" = /usr/bin/git
 git --version
 
 work=$(mktemp -d /tmp/fleetforge-toolchain.XXXXXX)
-cp /source/pixi.toml /source/pixi.lock /source/Cargo.toml /source/Cargo.lock "$work/"
+cp /source/pixi.toml /source/pixi.lock /source/Cargo.toml /source/Cargo.lock /source/LICENSE "$work/"
 mkdir -p "$work/apps"
 cp -r /source/apps/agent "$work/apps/"
 cd "$work"
@@ -47,7 +47,7 @@ dpkg-query -W ca-certificates
 snapshot > /tmp/original.sha256
 pixi install --locked --all
 
-for environment in default dev; do
+for environment in default device; do
     pixi run --locked -e "$environment" bash -eu -c '
         for tool in rustc cargo rustfmt cargo-clippy; do
             path=$(command -v "$tool")
@@ -83,8 +83,10 @@ for environment in default dev; do
         cargo build --workspace --locked --offline --verbose
 done
 
-pixi run --locked -e dev cargo fmt --all -- --check
-pixi run --locked -e dev cargo clippy --workspace --all-targets --locked --offline -- -D warnings
+pixi run --locked -e host prek --version
+pixi run --locked -e host cz version
+pixi run --locked -e device cargo fmt --all -- --check
+pixi run --locked -e device cargo clippy --workspace --all-targets --locked --offline -- -D warnings
 pixi run --locked cargo build --workspace --release --locked --offline
 output=$(pixi run --locked cargo run --locked --offline -p fleetforge-agent)
 test "$output" = 'fleetforge-agent 0.1.0 (x86_64-linux; bootstrap diagnostic)'

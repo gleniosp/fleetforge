@@ -26,3 +26,9 @@ decision/evidence changes together under the working agreement's
   by a present need and its development, build or runtime role. Follow
   [ADR 0003](docs/adr/0003-bounded-decisions-and-evidence.md) for proportionate
   validation and experiments; distinguish documented behavior from assumptions.
+
+- Keep contributor-host tooling separate from managed-device runtime support.
+  Follow the [platform boundary](docs/architecture/overview.md#developer-hosts-and-device-runtimes)
+  and [host matrix](docs/guides/development.md#host-prerequisites). Scope Linux-only
+  runtime packages/tasks to their owning components; do not narrow shared
+  developer tooling because devices target `linux-64`. Use host-installed Pixi.
