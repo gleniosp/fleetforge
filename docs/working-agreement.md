@@ -181,11 +181,6 @@ after its scoped deliveries and exit evidence are complete and closure is
 authorized. Future activation is a deliberate scope decision, independent of
 whether GitHub calls the milestone open.
 
-The maintainer-reviewed initial publication on `main` is the historical one-time
-exception to the normal branch/PR flow. [Issue #1](https://github.com/gleniosp/fleetforge/issues/1)
-is closed historical delivery; preserve that state. Later tasks follow this
-agreement.
-
 ## Permissions and upstream collaboration
 
 Use the narrowest tool, filesystem, credential, and network permissions needed

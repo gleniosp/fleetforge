@@ -2,129 +2,69 @@
 
 - **Status:** Accepted.
 - **Date:** 2026-10-19
-- **Updated:** 2026-10-21
+- **Updated:** 2026-10-23
 - **Requirement:** [MVP-01](../product/requirements.md#mvp-01--engineering-foundation)
-- **Delivery:** [M0-03](https://github.com/gleniosp/fleetforge/issues/3),
-  [M0-05](https://github.com/gleniosp/fleetforge/issues/5),
-  [M0-06](https://github.com/gleniosp/fleetforge/issues/6),
-  [M1-03](https://github.com/gleniosp/fleetforge/issues/12)
 
 ## Context
 
-Contributors need consistent system/toolchain dependencies, Rust package builds,
-and language checks. Robots need reproducible application runtimes without
-carrying the contributor toolset. Multiple package managers must have clear
-ownership.
+Contributors need consistent toolchains and language checks. Device workloads
+need reproducible runtimes without contributor tooling. Multiple package
+managers need clear ownership.
 
 ## Decision
 
-Root `pixi.toml` is the canonical tooling/task entry point. The default feature
-owns essential root build/run dependencies and their tasks. The normal default
-environment builds and invokes the application. The named `dev` environment
-inherits the default feature and composes `test` and `lint` features, which own
-their respective dependencies and tasks. Both environments share the
-`toolchain` solve group, keeping common package versions identical. Default
-build/run excludes contributor-only packages.
+Root [pixi.toml](../../pixi.toml) owns tooling and task definitions. Its default
+feature/environment provides essential build/run tools; `dev` inherits default
+and composes `test` and `lint`. One solve group aligns shared versions. Use the
+native Rust package and its transitive linker dependencies for Linux x86_64;
+avoid redundant activation/compiler packages and virtual-package overrides
+without a demonstrated need. Exact pins make upgrades deliberate.
 
-Cargo owns Rust dependencies/builds/tests. Start with a virtual workspace and
-one meaningful `fleetforge-agent` executable, Rust edition 2024 and explicit
-resolver 3. Pin a compatible stable toolchain through Pixi after a
-clean-environment build check; do not introduce a competing rustup toolchain
-path. Share metadata/lints and inherit them explicitly. Forbid unsafe code in
-the initial project packages; use rustfmt and Clippy without blanket pedantic
-policies.
+Cargo owns Rust dependencies, builds and tests through a virtual workspace.
+Inherit shared metadata/lints explicitly, forbid unsafe project code, and use
+rustfmt and Clippy without blanket pedantic policies. Extract crates only when
+real consumers justify them. The [workspace manifest](../../Cargo.toml) owns
+edition, resolver and package defaults.
 
-The lint feature supplies prek and Commitizen to dev. `prek.toml` owns project
-hooks; pre-commit runs `check` for source/configuration, commit-msg validates
-Conventional Commits. `check` aggregates non-mutating formatting, lint and
-configuration validation without test execution. `test` aggregates all
-implemented test suites, with focused tasks for each implemented app/service.
-CI runs checks, tests, builds and commit-range validation separately. Add Ruff
-lint/format and mypy with Python code, and frontend tooling with SvelteKit. Put
-Python tool settings in `pyproject.toml`. Minimal EditorConfig defaults help
-editors; language formatters remain authoritative, and supported editor
-properties must agree with them.
+Prek and Commitizen belong to contributor tooling. Pre-commit checks formatting,
+lints and configuration; tests execute separately with all-suite and focused
+app/service entry points. CI checks, tests, builds and validates commit ranges.
+Add Ruff/mypy and `pyproject.toml` settings with Python code, frontend tools with
+SvelteKit, and other task families only with real workflows. Language formatters
+own code layout; shared editor defaults must agree with them.
 
-Git is a host prerequisite for repository development and CI, including prek
-and Commitizen subprocesses. The asset/device identity and agent deployment
-design has no runtime Git requirement. Device workload dependencies belong in
-their separate release environments.
+Git is a host development/CI prerequisite, not an agent runtime requirement.
+Each planned ROS workload release owns a separate runtime manifest/lock; the
+planned frontend owns its npm lock. Commit relevant locks and validate without
+rewriting tracked source or resolution. Explicit format/fix commands may edit
+source. Ordinary clean/shutdown preserves operational state; reset is separate.
 
-Pixi resolves, locks and installs environments. Evaluate pixi-pack for packaging
-where useful; it is not required by this decision. FleetForge owns desired
-state, authorization, process supervision, health, activation/recovery and
-future artifact transfer/cache policy. Pixi does not provide fleet coordination,
-peer distribution or atomic process switching.
-
-Each ROS 2 Jazzy Python workload release has a separate runtime workspace and
-lockfile. The root workspace owns `pixi.lock`; Cargo owns `Cargo.lock`; the
-frontend will own its npm lockfile. Commit relevant locks. Use locked Pixi/Cargo
-validation so checks reject resolution drift rather than silently rewriting
-locks. Environments/caches/build outputs may be generated by checks; tracked
-source and locks may not change.
-
-Task families are `check`, `lint`, `format`, `format-check`, `fix`, `test`,
-`build`, and safe `clean`, with component-prefixed tasks. Root tasks cover all
-implemented components. Introduce `dev`, infrastructure, integration, and
-end-to-end tasks only with real workflows/suites. Define each task's tool,
-scope, mutation, exit behavior, and milestone when implemented. Ordinary
-clean/shutdown preserves operational databases, releases, and caches; reset is
-distinct.
+Pixi resolves, locks and installs environments. FleetForge owns desired state,
+authorization, supervision, health, activation/recovery and future artifact
+transfer/cache policy. Pixi does not supply fleet coordination or atomic process
+switching. Evaluate pixi-pack only when packaging needs justify it.
 
 ## Alternatives and consequences
 
-A host-managed Rust/tool stack is familiar but leaves the clean setup dependent
-on machine configuration. A single dev/runtime environment would leak
-contributor dependencies into releases. Separate unrelated tool/CI commands
-would duplicate policy. The chosen boundary adds Pixi resolution and routing to
-learn, but keeps tooling, source builds, and deployment inputs reproducible and
-inspectable.
+Host-managed tools make setup depend on machine configuration. A single
+contributor/runtime environment leaks development dependencies into workloads.
+Independent CI commands duplicate task definitions. Pixi adds a tool to learn,
+but keeps environment inputs and task routing reproducible and inspectable.
 
-The root toolchain targets Linux x86_64. Use the native `rust` package.
-It supplies the Rust tools, Linux linker configuration and transitive compiler
-driver/sysroot dependencies needed to link Rust executables without a host C
-toolchain. The target-specific `rust_linux-64` activation package is unnecessary
-for the native build. Avoid redundant direct dependencies for those implementation
-packages; their resolved versions belong in `pixi.lock`.
-
-The default feature currently needs only the native Rust package. Its bundled
-Cargo test support, rustfmt and Clippy remain installed in both environments;
-separating task ownership does not require redundant direct packages. The test
-feature initially contains real test tasks without additional dependencies.
-The lint feature groups lint/format tasks and contributor validation tools.
-Component-prefixed task names identify language scope; introduce separate
-language features only when actual composition needs justify them.
-
-Build/run/cleanup tasks belong to default and are inherited by dev. The lint
-feature owns `check` and component check aggregates; the test feature owns
-`test` and focused test tasks. Explicitly declare default's solve-group
-membership without adding another named build environment. The
-[task reference](../guides/tasks.md) owns exact commands and routing; the
-[development guide](../guides/development.md) owns setup and host prerequisites.
-
-Use Pixi's platform defaults unless a demonstrated dependency or supported host
-requires an explicit virtual package override. Exact tool pins make upgrades
-deliberate; host prerequisites and commands belong to the development guide,
-while the experiment records observed versions and compatibility limits.
-Extract additional crates/environments when actual dependency or component
-needs justify them.
+Rust bundles test, formatting and lint tools; feature ownership need not add
+redundant packages. Separate language environments/features require a real
+composition need. Use platform defaults until demonstrated host/dependency needs
+justify overrides. Current commands and constraints belong to the
+[development guide](../guides/development.md) and [task reference](../guides/tasks.md).
 
 ## Evidence and revisit conditions
 
-The official [Pixi environment
-documentation](https://pixi.prefix.dev/latest/workspace/multi_environment/) describes
-feature/environment composition; [Pixi
-install](https://pixi.prefix.dev/latest/reference/cli/pixi/install/) describes
-locked/offline installation options; [Cargo workspace
-documentation](https://doc.rust-lang.org/cargo/reference/workspaces.html) describes
-explicit virtual-workspace resolver and inheritance behavior. These describe
-the mechanisms used by the root configuration.
+The [toolchain experiment](../experiments/0001-pixi-toolchain.md) owns observed
+versions, clean builds and lock-drift/lint failure evidence. Official
+[Pixi environments](https://pixi.prefix.dev/latest/workspace/multi_environment/),
+[locked installation](https://pixi.prefix.dev/latest/reference/cli/pixi/install/)
+and [Cargo workspaces](https://doc.rust-lang.org/cargo/reference/workspaces.html)
+describe the mechanisms.
 
-The [toolchain experiment](../experiments/0001-pixi-toolchain.md) records fresh
-locked installation, tool paths and builds with host compilers absent,
-manifest/lock drift rejection and inherited lint enforcement. The initial
-package reports its compiled version/platform to demonstrate linked execution;
-stable CLI behavior belongs to #4. The [development guide](../guides/development.md)
-owns current commands and upgrade semantics. Revisit package/version/routing
-decisions when this experiment fails, Pixi changes its lock/activation behavior,
-or an implemented component has materially different needs.
+Revisit package/version/routing choices when clean validation fails, Pixi changes
+lock/activation behavior, or implemented components have different requirements.

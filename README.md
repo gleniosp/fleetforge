@@ -2,7 +2,7 @@
 
 **Local-first, Pixi-native robot software lifecycle management.**
 
-> **Heavy development:** FleetForge is under active development. Interfaces,
+> **⚠️ Heavy development:** FleetForge is under active development. Interfaces,
 > setup, and plans may change, and breaking changes are expected. Much of the
 > planned functionality is not implemented yet; see [Current state](#current-state)
 > for what exists today.
@@ -16,19 +16,35 @@ without public internet.
 
 ## Current state
 
-The repository provides design contracts and a reproducible development
-toolchain. Fleet operation is not implemented yet.
+FleetForge currently provides a Rust bootstrap diagnostic and a locked
+build/check toolchain. Fleet operation is not implemented yet.
 
-Build and invoke the bootstrap diagnostic from the repository root:
+To try it, use **Linux x86_64** with Git and
+[Pixi 0.82.1](https://github.com/prefix-dev/pixi/releases/tag/v0.82.1)
+on `PATH` (the manifest accepts 0.82.x). Ubuntu 24.04 is the verified reference
+userspace. Other Linux distributions are unverified; macOS, Windows and ARM64
+are not supported by the current toolchain. The host must provide glibc, basic
+Unix shell utilities, HTTPS CA certificates (`ca-certificates` on Ubuntu), and
+network access to GitHub and conda-forge for a fresh setup.
 
 ```sh
+git clone https://github.com/gleniosp/fleetforge.git
+cd fleetforge
+pixi install --locked
 pixi run --locked agent-run
 pixi run --locked agent-run -- --help
 pixi run --locked agent-run -- --version
 ```
 
-See the [development guide](docs/guides/development.md) for prerequisites,
-CLI behavior and validation commands.
+The first run builds the diagnostic, prints
+`fleetforge-agent 0.1.0 (x86_64-linux; bootstrap diagnostic)`, and exits.
+`--help` shows usage; `--version` prints the package version. No host Rust,
+C compiler, Python, ROS or Docker installation is needed for this quick start;
+Pixi installs the build tools. Locked installation checks the committed
+resolution; it still needs downloads on a fresh machine.
+
+To develop or run contributor checks, follow the
+[development guide](docs/guides/development.md).
 
 ## Planned MVP
 

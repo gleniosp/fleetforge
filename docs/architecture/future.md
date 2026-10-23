@@ -9,7 +9,7 @@ evidence.
 
 ## FUT-01 — Peer reachability
 
-Extend the existing secure direct protocol with authenticated
+Extend the planned MVP secure direct protocol with authenticated
 discovery/membership, justified alternate transports, NAT traversal and optional
 relays. Membership and relay access grant no deployment authority. Evaluate real
 reachability and abuse boundaries before choosing topology. Test unauthorized

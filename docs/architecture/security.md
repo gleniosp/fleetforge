@@ -106,4 +106,4 @@ API reads/writes by [#29](https://github.com/gleniosp/fleetforge/issues/29) and
 [#91](https://github.com/gleniosp/fleetforge/issues/91). Each slice includes
 relevant rejection and real boundary tests. Production IAM, security-service
 availability, incident response and independent review remain future
-requirements; no production-security claim follows from this design PR.
+requirements; no production-security claim follows from this design.

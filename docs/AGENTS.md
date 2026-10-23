@@ -6,9 +6,10 @@ Inherit [root agent guidance](../AGENTS.md). Use the
 
 - Edit the owning requirements, architecture contract, or ADR and update its
   affected references and traceability together. Keep navigation pages brief.
-- Describe current contracts directly. Keep revision history and factual
-  observations in journals, experiments, PRs, and Git history. Preserve existing
-  historical evidence; add a dated correction when necessary.
+- Follow the documentation map's current-state rule: keep revision narratives
+  and factual historical evidence in journals or experiment reports. Keep ADR
+  rationale relevant to the current decision. Preserve historical evidence; add
+  a dated correction when necessary.
 - Distinguish accepted design, implemented behavior, and verified behavior using
   the map's [evidence definitions](README.md#reading-design-and-evidence).
 - Use [ADR 0003](adr/0003-bounded-decisions-and-evidence.md) and the
