@@ -1,51 +1,63 @@
 # Task reference
 
-Run tasks from the repository with `pixi run --locked TASK` for build/run and
-`pixi run --locked -e dev TASK` for contributor checks. The
-[manifest](../../pixi.toml) owns exact commands, dependencies and environment
-routing; this page explains how to choose tasks and use them safely.
-See the [development guide](development.md) for setup and upgrades.
+Select non-default scopes explicitly: `pixi run --locked -e host TASK` for
+contributor work and `pixi run --locked -e device TASK` for device work. Default
+Rust tooling needs no environment flag. The [manifest](../../pixi.toml) owns
+commands and versions; the [development guide](development.md) owns setup.
+
+## Pixi configuration conventions
+
+- Keep the manifest in one place. Group each feature's dependencies, tasks and
+  platform overrides together; keep environment composition together at the end.
+- Use exactly the implicit default, `lint` and `test` feature roles. Default
+  owns build/run/clean, lint owns repository checks and setup,
+  and test owns tests. Put device-prefixed aggregates and component leaves in
+  their corresponding feature's Linux target table, not separate device features.
+- Put tasks in their owning feature, including native target tables; never put
+  tasks under environments. Environments select features/platforms only.
+- Tasks and dependencies do not select environments or invoke Pixi to switch
+  environments. Callers, CI and hooks explicitly select non-default environments
+  with `-e`; omission is reserved for default tooling.
+- Define component commands once, then compose aggregates through task names.
+  Keep checks non-mutating, format/fix explicit, and tests separate. Hooks call
+  component checks; repository `check` runs Prek without a hook calling it back.
+  Do not add empty tasks for future components.
 
 ## Commands and scopes
 
 | Task | Purpose | Environment |
 | --- | --- | --- |
-| `check` | Formatting, lints and hook configuration; no test execution | `dev` |
-| `format-check` | Inspect Rust formatting | `dev` |
-| `lint` | Clippy on all targets (warnings fail) and hook configuration | `dev` |
-| `test` | Execute all implemented workspace tests | `dev` |
-| `agent-test` | Execute only the agent package tests | `dev` |
-| `build` | Build all implemented components | `default` |
-| `agent-run` | Build and invoke the bootstrap diagnostic | `default` |
-| `format` | Rewrite source formatting | `dev` |
-| `fix` | Apply available lint/compiler suggestions | `dev` |
-| `clean` | Remove repository build output | `default` |
+| `setup` | Install contributor hooks | `host` |
+| `check` | Run repository hooks; no device checks/tests | `host` |
+| `device-build`, `agent-build` | Build device apps or just the agent | `device` |
+| `device-check`, `agent-check` | Device format-check and lint; no tests | `device` |
+| `device-format-check`, `device-format` | Inspect/rewrite device source formatting | `device` |
+| `device-lint`, `device-fix` | Device lints and Cargo-safe fixes | `device` |
+| `device-test`, `agent-test` | Execute device tests or just agent tests | `device` |
+| `agent-run` | Invoke the bootstrap diagnostic | `device` |
+| `device-clean` | Remove generated build output | `device` |
 
-Root tasks currently cover the Rust workspace, not Markdown validation, Python
-or frontend code. Add validators with their components. The `rust-*` tasks
-provide focused Rust equivalents; `rust-check` excludes hook validation.
-Run `check` and `test` separately for complete validation. Clippy compiles test
-targets but does not execute tests.
+Default provides shared Rust and Linux-only device build/run/clean tasks.
+`lint` adds repository tooling/checks and Linux-only device source checks;
+`test` owns Linux-only device tests. Both host and device select lint/test and
+inherit default; device additionally restricts platforms to linux-64. Linux host
+can see device-prefixed commands, but ordinary `check` never invokes them.
+Callers select `-e host` or `-e device` explicitly to state the intended scope.
+All environments share a solve group; deployed runtime locks remain separate.
 
-Tasks fail nonzero on tool, environment or lock errors; aggregates propagate
-failures. Checks may update caches/build output, but must leave tracked source
-and locks unchanged, including on failure. Tasks do not declare output caching;
-Cargo may reuse compilation output. Inspect fixes and rerun `check` afterward.
-
-## Feature and environment composition
-
-`default` provides build/run tools. `dev` inherits those and adds the `test`
-and `lint` features. Both share tool versions through one solve group.
-[ADR 0001](../adr/0001-pixi-cargo-and-task-ownership.md) owns this decision;
-[Pixi's manifest reference](https://pixi.prefix.dev/latest/reference/pixi_manifest/#the-feature-and-environments-tables)
-explains composition. Workload releases have independent runtime manifests/locks.
+Repository `check` uses Prek built-ins for TOML/JSON/YAML syntax, merge conflicts,
+case-conflicting filenames, large added files, trailing whitespace and final
+newlines, plus hook configuration validation. Whitespace hooks use `--check`
+and preserve Markdown hard line breaks; checks do not rewrite files. Add host
+format/lint/fix tasks when real workflows need them. Rust source keeps its
+agent/device-prefixed tasks. No host application test suite exists yet.
 
 Tasks run from the workspace root, including when invoked from a component
 directory. Forward CLI arguments after `--`:
 
 ```sh
-pixi run --locked agent-run -- --help
-pixi run --locked agent-run -- --version
+pixi run --locked -e device agent-run -- --help
+pixi run --locked -e device agent-run -- --version
 ```
 
 The [README](../../README.md#current-state) describes the diagnostic; the
@@ -56,10 +68,9 @@ other scopes.
 
 ## Hooks and commit messages
 
-| Task (in `dev`) | Purpose |
+| Task (in `host`) | Purpose |
 | --- | --- |
 | `hooks-install` | Install pre-commit and commit-msg Git shims |
-| `hooks-check` | Run check-only hooks on all current working-tree files |
 | `hooks-validate` | Validate `prek.toml` |
 | `commit-check PATH` | Validate one UTF-8 commit-message file |
 | `commit-check-range RANGE` | Validate messages in an explicit Git revision set |
@@ -69,22 +80,22 @@ the environment. Keep Pixi and Git on `PATH`. Existing hooks or `core.hooksPath`
 may require contributor resolution; inspect prek's migration notice rather than
 force-overwriting them. Installation is separate from validation.
 
-[prek.toml](../../prek.toml) is the sole hook configuration. Local system hooks
-invoke locked dev tasks without separate language environments. Pre-commit
-checks the entire repository through `check`, including docs-only commits and
-deletions; it does not run tests or stage/fix files. Keep `hooks-check` out of
-`check` and its dependencies to avoid recursion.
+[prek.toml](../../prek.toml) is the sole hook configuration. Pre-commit runs the
+built-ins and configuration validation directly; `check` runs those same hooks
+on all tracked working-tree files. No hook calls `check`, so there is no
+recursion. CI runs `check` on every developer host and device checks/build/tests
+in the Linux device job.
 
 At commit time, prek temporarily sets unstaged tracked edits aside to check the
 staged snapshot, then restores them. Do not interrupt restoration; inspect Git
 status after an interrupted run. Untracked files remain visible and can affect
-workspace checks. Prek refuses unstaged hook-configuration edits. `hooks-check`
+workspace checks. Prek refuses unstaged hook-configuration edits. `check`
 instead inspects the current working tree; passing it does not prove that a
 partially staged commit passes.
 
 ```sh
-pixi run --locked -e dev commit-check '/tmp/commit message.txt'
-pixi run --locked -e dev commit-check-range 'origin/main..HEAD'
+pixi run --locked -e host commit-check '/tmp/commit message.txt'
+pixi run --locked -e host commit-check-range 'origin/main..HEAD'
 ```
 
 Pass the path/range directly, without an extra `--`. Missing arguments, unknown
@@ -103,17 +114,18 @@ nor audit history. See [PR checks](development.md#pr-checks),
 
 ## Mutation and cleanup
 
-Inspect `git status` and the diff before `format` or `fix`. Formatting can
-rewrite uncommitted Rust edits. `fix` retains Cargo's Git safeguards and refuses
+Inspect `git status` and the diff before device/agent format or fix tasks.
+Formatting can rewrite uncommitted Rust edits. Cargo fix retains Git safeguards and refuses
 dirty/staged/untracked work; resolve that work deliberately. Neither task
 stages, commits, hides or reverts changes. Fixes can still need manual work.
 
-`clean` deletes generated build output, not operational state. Keep SQLite,
-release catalogs, runtime state and caches outside `target/`. The task pins
-final/intermediate output to repository `target/`, refuses symlinks (including
-dangling ones), and retains Cargo's `CACHEDIR.TAG` safeguard. An absent `target/`
-is safe. Custom external output directories require separate deliberate cleanup.
-It preserves source, locks, `.pixi/` and package caches. See
+`device-clean` optionally removes generated Rust output from this checkout's `target/`;
+the next build recompiles it. It preserves source, locks, Pixi environments,
+package caches and operational data (which must stay outside `target/`). The
+same guard runs on Linux, macOS and WSL2: it refuses symlinks—paths pointing
+elsewhere—even when their destination is missing, and overrides Cargo's final
+and intermediate output settings so cleanup stays inside the checkout. Custom
+external build directories require separate cleanup. See
 [Cargo clean](https://doc.rust-lang.org/cargo/commands/cargo-clean.html).
 
 ## Editor and Git defaults

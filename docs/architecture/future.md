@@ -76,6 +76,8 @@ platform.
 
 ## FUT-08 — Production device platforms
 
+Prioritize Linux ARM64 (`linux-aarch64`) as the first device-platform expansion,
+before other architectures or operating systems.
 Validate an explicit native/ARM64 platform matrix, installation, boot
 supervision, agent/schema upgrades and recovery. Preserve identity and accepted
 intent. Never blindly roll back a binary across an incompatible schema. Test

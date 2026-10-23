@@ -100,7 +100,9 @@ interface or normal `gh auth login` flow.
 ## Development setup
 
 Follow the [development guide](docs/guides/development.md) to install the locked
-Linux x86_64 Pixi/Cargo toolchain and build the agent bootstrap diagnostic.
+Pixi/Cargo contributor toolchain for your host and build the agent bootstrap
+diagnostic. Contributor-host support and managed-device runtime support are
+separate; the guide records prerequisites and validation limits.
 
 For documentation changes, inspect links and heading fragments, current contract
 consistency, and the diff; follow [docs/AGENTS.md](docs/AGENTS.md). Use available

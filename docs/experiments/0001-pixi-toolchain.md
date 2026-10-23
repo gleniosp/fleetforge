@@ -143,6 +143,12 @@ direct GCC/sysroot pins, populated default mirror and custom glibc override.
 The development guide's build/run, formatting and Clippy commands passed.
 Additional local checks passed:
 
+**Clarification (2026-10-23):** `bash -n` below was run on the original Linux
+host. It parses the script for syntax errors without executing its commands.
+This is historical review evidence, not a cross-platform setup requirement.
+The full `verify.sh` experiment must run inside the documented disposable Ubuntu
+container, where Bash and the expected Linux utilities are available.
+
 ```sh
 pixi run --locked -e build cargo metadata --locked --offline --no-deps --format-version 1
 bash -n experiments/pixi-toolchain/verify.sh
