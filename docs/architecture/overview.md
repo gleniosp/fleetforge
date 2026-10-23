@@ -235,9 +235,12 @@ exposure.
 
 ## Decisions still requiring experiments
 
+The root toolchain has [clean-build evidence](../experiments/0001-pixi-toolchain.md).
+Revalidate it when toolchain or host requirements change. The following design
+questions still need evidence in their owning deliveries.
+
 | Milestone owner | Question and evidence | Default and revisit trigger |
 | --- | --- | --- |
-| [M0-03](https://github.com/gleniosp/fleetforge/issues/3) | Does clean Linux Pixi provisioning supply compiler, formatter, linter and linker without host leakage? | Pinned stable toolset; change if package compatibility or clean-build evidence fails |
 | [M1-02](https://github.com/gleniosp/fleetforge/issues/11) | Does the actual RoboStack/Pixi combination run isolated ROS 2 Jazzy A/B health on the reference container? | Real ROS behavior; reproduce package gaps with an actionable handoff |
 | [M1-05](https://github.com/gleniosp/fleetforge/issues/14) | Can an absent runtime environment be installed from isolated cached bytes? | Locked offline Pixi install; revisit cache strategy if required bytes/metadata are incomplete |
 | [M3-03](https://github.com/gleniosp/fleetforge/issues/21) | Can supervised stop/start recover across crashes without duplicate/unknown children? | Direct child/process-group supervision; evaluate a small supervisor only if evidence requires it |

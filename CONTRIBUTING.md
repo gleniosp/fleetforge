@@ -87,33 +87,15 @@ Keep credentials in your user environment and out of repository files and report
 
 ### Optional fine-grained personal access token
 
-The browser sign-in flow above does not require you to create a personal access
-token. If you choose a fine-grained token, GitHub CLI recommends supplying it
-through `GH_TOKEN`; this takes precedence over saved credentials. See the
+The browser sign-in flow above does not require a personal access token. If you
+choose a fine-grained token, scope it to the selected repository and operations,
+set an expiration, and supply it through `GH_TOKEN` as described in the
 [CLI environment reference](https://cli.github.com/manual/gh_help_environment).
-
-Select the appropriate resource owner and only the repositories needed for your
-operations: your fork for fork changes, or `gleniosp/fleetforge` for authorized
-maintainer operations. Set an expiration and grant permissions by operation:
-
-| Operation on a selected repository | Repository permission |
-| --- | --- |
-| Read repository metadata | Metadata: read (included automatically) |
-| Read source / push source changes over HTTPS with this token | Contents: read / read and write |
-| Read / create or update issues | Issues: read / read and write |
-| Read / create or update pull requests | Pull requests: read / read and write |
-| Read workflow runs and logs, when needed | Actions: read |
-| Push changes to workflow files, when needed | Workflows: read and write, in addition to Contents: read and write |
-
-Choose only the rows and access levels you need. These permissions do not grant
-repository membership or bypass maintainer review. A fork-scoped token does not
-grant write access to upstream issues or PRs. GitHub currently limits fine-grained
-tokens for public repositories where you are not a member and for outside or
-repository collaborators; use GitHub's web interface or the normal `gh auth login`
-flow for unsupported contribution paths. Check the current
-[token limitations and setup guidance](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
-and [permission reference](https://docs.github.com/en/rest/authentication/permissions-required-for-fine-grained-personal-access-tokens)
-for the operation you intend to perform.
+A fork-scoped token grants no upstream write access or review bypass. Check
+GitHub's current [token limitations and setup](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
+and [operation permissions](https://docs.github.com/en/rest/authentication/permissions-required-for-fine-grained-personal-access-tokens)
+before choosing scopes; some external-contributor operations require the web
+interface or normal `gh auth login` flow.
 
 ## Development setup
 
@@ -135,11 +117,10 @@ message/history checks, checker exemptions and staged-content behavior.
 
 ## PR checks and maintainer review
 
-Every PR targeting `main` runs the **PR checks / Repository checks** job, including
-documentation-only PRs. It installs locked tools without restored caches, checks
-all files through prek, runs tests/builds and validates proposed commit messages.
-The [development guide](docs/guides/development.md#pr-checks)
-documents the runner, revision selection and local reproduction.
+Every PR targeting `main` runs **PR checks / Repository checks**, including
+documentation-only PRs. The [development guide](docs/guides/development.md#pr-checks)
+explains the checks, revision selection and local reproduction; the linked
+workflow owns CI configuration.
 Inspect failures in the Actions step logs.
 For fork PRs, a maintainer may need to approve the workflow run first.
 

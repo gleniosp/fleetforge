@@ -1,14 +1,21 @@
 # Documentation map
 
-Use one authoritative owner for each fact and link to it from other documents.
-The latest explicit maintainer direction takes precedence; update affected
-contracts, decisions, planning, and verification together when direction
-changes. Current contracts describe the present design and workflow. Keep useful
-status/date metadata and decision rationale, alternatives and consequences; record
-edit history and reasons for revisions in journals, issues, PRs and Git history.
+Use one authoritative owner for each topic and link to it elsewhere. Documents
+outside journals and experiment reports describe the current implementation,
+workflow, or accepted design/plans. Keep revision narratives and superseded
+implementation details in journals or relevant experiment evidence. Preserve
+those records as dated evidence, with corrections rather than rewritten results.
+ADRs retain current decisions and their rationale, alternatives, consequences
+and revisit conditions; creation/update dates and status are useful metadata.
+
+Code and configuration own executable details. Guides explain purpose, main
+commands and non-obvious constraints rather than restating those files. Repeat
+only what readers need at an entry point. The latest explicit maintainer
+direction takes precedence; update affected owners and verification together.
 
 | Source | Owns |
 | --- | --- |
+| [README](../README.md) | Current capabilities, minimum host/tools and first run |
 | [Product requirements](product/requirements.md) | Vision, terminology, scope, requirements, exclusions, and product acceptance |
 | [Architecture](architecture/overview.md) | Component/lifecycle boundaries and navigation to identity, coordination, security, and future architecture contracts |
 | [ADRs](adr/README.md) | Significant decisions, alternatives, rationale, consequences, and revisit conditions |
@@ -21,13 +28,12 @@ edit history and reasons for revisions in journals, issues, PRs and Git history.
 | [License](../LICENSE) and [third-party guidance](../THIRD_PARTY.md) | Original project license and provenance/notice responsibilities for contributions and distributions |
 | [Security policy](../SECURITY.md) | Supported scope, vulnerability reporting route, and reporting-service limits |
 | [Code of conduct](../CODE_OF_CONDUCT.md) | Participation, conduct reports, and provisional maintainer-owned moderation |
-| [Guides](guides/) | Supported setup and workflows |
-| [Task reference](guides/tasks.md) | Canonical task tools, scopes, environments, mutation and exit behavior |
+| [Development guide](guides/development.md) | Contributor setup, checks, hooks and upgrades |
+| [Task reference](guides/tasks.md) | Task selection, scopes and operational caveats; exact definitions live in [pixi.toml](../pixi.toml) |
 | [Experiments](experiments/) | Reproducible investigation of bounded technical questions |
 | [Journals](journal/) | Dated implementation/review evidence and limitations |
 
-Specifications accompany the behavior they define. Blog drafts may explain
-verified milestone results without becoming requirements or task trackers.
+Specifications accompany the behavior they define.
 
 ## Reading design and evidence
 

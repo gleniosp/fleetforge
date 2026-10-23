@@ -12,7 +12,8 @@ add guidance for their directories; [docs/AGENTS.md](docs/AGENTS.md) applies to
 documentation changes.
 
 Introduce executable setup and checks with the delivery that owns them; current
-toolchain availability is described in [CONTRIBUTING.md](CONTRIBUTING.md).
+minimum setup is in [README.md](README.md#current-state) and contributor
+workflows are in the [development guide](docs/guides/development.md).
 Keep essential implementation, validation, configuration, documentation, and
 decision/evidence changes together under the working agreement's
 [readiness rules](docs/working-agreement.md#implementation-and-readiness).
