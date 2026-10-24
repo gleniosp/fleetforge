@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "descriptor_digest",
+    "signature"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "descriptor_digest": {
+      "$ref": "common.schema.json#/$defs/digest"
+    },
+    "signature": {
+      "type": "string",
+      "minLength": 128,
+      "maxLength": 128,
+      "pattern": "^[0-9a-f]{128}$"
+    }
+  }
+}

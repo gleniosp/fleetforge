@@ -120,6 +120,8 @@ workload. Each has a stable ID, manifest, lockfile, files, executable
 entrypoint, health contract, publisher-signed immutable descriptor, and
 integrity information. Authority and devices agree on the explicit catalog.
 Unknown, missing, or mismatched releases fail clearly.
+The [release specification](../specs/releases.md) owns immutable descriptor,
+catalog, publisher trust and execution/health interface details.
 
 **Acceptance:** fresh installed environments execute genuinely different
 application behavior, not only different version metadata; health identifies the

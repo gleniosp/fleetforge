@@ -13,25 +13,27 @@ commands and non-obvious constraints rather than restating those files. Repeat
 only what readers need at an entry point. The latest explicit maintainer
 direction takes precedence; update affected owners and verification together.
 
-| Source | Owns |
-| --- | --- |
-| [README](../README.md) | Current capabilities, minimum host/tools and first run |
-| [Product requirements](product/requirements.md) | Vision, terminology, scope, requirements, exclusions, and product acceptance |
-| [Architecture](architecture/overview.md) | Component/lifecycle boundaries and navigation to identity, coordination, security, and future architecture contracts |
-| [ADRs](adr/README.md) | Significant decisions, alternatives, rationale, consequences, and revisit conditions |
-| [Roadmap](roadmap.md) | Navigation to GitHub milestones |
-| [Traceability](traceability.md) | Requirement links to delivery owners, planned components, and verification methods |
-| [GitHub issues](https://github.com/gleniosp/fleetforge/issues) | Live task scope, dependencies, priority, checklists, and review/merge progress |
-| [GitHub milestones](https://github.com/gleniosp/fleetforge/milestones) | Delivery grouping, milestone exit criteria, and progress |
-| [Working agreement](working-agreement.md) | Task selection, delivery permissions, review/commit/publication flow, issue sizing, and milestone exit |
-| [Contributing](../CONTRIBUTING.md) | Public issue validation, fork/PR submissions, project decision ownership, and optional global GitHub CLI usage |
-| [License](../LICENSE) and [third-party guidance](../THIRD_PARTY.md) | Original project license and provenance/notice responsibilities for contributions and distributions |
-| [Security policy](../SECURITY.md) | Supported scope, vulnerability reporting route, and reporting-service limits |
-| [Code of conduct](../CODE_OF_CONDUCT.md) | Participation, conduct reports, and provisional maintainer-owned moderation |
-| [Development guide](guides/development.md) | Contributor setup, checks, hooks and upgrades |
-| [Task reference](guides/tasks.md) | Task selection, scopes and operational caveats; exact definitions live in [pixi.toml](../pixi.toml) |
-| [Experiments](experiments/) | Reproducible investigation of bounded technical questions |
-| [Journals](journal/) | Dated implementation/review evidence and limitations |
+| Source                                                                 | Owns                                                                                                                 |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| [README](../README.md)                                                 | Current capabilities, minimum host/tools and first run                                                               |
+| [Product requirements](product/requirements.md)                        | Vision, terminology, scope, requirements, exclusions, and product acceptance                                         |
+| [Architecture](architecture/overview.md)                               | Component/lifecycle boundaries and navigation to identity, coordination, security, and future architecture contracts |
+| [ADRs](adr/README.md)                                                  | Significant decisions, alternatives, rationale, consequences, and revisit conditions                                 |
+| [Release specification](specs/releases.md)                             | Immutable descriptor/catalog schemas, signed bytes, publisher keyring and ROS health interface                       |
+| [Roadmap](roadmap.md)                                                  | Navigation to GitHub milestones                                                                                      |
+| [Traceability](traceability.md)                                        | Requirement links to delivery owners, planned components, and verification methods                                   |
+| [GitHub issues](https://github.com/gleniosp/fleetforge/issues)         | Live task scope, dependencies, priority, checklists, and review/merge progress                                       |
+| [GitHub milestones](https://github.com/gleniosp/fleetforge/milestones) | Delivery grouping, milestone exit criteria, and progress                                                             |
+| [Working agreement](working-agreement.md)                              | Task selection, delivery permissions, review/commit/publication flow, issue sizing, and milestone exit               |
+| [Contributing](../CONTRIBUTING.md)                                     | Public issue validation, fork/PR submissions, project decision ownership, and optional global GitHub CLI usage       |
+| [License](../LICENSE) and [third-party guidance](../THIRD_PARTY.md)    | Original project license and provenance/notice responsibilities for contributions and distributions                  |
+| [Security policy](../SECURITY.md)                                      | Supported scope, vulnerability reporting route, and reporting-service limits                                         |
+| [Code of conduct](../CODE_OF_CONDUCT.md)                               | Participation, conduct reports, and provisional maintainer-owned moderation                                          |
+| [Development guide](guides/development.md)                             | Contributor setup, checks, hooks and upgrades                                                                        |
+| [Release walkthrough](guides/releases-explained.md)                    | Introductory explanation of releases, trust and the planned deployment journey                                       |
+| [Task reference](guides/tasks.md)                                      | Task selection, scopes and operational caveats; exact definitions live in [pixi.toml](../pixi.toml)                  |
+| [Experiments](experiments/)                                            | Reproducible investigation of bounded technical questions                                                            |
+| [Journals](journal/)                                                   | Dated implementation/review evidence and limitations                                                                 |
 
 Specifications accompany the behavior they define.
 

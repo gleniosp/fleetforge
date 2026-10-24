@@ -14,8 +14,9 @@ behavior.
 | [0005](0005-authenticated-push-transport.md) | Direct mutually authenticated WebSocket push |
 | [0006](0006-signed-trust-and-privilege-boundaries.md) | Signed releases/instructions and MVP privilege/trust boundaries |
 
-Exact signed encodings, schemas, finite limits, SQLite settings and supervision
-mechanisms are specified/validated in their owning implementation slices. They
+The [release specification](../specs/releases.md) owns the version 1 descriptor,
+signed bytes, schemas and input limits. Instruction encodings, SQLite settings
+and supervision mechanisms are specified/validated in their owning slices. They
 do not reopen accepted transport/framework/identity choices without demonstrated
 need. The [architecture](../architecture/overview.md) links current contracts
 and bounded experiments; the [traceability map](../traceability.md) links

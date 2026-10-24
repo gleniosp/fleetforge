@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "release_id",
+    "platform",
+    "runtime",
+    "manifest",
+    "lock",
+    "files",
+    "entrypoint",
+    "health",
+    "signing"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "release_id": {
+      "$ref": "common.schema.json#/$defs/id"
+    },
+    "platform": {
+      "const": "linux-64"
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "environment",
+        "minimum_pixi_version"
+      ],
+      "properties": {
+        "environment": {
+          "const": "default"
+        },
+        "minimum_pixi_version": {
+          "const": "0.83.0"
+        }
+      }
+    },
+    "manifest": {
+      "const": "pixi.toml"
+    },
+    "lock": {
+      "const": "pixi.lock"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "sha256",
+          "size"
+        ],
+        "properties": {
+          "path": {
+            "$ref": "common.schema.json#/$defs/path"
+          },
+          "sha256": {
+            "$ref": "common.schema.json#/$defs/sha256"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1073741824
+          }
+        }
+      },
+      "minItems": 2,
+      "maxItems": 4096
+    },
+    "entrypoint": {
+      "$ref": "common.schema.json#/$defs/command"
+    },
+    "health": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "argv",
+        "cwd",
+        "kind",
+        "expected_behavior",
+        "startup_timeout_ms",
+        "probe_timeout_ms",
+        "interval_ms"
+      ],
+      "properties": {
+        "argv": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "prefixItems": [
+            {
+              "$ref": "common.schema.json#/$defs/path"
+            }
+          ],
+          "items": {
+            "type": "string",
+            "maxLength": 1024,
+            "not": {
+              "pattern": "\u0000"
+            }
+          }
+        },
+        "cwd": {
+          "anyOf": [
+            {
+              "const": "."
+            },
+            {
+              "$ref": "common.schema.json#/$defs/path"
+            }
+          ]
+        },
+        "kind": {
+          "const": "ros2-probe-v1"
+        },
+        "expected_behavior": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[ -~]+$",
+          "not": {
+            "pattern": "\n"
+          }
+        },
+        "startup_timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 300000
+        },
+        "probe_timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30000
+        },
+        "interval_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        }
+      }
+    },
+    "signing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "key_id"
+      ],
+      "properties": {
+        "algorithm": {
+          "const": "Ed25519"
+        },
+        "key_id": {
+          "$ref": "common.schema.json#/$defs/id"
+        }
+      }
+    }
+  }
+}

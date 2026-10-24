@@ -10,6 +10,7 @@ acceptance.
 | [Identity](identity.md) | Asset/device lifecycle, tenancy and assignment history |
 | [Coordination](coordination.md) | Authority, signed-intent semantics, selected transport, offline behavior, synchronization and freshness |
 | [Security](security.md) | Initial threat model, signatures, credentials and workload privilege boundary |
+| [Release specification](../specs/releases.md) | Immutable descriptor bytes, local catalog, publisher keyring and ROS health interface |
 | This overview | Components, release preparation, local lifecycle, persistence and simulation |
 | [Future architecture](future.md) | All twelve deferred capability constraints and scale evidence |
 
@@ -74,8 +75,10 @@ core/network/edge crates or cloud directories.
 Each headless ROS 2 Jazzy Python A/B release owns a publisher-signed immutable
 descriptor, files, Pixi manifest/lockfile, entrypoint, and health contract. The
 catalog maps a stable release ID to its descriptor/digest and local location.
-Detailed descriptor/path/schema rules belong to
-[M1-01](https://github.com/gleniosp/fleetforge/issues/10).
+The [version 1 release specification](../specs/releases.md) owns descriptor,
+path/schema, canonical signing, catalog collision and ROS probe interface rules.
+Its schemas and review fixtures specify the contract; runtime enforcement and
+real ROS evidence remain with the subsequent M1 deliveries.
 
 Before deployment scenarios, provision each relevant robot with release inputs
 and all dependency bytes needed for offline installation. The operator sends

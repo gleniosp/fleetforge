@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "releases"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "releases": {
+      "type": "array",
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "release_id",
+          "descriptor_digest",
+          "directory"
+        ],
+        "properties": {
+          "release_id": {
+            "$ref": "common.schema.json#/$defs/id"
+          },
+          "descriptor_digest": {
+            "$ref": "common.schema.json#/$defs/digest"
+          },
+          "directory": {
+            "$ref": "common.schema.json#/$defs/path"
+          }
+        }
+      }
+    }
+  }
+}

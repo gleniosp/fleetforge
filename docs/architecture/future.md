@@ -36,6 +36,11 @@ execution/recovery dependent on a cache service. Validate authorization,
 corruption, interruption, resume, quota/eviction and offline recovery with real
 bytes before claiming delivery.
 
+Specify how a complete verified release becomes locally available through a
+protected catalog update, including interruption and conflicting ID/digest
+bindings. This enables remote provisioning of new releases while the current
+workload continues running; the MVP assumes trusted pre-provisioning instead.
+
 ## FUT-04 — Advanced rollouts
 
 Add canaries/waves, fresh-health gates, scheduling, durable admissions,
