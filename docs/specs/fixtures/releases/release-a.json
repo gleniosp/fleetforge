@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "release_id": "example-a-v1",
+  "platform": "linux-64",
+  "runtime": {
+    "environment": "default",
+    "minimum_pixi_version": "0.83.0"
+  },
+  "manifest": "pixi.toml",
+  "lock": "pixi.lock",
+  "files": [
+    {
+      "path": "app/health.py",
+      "sha256": "39f810a8528d9c7c980cf3bf80f7830ff84531e16623f3c37ee2ed52cb3526cd",
+      "size": 52
+    },
+    {
+      "path": "app/main.py",
+      "sha256": "a4e10e99225c6d7c5ba5edf2f7f3f93f197f798feca94f6f6f42141cc32aa30f",
+      "size": 40
+    },
+    {
+      "path": "pixi.lock",
+      "sha256": "e21229aa1076cc761448e7dcf0e02602dc8120ff58ac7574a392b00605f69420",
+      "size": 41
+    },
+    {
+      "path": "pixi.toml",
+      "sha256": "139b199041f0e843e77244f298ffa9d9a139cefbf316eeddd54ab754a01b2a26",
+      "size": 51
+    }
+  ],
+  "entrypoint": {
+    "argv": [
+      "bin/python",
+      "app/main.py"
+    ],
+    "cwd": "."
+  },
+  "health": {
+    "kind": "ros2-probe-v1",
+    "argv": [
+      "bin/python",
+      "app/health.py"
+    ],
+    "cwd": ".",
+    "expected_behavior": "counter-step-1",
+    "startup_timeout_ms": 30000,
+    "probe_timeout_ms": 3000,
+    "interval_ms": 500
+  },
+  "signing": {
+    "algorithm": "Ed25519",
+    "key_id": "example-publisher-1"
+  }
+}

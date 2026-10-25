@@ -1,0 +1,14 @@
+{
+  "a": {
+    "pixi.toml": "# Contract fixture A; not an installable manifest.\n",
+    "pixi.lock": "Contract fixture A; not a Pixi lockfile.\n",
+    "app/main.py": "# Intended ROS behavior: counter-step-1\n",
+    "app/health.py": "# Probe contract fixture; no health implementation.\n"
+  },
+  "b": {
+    "pixi.toml": "# Contract fixture B; not an installable manifest.\n",
+    "pixi.lock": "Contract fixture B; not a Pixi lockfile.\n",
+    "app/main.py": "# Intended ROS behavior: counter-step-2\n",
+    "app/health.py": "# Probe contract fixture; no health implementation.\n"
+  }
+}

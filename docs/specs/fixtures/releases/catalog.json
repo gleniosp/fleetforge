@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "releases": [
+    {
+      "release_id": "example-a-v1",
+      "descriptor_digest": "sha256:e8343134dffc011d0a9f616651d03ccff1e2f27d7bb59444ced9df9cbae3238c",
+      "directory": "example-a-v1"
+    },
+    {
+      "release_id": "example-b-v1",
+      "descriptor_digest": "sha256:f3ddc0686930aa08669116e83adc1f4035a707e564bc1dcfa02b46fbb61009ba",
+      "directory": "example-b-v1"
+    }
+  ]
+}

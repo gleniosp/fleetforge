@@ -2,7 +2,7 @@
 
 - **Status:** Accepted.
 - **Date:** 2026-10-19
-- **Updated:** 2026-10-23
+- **Updated:** 2026-10-24
 - **Requirement:** [MVP-01](../product/requirements.md#mvp-01--engineering-foundation)
 
 ## Context
@@ -67,6 +67,10 @@ Pixi resolves, locks and installs environments. FleetForge owns desired state,
 authorization, supervision, health, activation/recovery and future artifact
 transfer/cache policy. Pixi does not supply fleet coordination or atomic process
 switching. Evaluate pixi-pack only when packaging needs justify it.
+The [release specification](../specs/releases.md#inputs-installed-environments-and-offline-preparation)
+owns the distinction between signed immutable release inputs, provisioned package
+bytes and generated release-specific environments. Actual offline cache and ROS
+compatibility evidence belongs to the M1 workload/cache deliveries.
 
 ## Alternatives and consequences
 

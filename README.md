@@ -44,6 +44,13 @@ It prints `fleetforge-agent 0.1.0 (x86_64-linux; bootstrap diagnostic)` and exit
 
 ## Planned MVP
 
+> [!TIP]
+> **Follow the software from release to robot.**
+> The [illustrated walkthrough](docs/guides/releases-explained.md) explains the
+> planned flow step by step: creating and approving a release, requesting a
+> deployment, preparing its environment, running it, checking health, and recovering
+> from failure. It introduces the concepts as they appear, with connected examples.
+
 - One local Rust/Tokio authority and three independent device agents with SQLite.
 - Separate asset/device identities and tenant/authority/assignment context.
 - Real headless ROS 2 Jazzy Python A/B releases in independent Pixi environments.

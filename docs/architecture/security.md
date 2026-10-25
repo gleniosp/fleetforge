@@ -62,12 +62,13 @@ Deduplication compares immutable payload semantics rather than signature or
 framing representation. Hashes prove byte integrity, not trusted provenance or
 download permission.
 
-[M1-01 (#10)](https://github.com/gleniosp/fleetforge/issues/10) and [M4-01
-(#25)](https://github.com/gleniosp/fleetforge/issues/25) must specify exact
-signed encoding, domain/version separation, algorithm/key IDs and verification
-fixtures before their implementations. This architecture fixes the trust choice
-without inventing an untested wire format. Check signatures and integrity before
-preparation and activation, including recovery inputs; unsafe or untrusted
+The [release specification](../specs/releases.md#canonical-bytes-and-detached-signature)
+owns exact publisher-signed bytes, domain/version separation, key IDs, local
+keyring replacement and review fixtures. [M4-01
+(#25)](https://github.com/gleniosp/fleetforge/issues/25) must specify the separate
+instruction encoding before implementation. These are design contracts;
+executable signature verification still requires its owning delivery. Check
+signatures and integrity before preparation and activation, including recovery inputs; unsafe or untrusted
 inputs fail closed with an actionable decision record.
 
 ## Local privileges and key lifecycle
