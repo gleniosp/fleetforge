@@ -64,13 +64,13 @@ were changed or private reporting endpoint advertised.
 Used Linux x86_64, Pixi 0.82.1, Cargo 1.98.1, and prek 0.5.6. Commands and
 results:
 
-| Command | Result |
-| --- | --- |
-| `curl -fsSL https://www.apache.org/licenses/LICENSE-2.0.txt \| cmp - LICENSE` | Exact match to Apache's published license text |
-| `pixi run --locked cargo metadata --locked --format-version 1 --no-deps` | Agent resolves `Apache-2.0`, publication remains disabled, zero external Cargo dependencies |
-| `pixi run --locked -e dev hooks-check` | Passed repository formatting, Clippy, and hook configuration checks |
-| `git diff --check` | Passed |
-| `git diff --exit-code -- Cargo.lock pixi.lock` | Passed; both lockfiles unchanged |
+| Command                                                                       | Result                                                                                      |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `curl -fsSL https://www.apache.org/licenses/LICENSE-2.0.txt \| cmp - LICENSE` | Exact match to Apache's published license text                                              |
+| `pixi run --locked cargo metadata --locked --format-version 1 --no-deps`      | Agent resolves `Apache-2.0`, publication remains disabled, zero external Cargo dependencies |
+| `pixi run --locked -e dev hooks-check`                                        | Passed repository formatting, Clippy, and hook configuration checks                         |
+| `git diff --check`                                                            | Passed                                                                                      |
+| `git diff --exit-code -- Cargo.lock pixi.lock`                                | Passed; both lockfiles unchanged                                                            |
 
 An initial hook run was blocked by the sandbox's access to prek's log cache; the
 same repository command passed after access was granted. Manually reviewed the

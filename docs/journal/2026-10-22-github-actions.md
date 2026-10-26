@@ -24,9 +24,9 @@ Consulted current official [Pixi Actions integration](https://pixi.prefix.dev/la
 and [protected-branch guidance](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
 Checked release tags and action input definitions through GitHub's API:
 
-| Action | Release | Pinned commit |
-| --- | --- | --- |
-| [checkout](https://github.com/actions/checkout/tree/v7.0.1) | v7.0.1 | `3d3c42e5aac5ba805825da76410c181273ba90b1` |
+| Action                                                              | Release | Pinned commit                              |
+| ------------------------------------------------------------------- | ------- | ------------------------------------------ |
+| [checkout](https://github.com/actions/checkout/tree/v7.0.1)         | v7.0.1  | `3d3c42e5aac5ba805825da76410c181273ba90b1` |
 | [setup-pixi](https://github.com/prefix-dev/setup-pixi/tree/v0.11.2) | v0.11.2 | `ad1da6449d9e506fd127fd67ab2d054a769f6a94` |
 
 Setup installs Pixi 0.82.1 and both environments using `environments: dev default`, `locked: true` and `cache: false`. The documented inputs support the
@@ -78,20 +78,20 @@ The fixture driver set `PR_BASE`/`PR_HEAD` to real Git objects created with
 `git commit-tree`, disabled system/global Git configuration, and restored valid
 source between each independent fault. Final workflow steps produced:
 
-| Input | Result |
-| --- | --- |
-| Valid proposed commit, hooks, tests, build and stable tree | All pass; ten CLI tests pass |
-| Malformed `main` signature: `fn main()->io::Result<ExitCode>{` | Hooks exit 1 with rustfmt diff |
-| `let unused_ci_sentinel = 1;` inside `main` | Hooks exit 1 with denied Clippy warning |
-| Formatted test that panics with `CI test failure sentinel` | Hooks pass; tests exit 101 |
-| Invalid proposed commit subject | Commit check exits 14 |
-| Checkout is a synthetic merge with invalid subject; proposed head is valid | Commit check passes; synthetic subject excluded |
-| Real `Merge ` commit containing valid side history | Commit check passes |
-| Real merge containing an invalid side commit | Commit check exits 14 and identifies the side commit |
-| Empty proposed range | Commit check exits 3 |
-| Missing base object | Commit check exits 23 |
-| Unstaged or staged tracked README change | Stability exits 1 |
-| Clean tree/index after restoration | Stability exits 0 |
+| Input                                                                      | Result                                               |
+| -------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Valid proposed commit, hooks, tests, build and stable tree                 | All pass; ten CLI tests pass                         |
+| Malformed `main` signature: `fn main()->io::Result<ExitCode>{`             | Hooks exit 1 with rustfmt diff                       |
+| `let unused_ci_sentinel = 1;` inside `main`                                | Hooks exit 1 with denied Clippy warning              |
+| Formatted test that panics with `CI test failure sentinel`                 | Hooks pass; tests exit 101                           |
+| Invalid proposed commit subject                                            | Commit check exits 14                                |
+| Checkout is a synthetic merge with invalid subject; proposed head is valid | Commit check passes; synthetic subject excluded      |
+| Real `Merge ` commit containing valid side history                         | Commit check passes                                  |
+| Real merge containing an invalid side commit                               | Commit check exits 14 and identifies the side commit |
+| Empty proposed range                                                       | Commit check exits 3                                 |
+| Missing base object                                                        | Commit check exits 23                                |
+| Unstaged or staged tracked README change                                   | Stability exits 1                                    |
+| Clean tree/index after restoration                                         | Stability exits 0                                    |
 
 Also exercised inverse staged/unstaged README changes: stage an injected line,
 then restore only worktree content from HEAD. A net-content `git diff HEAD`
@@ -117,7 +117,6 @@ claiming issue #7's hosted validation complete. Inspect their ordinary Actions
 logs and restore valid inputs. Required-check/review recommendations are in the
 contribution policy; repository settings remain maintainer-owned.
 
-
 ## Hosted failure validation and restoration — 2026-10-22
 
 The maintainer authorized committing/pushing deliberate faults and restoring the
@@ -125,13 +124,13 @@ working state. Each fault used a separate valid Conventional Commit and was
 pushed only after the preceding run completed and its failure logs were
 inspected. The hosted workflow produced:
 
-| Case | Source revision | Hosted run | Observed result |
-| --- | --- | --- | --- |
-| Formatting | `bf20578fb749436e0ce138f81c2b933f10a8d0f3` | [39762257245](https://github.com/gleniosp/fleetforge/actions/runs/39762257245) | failure: Hooks rejected the malformed `main` signature |
-| Lint | `eb444758e8c73a23354cc98c57f99122c16fe82a` | [39762534171](https://github.com/gleniosp/fleetforge/actions/runs/39762534171) | failure: Hooks rejected `unused_ci_sentinel` under denied warnings |
-| Test | `94955f03c5953771d3c189187f519e68fc94a802` | [39762617179](https://github.com/gleniosp/fleetforge/actions/runs/39762617179) | failure: Hooks passed; tests rejected the deliberate panic |
-| Commit message | `a93d9c2edd4c6f967bef3dbcc00b2a15161a54d2` | [39762690839](https://github.com/gleniosp/fleetforge/actions/runs/39762690839) | failure: Commit-range validation rejected an invalid runner-only commit |
-| Restored working state | `4d9e0f672f337edc67ffca953664ca0216749fff` | [39762762788](https://github.com/gleniosp/fleetforge/actions/runs/39762762788) | success: Every job step passed |
+| Case                   | Source revision                            | Hosted run                                                                     | Observed result                                                         |
+| ---------------------- | ------------------------------------------ | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| Formatting             | `bf20578fb749436e0ce138f81c2b933f10a8d0f3` | [39762257245](https://github.com/gleniosp/fleetforge/actions/runs/39762257245) | failure: Hooks rejected the malformed `main` signature                  |
+| Lint                   | `eb444758e8c73a23354cc98c57f99122c16fe82a` | [39762534171](https://github.com/gleniosp/fleetforge/actions/runs/39762534171) | failure: Hooks rejected `unused_ci_sentinel` under denied warnings      |
+| Test                   | `94955f03c5953771d3c189187f519e68fc94a802` | [39762617179](https://github.com/gleniosp/fleetforge/actions/runs/39762617179) | failure: Hooks passed; tests rejected the deliberate panic              |
+| Commit message         | `a93d9c2edd4c6f967bef3dbcc00b2a15161a54d2` | [39762690839](https://github.com/gleniosp/fleetforge/actions/runs/39762690839) | failure: Commit-range validation rejected an invalid runner-only commit |
+| Restored working state | `4d9e0f672f337edc67ffca953664ca0216749fff` | [39762762788](https://github.com/gleniosp/fleetforge/actions/runs/39762762788) | success: Every job step passed                                          |
 
 Formatting changed only the `main` signature to `fn main()->io::Result<ExitCode>{`.
 The lint case restored formatting and inserted `let unused_ci_sentinel = 1;`.

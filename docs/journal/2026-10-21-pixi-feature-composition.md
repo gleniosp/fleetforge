@@ -128,13 +128,13 @@ returned 2. The latter reported one unexpected argument containing spaces.
 Invocation from `apps/agent` also worked. Each deliberate failure below
 preserved the injected source and both locks.
 
-| Disposable input | Commands / observed result |
-| --- | --- |
-| Remove spaces in `fn main() -> io::Result<ExitCode> {` | Dev `format-check`, `rust-format-check`, `check`, `rust-check` failed; dev `format` restored the original bytes |
-| Add unused `let lint_failure = 1;` in `main` | Dev `lint`, `rust-lint`, `check`, `rust-check` failed; dev `fix`/`rust-fix` refused the dirty fixture |
-| Append formatted `#[test] fn injected_failure()` that panics with `task failure sentinel` | Dev `test`, `rust-test`, `check`, `rust-check` failed with the injected test |
-| Change workspace version from `0.1.0` to `0.1.1` without a Cargo lock update | Default `build`/`agent-run` and dev `check` rejected the stale lock |
-| Change Rust pin from `=1.98.1` to `=1.98.0` without a Pixi lock update | Default `build` and dev `check` rejected the stale lock |
+| Disposable input                                                                          | Commands / observed result                                                                                      |
+| ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Remove spaces in `fn main() -> io::Result<ExitCode> {`                                    | Dev `format-check`, `rust-format-check`, `check`, `rust-check` failed; dev `format` restored the original bytes |
+| Add unused `let lint_failure = 1;` in `main`                                              | Dev `lint`, `rust-lint`, `check`, `rust-check` failed; dev `fix`/`rust-fix` refused the dirty fixture           |
+| Append formatted `#[test] fn injected_failure()` that panics with `task failure sentinel` | Dev `test`, `rust-test`, `check`, `rust-check` failed with the injected test                                    |
+| Change workspace version from `0.1.0` to `0.1.1` without a Cargo lock update              | Default `build`/`agent-run` and dev `check` rejected the stale lock                                             |
+| Change Rust pin from `=1.98.1` to `=1.98.0` without a Pixi lock update                    | Default `build` and dev `check` rejected the stale lock                                                         |
 
 For each of `pixi run --locked clean` and `rust-clean`, built real root
 `target/` output first, verified Cargo's marker, then supplied external

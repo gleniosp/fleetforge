@@ -96,21 +96,21 @@ The final run returned exit 0 and:
 PASS: fresh installs, isolated tool paths, builds, lock rejection, inherited unsafe lint, source preservation
 ```
 
-| Check | Observed result |
-| --- | --- |
-| Fresh locked install | dev/build installed from lock; implicit default has no packages |
-| Rust/Cargo | rustc 1.98.1, Cargo 1.98.1 |
-| Formatter/linter | rustfmt 1.9.0-stable, Clippy 0.1.98 |
-| Transitive native toolchain | GCC implementation 16.2.0, binutils 2.46.1, sysroot 2.28 |
-| Isolation | 17 build packages; 54 dev packages; prek 0.5.6 and Commitizen 4.19.2 absent from build |
-| Tool paths | Rust tools and linker under each environment's own `bin/`; Git resolves to `/usr/bin/git` |
-| Compilation | Both environments compile/link afresh using distinct target directories; release build also succeeds |
-| Execution | `fleetforge-agent 0.1.0 (x86_64-linux; bootstrap diagnostic)` |
-| Source checks | Formatting and Clippy with warnings denied pass |
-| Stale Pixi lock | Pin changed to Rust 1.98.0: locked install and run reject `lock file not up-to-date with the workspace` |
-| Stale Cargo lock | Workspace version changed to 0.1.1: locked offline build rejects `cannot update the lock file ... because --locked was passed` |
-| Inherited lint | Injected `unsafe {}` rejects with `usage of an unsafe block` and `-F unsafe-code` |
-| Mutation checks | Source/lock SHA-256 snapshots match before/after successful checks and each rejection; restoring fixtures reproduces original bytes |
+| Check                       | Observed result                                                                                                                     |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Fresh locked install        | dev/build installed from lock; implicit default has no packages                                                                     |
+| Rust/Cargo                  | rustc 1.98.1, Cargo 1.98.1                                                                                                          |
+| Formatter/linter            | rustfmt 1.9.0-stable, Clippy 0.1.98                                                                                                 |
+| Transitive native toolchain | GCC implementation 16.2.0, binutils 2.46.1, sysroot 2.28                                                                            |
+| Isolation                   | 17 build packages; 54 dev packages; prek 0.5.6 and Commitizen 4.19.2 absent from build                                              |
+| Tool paths                  | Rust tools and linker under each environment's own `bin/`; Git resolves to `/usr/bin/git`                                           |
+| Compilation                 | Both environments compile/link afresh using distinct target directories; release build also succeeds                                |
+| Execution                   | `fleetforge-agent 0.1.0 (x86_64-linux; bootstrap diagnostic)`                                                                       |
+| Source checks               | Formatting and Clippy with warnings denied pass                                                                                     |
+| Stale Pixi lock             | Pin changed to Rust 1.98.0: locked install and run reject `lock file not up-to-date with the workspace`                             |
+| Stale Cargo lock            | Workspace version changed to 0.1.1: locked offline build rejects `cannot update the lock file ... because --locked was passed`      |
+| Inherited lint              | Injected `unsafe {}` rejects with `usage of an unsafe block` and `-F unsafe-code`                                                   |
+| Mutation checks             | Source/lock SHA-256 snapshots match before/after successful checks and each rejection; restoring fixtures reproduces original bytes |
 
 The lock's default Linux virtual packages include glibc 2.28; the manifest has
 no custom override. This describes solver assumptions, not an installed host

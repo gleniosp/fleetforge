@@ -125,7 +125,7 @@ unchanged.
 Relative documentation links/fragments, fenced blocks and final newlines were
 also checked across changed/new Markdown using:
 
-```sh
+````sh
 python3 - <<'PY'
 from pathlib import Path
 import re
@@ -152,7 +152,7 @@ for name in files:
         count += 1
 print(f'Checked {count} relative links/fragments, fences and final newlines')
 PY
-```
+````
 
 Result: 138 relative links/fragments passed. This is a source-level check of
 the current headings, not a rendered Markdown or external-URL availability test.
@@ -253,7 +253,7 @@ values; they are neither deployable inputs nor new cryptographic fixtures.
 
 Checked the example relationships from the repository root with:
 
-```sh
+````sh
 python3 - <<'PY'
 import json
 import re
@@ -273,7 +273,7 @@ assert descriptor['signing']['algorithm'] == key['algorithm'] == 'Ed25519'
 assert descriptor['entrypoint']['argv'][1] == descriptor['files'][0]['path']
 print('Four teaching JSON excerpts parse; identity, key and file references agree')
 PY
-```
+````
 
 Result: passed. Repeated the relative-link/fence/newline check: 171 relative
 links/fragments passed. Configured hooks over changed/untracked files and
@@ -294,7 +294,7 @@ No contract, schema, fixture bytes or Mermaid diagram changed.
 The preceding connected-example command describes the previous four-excerpt
 layout. For the current progressive six-excerpt layout, use:
 
-```sh
+````sh
 python3 - <<'PY'
 import json
 import re
@@ -313,7 +313,7 @@ assert signing['signing']['algorithm'] == key['algorithm'] == 'Ed25519'
 assert descriptor['entrypoint']['argv'][1] == files['files'][0]['path']
 print('Six progressive JSON excerpts parse; identity, key and file references agree')
 PY
-```
+````
 
 Result: passed. Manual reading-order review checked that hashing, publisher
 keys, signatures and keyrings are explained before their JSON excerpts. Repeated
@@ -376,7 +376,7 @@ were introduced. Glyph appearance depends on the viewer's fonts.
 
 Check diagram/prose numbering from the repository root:
 
-```sh
+````sh
 python3 - <<'PY'
 from pathlib import Path
 import re
@@ -391,7 +391,7 @@ assert list(map(int, labels)) == list(range(1, 27))
 assert labels == paragraphs
 print('Five diagrams and 26 ordered diagram/prose steps agree')
 PY
-```
+````
 
 Manual source review checked that the split preserves trust, durable acceptance,
 preparation-before-switch, health and recovery boundaries. Rendered diagram

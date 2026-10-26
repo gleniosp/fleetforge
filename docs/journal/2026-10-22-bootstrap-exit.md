@@ -131,16 +131,16 @@ executable had SHA-256
 Installed tools reported Rust/Cargo 1.98.1, rustfmt 1.9.0-stable,
 Clippy 0.1.98, prek 0.5.6 and Commitizen 4.19.2.
 
-| Check | Result |
-| --- | --- |
-| Fresh clone and cache/tool absence | Passed before installation; no host Rust, C compiler, Python, prek or Commitizen |
-| Separate locked dev/default installation | Both succeeded from the committed lock with initially empty caches |
-| `check` | Formatting, Clippy with denied warnings and hook configuration validation passed |
-| `test` | All 10 CLI integration tests passed; the binary unit-test target contains zero tests |
-| `build` and three CLI invocations | Passed; diagnostic reported `fleetforge-agent 0.1.0 (x86_64-linux; bootstrap diagnostic)`, help/version matched the documented interface |
-| Hook installation and `hooks-check` | Both hook shims executable; all-file repository check passed |
-| Commit validation | Valid message and PR #122's actual proposed range passed; invalid subject rejected with exit 14 |
-| Tracked-file stability | All tracked file hashes matched; index, worktree and untracked-file checks were clean |
+| Check                                    | Result                                                                                                                                   |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Fresh clone and cache/tool absence       | Passed before installation; no host Rust, C compiler, Python, prek or Commitizen                                                         |
+| Separate locked dev/default installation | Both succeeded from the committed lock with initially empty caches                                                                       |
+| `check`                                  | Formatting, Clippy with denied warnings and hook configuration validation passed                                                         |
+| `test`                                   | All 10 CLI integration tests passed; the binary unit-test target contains zero tests                                                     |
+| `build` and three CLI invocations        | Passed; diagnostic reported `fleetforge-agent 0.1.0 (x86_64-linux; bootstrap diagnostic)`, help/version matched the documented interface |
+| Hook installation and `hooks-check`      | Both hook shims executable; all-file repository check passed                                                                             |
+| Commit validation                        | Valid message and PR #122's actual proposed range passed; invalid subject rejected with exit 14                                          |
+| Tracked-file stability                   | All tracked file hashes matched; index, worktree and untracked-file checks were clean                                                    |
 
 The integration suite exercises usage errors, extra/repeated options,
 non-UTF-8 arguments, closed stdout and Linux `/dev/full` output/error failures
@@ -203,17 +203,17 @@ PRs #121/#122. Verified all merge commits below are ancestors of the tested
 revision. Issue #1 is the historical initial-publication exception under the
 [working agreement](../working-agreement.md#review-commits-and-publication).
 
-| Delivery | Merged evidence |
-| --- | --- |
-| Initial publication #1 | [Foundation journal](2026-10-19-foundation-design.md), `192cde37219bc6c04c09a7777406482e8d99a219` |
-| Architecture baseline #85 | [PR #115](https://github.com/gleniosp/fleetforge/pull/115), `dbbe2e09a1f8d88dcfe6d42a125bd565688f3ff7` |
-| Working agreement/skills #2 | [PR #116](https://github.com/gleniosp/fleetforge/pull/116), `8492da06dab19c6424842c16a40d6ef03b05a80b` |
-| Locked toolchain #3 | [PR #117](https://github.com/gleniosp/fleetforge/pull/117), `7ea5ceb0026740fb6c680e32164a16c92e0c1c3f` |
-| Diagnostic executable #4 | [PR #118](https://github.com/gleniosp/fleetforge/pull/118), `c8fc745b0eed2ae295edd9c0ae0f37c2f95d2b44` |
+| Delivery                           | Merged evidence                                                                                        |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Initial publication #1             | [Foundation journal](2026-10-19-foundation-design.md), `192cde37219bc6c04c09a7777406482e8d99a219`      |
+| Architecture baseline #85          | [PR #115](https://github.com/gleniosp/fleetforge/pull/115), `dbbe2e09a1f8d88dcfe6d42a125bd565688f3ff7` |
+| Working agreement/skills #2        | [PR #116](https://github.com/gleniosp/fleetforge/pull/116), `8492da06dab19c6424842c16a40d6ef03b05a80b` |
+| Locked toolchain #3                | [PR #117](https://github.com/gleniosp/fleetforge/pull/117), `7ea5ceb0026740fb6c680e32164a16c92e0c1c3f` |
+| Diagnostic executable #4           | [PR #118](https://github.com/gleniosp/fleetforge/pull/118), `c8fc745b0eed2ae295edd9c0ae0f37c2f95d2b44` |
 | Canonical tasks/editor defaults #5 | [PR #119](https://github.com/gleniosp/fleetforge/pull/119), `83eb8d934afa4c77ad2a4b3b786423618263333e` |
-| Hooks/commit validation #6 | [PR #120](https://github.com/gleniosp/fleetforge/pull/120), `4c9b7716f81c70b0f06de947f5487cbdf4d57f2e` |
-| Hosted PR validation #7 | [PR #121](https://github.com/gleniosp/fleetforge/pull/121), `d8d45730251ed6b403b5c431e1b13d45813af3a4` |
-| Licensing/contributor safety #8 | [PR #122](https://github.com/gleniosp/fleetforge/pull/122), `2c21afea621cdb5068b13b25473c8daa981ba4cd` |
+| Hooks/commit validation #6         | [PR #120](https://github.com/gleniosp/fleetforge/pull/120), `4c9b7716f81c70b0f06de947f5487cbdf4d57f2e` |
+| Hosted PR validation #7            | [PR #121](https://github.com/gleniosp/fleetforge/pull/121), `d8d45730251ed6b403b5c431e1b13d45813af3a4` |
+| Licensing/contributor safety #8    | [PR #122](https://github.com/gleniosp/fleetforge/pull/122), `2c21afea621cdb5068b13b25473c8daa981ba4cd` |
 
 Reproduce the GitHub delivery inspection with:
 
@@ -295,7 +295,7 @@ Used host Python 3.14.4 for this inline inspection, separate from the supported
 contributor toolchain. It checks local file targets, LF/final newlines, balanced
 Markdown fences and the shell syntax of every reproduction block in this record:
 
-```sh
+````sh
 python3 - <<'PY'
 from pathlib import Path
 import re
@@ -324,7 +324,7 @@ pixi run --locked -e dev hooks-check
 git diff --check
 git diff --exit-code HEAD -- Cargo.toml Cargo.lock pixi.toml pixi.lock \
   apps/agent .github/workflows/pr-checks.yml prek.toml .cz.toml
-```
+````
 
 All commands passed. The host hook run initially required environment approval
 for prek's user-cache log, then passed. Manually checked local heading fragments

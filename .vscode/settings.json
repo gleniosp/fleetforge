@@ -1,0 +1,11 @@
+{
+  "dprint.path": "./.pixi/envs/host/bin/dprint",
+  "dprint.ensureStableFormat": true,
+  "[markdown][json][jsonc][yaml][toml]": {
+    "editor.defaultFormatter": "dprint.dprint",
+    "editor.formatOnSave": true
+  },
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer"
+  }
+}

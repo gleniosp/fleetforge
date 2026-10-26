@@ -58,16 +58,16 @@ not an exhaustive availability check of every third-party URL.
 
 Manual decision-register review covered the following contracts:
 
-| Register subject | Owning documentation and review result |
-| --- | --- |
-| Execution/Pixi ownership | Overview and ADR 0001 distinguish install/lock from authorization, activation, supervision and recovery |
-| Identity/ownership | Identity contract and ADR 0004 specify canonical typed IDs, assignment context, replacement/clones and historical privacy |
-| Authority/offline/restore | Coordination and amended ADR 0002 cover durable acceptance, retry/conflict/supersession, expiry and stale-ledger quarantine |
-| Transport/bounds/freshness | Coordination and ADR 0005 select authenticated push with fair bounded work and source-aware projections |
-| Trust/privileges | Security threat table and ADR 0006 require signatures, registry checks, local operator auth and workload separation |
-| Real robotics | Requirements/overview require ROS 2 Jazzy A/B, isolated actual health and reproduced package gaps |
+| Register subject            | Owning documentation and review result                                                                                                             |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Execution/Pixi ownership    | Overview and ADR 0001 distinguish install/lock from authorization, activation, supervision and recovery                                            |
+| Identity/ownership          | Identity contract and ADR 0004 specify canonical typed IDs, assignment context, replacement/clones and historical privacy                          |
+| Authority/offline/restore   | Coordination and amended ADR 0002 cover durable acceptance, retry/conflict/supersession, expiry and stale-ledger quarantine                        |
+| Transport/bounds/freshness  | Coordination and ADR 0005 select authenticated push with fair bounded work and source-aware projections                                            |
+| Trust/privileges            | Security threat table and ADR 0006 require signatures, registry checks, local operator auth and workload separation                                |
+| Real robotics               | Requirements/overview require ROS 2 Jazzy A/B, isolated actual health and reproduced package gaps                                                  |
 | Deferred capabilities/scale | Future architecture and traceability cover FUT-01–12, including fenced rollout/authority transfer, tenant-aware central restore and measured scale |
-| Delivery/upstream | Documentation map owns branch naming, focused issue/PR sizing, authorized upstream work and maintainer-only approval/merge |
+| Delivery/upstream           | Documentation map owns branch naming, focused issue/PR sizing, authorized upstream work and maintainer-only approval/merge                         |
 
 When publication is authorized, the PR will identify its final source revision;
 no self-referential commit ID is invented inside this journal. Checklist completion

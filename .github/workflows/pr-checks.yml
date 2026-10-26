@@ -55,8 +55,11 @@ jobs:
           PR_HEAD: ${{ github.event.pull_request.head.sha }}
         run: pixi run --locked -e host commit-check-range "$PR_BASE..$PR_HEAD"
 
-      - name: Check contributor configuration
+      - name: Check contributor configuration and formatting
         run: pixi run --locked -e host check
+
+      - name: Check commit safety without applying fixes
+        run: pixi run --locked -e host prek run --all-files --stage pre-commit --skip fix
 
       - name: Check tracked-file stability
         if: ${{ always() && steps.checkout.outcome == 'success' }}

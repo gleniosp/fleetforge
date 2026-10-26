@@ -5,14 +5,14 @@ labelled below require bounded validation before becoming implementation claims.
 The [product requirements](../product/requirements.md) own capability
 acceptance.
 
-| Contract owner | Subject |
-| --- | --- |
-| [Identity](identity.md) | Asset/device lifecycle, tenancy and assignment history |
-| [Coordination](coordination.md) | Authority, signed-intent semantics, selected transport, offline behavior, synchronization and freshness |
-| [Security](security.md) | Initial threat model, signatures, credentials and workload privilege boundary |
-| [Release specification](../specs/releases.md) | Immutable descriptor bytes, local catalog, publisher keyring and ROS health interface |
-| This overview | Components, release preparation, local lifecycle, persistence and simulation |
-| [Future architecture](future.md) | All twelve deferred capability constraints and scale evidence |
+| Contract owner                                | Subject                                                                                                 |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [Identity](identity.md)                       | Asset/device lifecycle, tenancy and assignment history                                                  |
+| [Coordination](coordination.md)               | Authority, signed-intent semantics, selected transport, offline behavior, synchronization and freshness |
+| [Security](security.md)                       | Initial threat model, signatures, credentials and workload privilege boundary                           |
+| [Release specification](../specs/releases.md) | Immutable descriptor bytes, local catalog, publisher keyring and ROS health interface                   |
+| This overview                                 | Components, release preparation, local lifecycle, persistence and simulation                            |
+| [Future architecture](future.md)              | All twelve deferred capability constraints and scale evidence                                           |
 
 Rust/Tokio owns agent and logical authority services; SvelteKit/TypeScript owns
 the console. These framework choices and the direct authenticated push transport
@@ -54,16 +54,16 @@ uses the operator API; it does not control agents or read robot databases
 directly. Future services are optional additions, never prerequisites for local
 execution.
 
-| Component | Responsibility and authoritative data |
-| --- | --- |
-| Authority | Persist tenant/asset/device/assignment registry, credentials, authority, configured inventory, desired generations/request IDs, delivery/acceptance, and last observations |
-| Agent | Persist accepted intent, attempts, active/known-good release and recovery metadata; inspect and supervise actual processes |
-| Device SQLite | Local identity/ownership/assignment, durable execution and recovery state, migrations, bounded lifecycle events |
-| Authority SQLite | Durable requested state and bounded projections of robot status/events |
-| Release catalog | Consistent publisher-signed immutable identities/descriptors known to operator and agents |
-| Pixi | Resolve/install locked runtime environments; no application-level activation, supervision, authorization, or recovery guarantee |
-| SvelteKit | Controls and honest presentation of operator observations and their freshness |
-| Compose/test setup | Independent process/storage fixtures, pre-provisioning and controlled failures |
+| Component          | Responsibility and authoritative data                                                                                                                                      |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Authority          | Persist tenant/asset/device/assignment registry, credentials, authority, configured inventory, desired generations/request IDs, delivery/acceptance, and last observations |
+| Agent              | Persist accepted intent, attempts, active/known-good release and recovery metadata; inspect and supervise actual processes                                                 |
+| Device SQLite      | Local identity/ownership/assignment, durable execution and recovery state, migrations, bounded lifecycle events                                                            |
+| Authority SQLite   | Durable requested state and bounded projections of robot status/events                                                                                                     |
+| Release catalog    | Consistent publisher-signed immutable identities/descriptors known to operator and agents                                                                                  |
+| Pixi               | Resolve/install locked runtime environments; no application-level activation, supervision, authorization, or recovery guarantee                                            |
+| SvelteKit          | Controls and honest presentation of operator observations and their freshness                                                                                              |
+| Compose/test setup | Independent process/storage fixtures, pre-provisioning and controlled failures                                                                                             |
 
 One process owner writes each local database. Start with modules inside the
 agent; introduce the operator package when it has real responsibilities and
@@ -261,13 +261,13 @@ The root toolchain has [clean-build evidence](../experiments/0001-pixi-toolchain
 Revalidate it when toolchain or host requirements change. The following design
 questions still need evidence in their owning deliveries.
 
-| Milestone owner | Question and evidence | Default and revisit trigger |
-| --- | --- | --- |
-| [M1-02](https://github.com/gleniosp/fleetforge/issues/11) | Does the actual RoboStack/Pixi combination run isolated ROS 2 Jazzy A/B health on the reference container? | Real ROS behavior; reproduce package gaps with an actionable handoff |
-| [M1-05](https://github.com/gleniosp/fleetforge/issues/14) | Can an absent runtime environment be installed from isolated cached bytes? | Locked offline Pixi install; revisit cache strategy if required bytes/metadata are incomplete |
-| [M3-03](https://github.com/gleniosp/fleetforge/issues/21) | Can supervised stop/start recover across crashes without duplicate/unknown children? | Direct child/process-group supervision; evaluate a small supervisor only if evidence requires it |
-| [M4-11](https://github.com/gleniosp/fleetforge/issues/92) | Do implemented WSS/session, fairness and catch-up limits preserve control under pressure? | Selected direct mutual TLS WebSocket; measure finite limits, not transport selection |
-| [M5-05](https://github.com/gleniosp/fleetforge/issues/93) | Can internet and control paths be interrupted independently and verified? | Compose topology plus controlled actions; revise based on real probes |
+| Milestone owner                                           | Question and evidence                                                                                      | Default and revisit trigger                                                                      |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [M1-02](https://github.com/gleniosp/fleetforge/issues/11) | Does the actual RoboStack/Pixi combination run isolated ROS 2 Jazzy A/B health on the reference container? | Real ROS behavior; reproduce package gaps with an actionable handoff                             |
+| [M1-05](https://github.com/gleniosp/fleetforge/issues/14) | Can an absent runtime environment be installed from isolated cached bytes?                                 | Locked offline Pixi install; revisit cache strategy if required bytes/metadata are incomplete    |
+| [M3-03](https://github.com/gleniosp/fleetforge/issues/21) | Can supervised stop/start recover across crashes without duplicate/unknown children?                       | Direct child/process-group supervision; evaluate a small supervisor only if evidence requires it |
+| [M4-11](https://github.com/gleniosp/fleetforge/issues/92) | Do implemented WSS/session, fairness and catch-up limits preserve control under pressure?                  | Selected direct mutual TLS WebSocket; measure finite limits, not transport selection             |
+| [M5-05](https://github.com/gleniosp/fleetforge/issues/93) | Can internet and control paths be interrupted independently and verified?                                  | Compose topology plus controlled actions; revise based on real probes                            |
 
 Follow the evidence rules in [ADR
 0003](../adr/0003-bounded-decisions-and-evidence.md). The [traceability

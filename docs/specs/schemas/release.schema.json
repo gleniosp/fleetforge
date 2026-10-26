@@ -27,10 +27,7 @@
     "runtime": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "environment",
-        "minimum_pixi_version"
-      ],
+      "required": ["environment", "minimum_pixi_version"],
       "properties": {
         "environment": {
           "const": "default"
@@ -51,11 +48,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "path",
-          "sha256",
-          "size"
-        ],
+        "required": ["path", "sha256", "size"],
         "properties": {
           "path": {
             "$ref": "common.schema.json#/$defs/path"
@@ -148,10 +141,7 @@
     "signing": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "algorithm",
-        "key_id"
-      ],
+      "required": ["algorithm", "key_id"],
       "properties": {
         "algorithm": {
           "const": "Ed25519"

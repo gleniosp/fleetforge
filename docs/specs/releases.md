@@ -182,15 +182,15 @@ workload from replacing validated bytes or directory entries between validation
 and use. Package-managed links inside the installed environment are a separate
 Pixi resource; this ban describes release inputs, not all dependency internals.
 
-| Input/resource | Version 1 maximum |
-| --- | --- |
-| Descriptor | 1 MiB |
-| Signature envelope | 4 KiB |
-| Catalog / keyring | 1 MiB each |
-| Entries | 1,024 releases; 64 publisher keys; 4,096 files per release |
-| Payload bytes | 1 GiB per file, 4 GiB total per release |
-| Entrypoint/probe argv | 32 items, 1,024 characters each, no NUL |
-| Health probe stdout | 4 KiB, one JSON object; stderr separately bounded by supervisor |
+| Input/resource        | Version 1 maximum                                               |
+| --------------------- | --------------------------------------------------------------- |
+| Descriptor            | 1 MiB                                                           |
+| Signature envelope    | 4 KiB                                                           |
+| Catalog / keyring     | 1 MiB each                                                      |
+| Entries               | 1,024 releases; 64 publisher keys; 4,096 files per release      |
+| Payload bytes         | 1 GiB per file, 4 GiB total per release                         |
+| Entrypoint/probe argv | 32 items, 1,024 characters each, no NUL                         |
+| Health probe stdout   | 4 KiB, one JSON object; stderr separately bounded by supervisor |
 
 Reject limits before unbounded allocation; JSON nesting is at most 16 containers.
 Aggregate byte, encoded document, ordering and cross-field bounds need semantic
@@ -293,16 +293,16 @@ assumed here. Future artifact transfer is owned by FUT-03.
 
 ## Error vocabulary and review fixtures
 
-| Code | Condition |
-| --- | --- |
-| `release_unavailable` | Unknown ID, missing catalog/directory/metadata/payload; include missing resource kind |
-| `release_conflict` | Duplicate/rebound ID or conflicting catalog/durable digest binding |
-| `release_unsupported` | Unsupported schema, platform, algorithm, runtime or health kind |
-| `release_invalid` | Malformed/noncanonical JSON, schema/limit/path/file-type violation |
-| `release_integrity` | Digest/hash/size mismatch, unexpected file or inconsistent manifest/lock |
-| `release_untrusted_publisher` | Missing signature, absent/unknown key, invalid public key or failed signature |
-| `release_prepare_failed` | Verified inputs cannot install, including missing dependency bytes |
-| `release_unhealthy` | Actual workload/probe verification fails or times out |
+| Code                          | Condition                                                                             |
+| ----------------------------- | ------------------------------------------------------------------------------------- |
+| `release_unavailable`         | Unknown ID, missing catalog/directory/metadata/payload; include missing resource kind |
+| `release_conflict`            | Duplicate/rebound ID or conflicting catalog/durable digest binding                    |
+| `release_unsupported`         | Unsupported schema, platform, algorithm, runtime or health kind                       |
+| `release_invalid`             | Malformed/noncanonical JSON, schema/limit/path/file-type violation                    |
+| `release_integrity`           | Digest/hash/size mismatch, unexpected file or inconsistent manifest/lock              |
+| `release_untrusted_publisher` | Missing signature, absent/unknown key, invalid public key or failed signature         |
+| `release_prepare_failed`      | Verified inputs cannot install, including missing dependency bytes                    |
+| `release_unhealthy`           | Actual workload/probe verification fails or times out                                 |
 
 A missing signature uses `release_untrusted_publisher`, not generic missing-file
 classification. An unsupported version/algorithm uses `release_unsupported`

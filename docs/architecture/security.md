@@ -24,18 +24,18 @@ custody and workload isolation remain necessary even when signatures verify.
 
 ## Threats and required controls
 
-| Threat / boundary crossed | MVP response and required evidence |
-| --- | --- |
-| Network interception, impersonation or unauthorized CA-issued peer | TLS 1.3 mutual TLS, hostname/peer verification, unique device credentials and registry authorization; wrong CA/identity/assignment rejects |
-| Cross-tenant/device/assignment or wrong-authority instruction | Verify exact registry scope and authority-signed payload bindings before acceptance; negative field-by-field tests |
-| Tampered/unsigned release or descriptor substitution | Trusted publisher signature plus content digests verified before preparation/activation; reject unknown key, unsupported encoding and altered bytes |
-| Replay, conflicting intent or stale authority restore | Durable request/generation semantics and restore quarantine from the [coordination contract](coordination.md); no automatic takeover/replay |
-| Expired credentials or long-lived sessions | Block new authorizations and terminate or revalidate at expiry; test expiry during live sessions and disconnected execution |
-| Compromised managed workload | Separate OS user/permissions; workload cannot read agent keys or modify SQLite, policy or trusted release inputs; real permission tests |
-| Malicious paths, descriptor argv or symlinks | Validate owned roots, traversal, symlink/ownership and platform/version rules; explicit argv, no arbitrary remote shell |
-| Unauthenticated browser write, cross-site request or session theft | Manually provisioned local operator authentication, protected sessions, same-origin/CSRF checks and bounded requests; no unauthenticated network control API/UI |
-| Oversized traffic, slow peer, reconnect storm, stdout or disk exhaustion | Finite capacity/deadlines, fair queues and reserved recovery space; reject overload before durable acceptance and test retained control progress |
-| Secret/history exposure through logs or observations | Bounded security decision codes without secrets, authorized reads and source context; historical tenant/assignment privacy |
+| Threat / boundary crossed                                                | MVP response and required evidence                                                                                                                              |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Network interception, impersonation or unauthorized CA-issued peer       | TLS 1.3 mutual TLS, hostname/peer verification, unique device credentials and registry authorization; wrong CA/identity/assignment rejects                      |
+| Cross-tenant/device/assignment or wrong-authority instruction            | Verify exact registry scope and authority-signed payload bindings before acceptance; negative field-by-field tests                                              |
+| Tampered/unsigned release or descriptor substitution                     | Trusted publisher signature plus content digests verified before preparation/activation; reject unknown key, unsupported encoding and altered bytes             |
+| Replay, conflicting intent or stale authority restore                    | Durable request/generation semantics and restore quarantine from the [coordination contract](coordination.md); no automatic takeover/replay                     |
+| Expired credentials or long-lived sessions                               | Block new authorizations and terminate or revalidate at expiry; test expiry during live sessions and disconnected execution                                     |
+| Compromised managed workload                                             | Separate OS user/permissions; workload cannot read agent keys or modify SQLite, policy or trusted release inputs; real permission tests                         |
+| Malicious paths, descriptor argv or symlinks                             | Validate owned roots, traversal, symlink/ownership and platform/version rules; explicit argv, no arbitrary remote shell                                         |
+| Unauthenticated browser write, cross-site request or session theft       | Manually provisioned local operator authentication, protected sessions, same-origin/CSRF checks and bounded requests; no unauthenticated network control API/UI |
+| Oversized traffic, slow peer, reconnect storm, stdout or disk exhaustion | Finite capacity/deadlines, fair queues and reserved recovery space; reject overload before durable acceptance and test retained control progress                |
+| Secret/history exposure through logs or observations                     | Bounded security decision codes without secrets, authorized reads and source context; historical tenant/assignment privacy                                      |
 
 Network attacks and compromised workloads are in scope for these controls. A
 privileged host/CA compromise, physical tampering, kernel escape and physical

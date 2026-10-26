@@ -41,7 +41,6 @@ pixi run --locked -e device agent-run -- --version
 
 It prints `fleetforge-agent 0.1.0 (x86_64-linux; bootstrap diagnostic)` and exits.
 
-
 ## Planned MVP
 
 > [!TIP]

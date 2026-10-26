@@ -66,16 +66,16 @@ each corresponding `rust-*` task. All passed and preserved source and locks.
 Then applied each input below separately, restoring fixture bytes afterward.
 Every failing non-mutating invocation preserved the injected input and locks.
 
-| Input / exact command family | Observed result |
-| --- | --- |
-| Replace `fn main() -> io::Result<ExitCode> {` with `fn main()->io::Result<ExitCode>{`; run `format-check`, `rust-format-check`, `check`, `rust-check` | Nonzero; both `format` and `rust-format` separately restored the original formatted source |
-| Add `let lint_failure = 1;` at the start of `main`; run `lint`, `rust-lint`, `check`, `rust-check` | Nonzero; unused-variable warning denied |
-| Run `fix` and `rust-fix` with the fixture's dirty source, then staged source, then a separate untracked file | Each refused uncommitted work without rewriting it |
-| Commit fixture input `let mut fixable = 1; let _ = fixable;` in `main`; run each of `fix` and `rust-fix` from a clean fixture | Both removed `mut`; subsequent `check` passed |
-| Append `#[test] fn injected_failure() { panic!("task failure sentinel"); }` to `apps/agent/tests/cli.rs`; run `test`, `rust-test`, `check`, `rust-check` | Nonzero; injected test failed |
-| Append `compile_error!("task build failure sentinel");` to `main.rs`; run `build`, `rust-build`, `check`, `rust-check` | Nonzero; compilation failed |
-| Change workspace version from `0.1.0` to `0.1.1` without updating `Cargo.lock`; run `build`, `lint`, `test`, `check` | Nonzero; Cargo rejected the stale lock |
-| Change the Pixi Rust pin from `=1.98.1` to `=1.98.0` without updating `pixi.lock`; run `check` | Nonzero; Pixi rejected the stale lock before tool execution |
+| Input / exact command family                                                                                                                             | Observed result                                                                            |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Replace `fn main() -> io::Result<ExitCode> {` with `fn main()->io::Result<ExitCode>{`; run `format-check`, `rust-format-check`, `check`, `rust-check`    | Nonzero; both `format` and `rust-format` separately restored the original formatted source |
+| Add `let lint_failure = 1;` at the start of `main`; run `lint`, `rust-lint`, `check`, `rust-check`                                                       | Nonzero; unused-variable warning denied                                                    |
+| Run `fix` and `rust-fix` with the fixture's dirty source, then staged source, then a separate untracked file                                             | Each refused uncommitted work without rewriting it                                         |
+| Commit fixture input `let mut fixable = 1; let _ = fixable;` in `main`; run each of `fix` and `rust-fix` from a clean fixture                            | Both removed `mut`; subsequent `check` passed                                              |
+| Append `#[test] fn injected_failure() { panic!("task failure sentinel"); }` to `apps/agent/tests/cli.rs`; run `test`, `rust-test`, `check`, `rust-check` | Nonzero; injected test failed                                                              |
+| Append `compile_error!("task build failure sentinel");` to `main.rs`; run `build`, `rust-build`, `check`, `rust-check`                                   | Nonzero; compilation failed                                                                |
+| Change workspace version from `0.1.0` to `0.1.1` without updating `Cargo.lock`; run `build`, `lint`, `test`, `check`                                     | Nonzero; Cargo rejected the stale lock                                                     |
+| Change the Pixi Rust pin from `=1.98.1` to `=1.98.0` without updating `pixi.lock`; run `check`                                                           | Nonzero; Pixi rejected the stale lock before tool execution                                |
 
 ## Cleanup safety
 

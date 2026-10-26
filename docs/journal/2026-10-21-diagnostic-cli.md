@@ -88,8 +88,7 @@ skill. Ownership, the small `Action` enum, OS-native arguments, inherited lints
 and dependency-free subprocess tests fit the present scope. The concrete gap was
 ordinary output errors: the original `println!`/`eprintln!` calls panicked on
 a closed stdout pipe or Linux `/dev/full`, returning 101. Both stdout failure
-cases were reproduced with captured panic output; failing stderr also returned
-101. This is a routine error-path correction within #4.
+cases were reproduced with captured panic output; failing stderr also returned 101. This is a routine error-path correction within #4.
 
 Changed `main` and the invalid-argument helper to return `io::Result<ExitCode>`.
 Fallible writes to locked streams and explicit flushes propagate errors through

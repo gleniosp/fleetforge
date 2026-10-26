@@ -18,6 +18,11 @@ Keep essential implementation, validation, configuration, documentation, and
 decision/evidence changes together under the working agreement's
 [readiness rules](docs/working-agreement.md#implementation-and-readiness).
 
+Before handing off document/configuration edits, run
+`pixi run --locked -e host format` and `pixi run --locked -e host check`, then
+review the diff. [Formatting coverage](docs/guides/development.md#repository-formatting)
+identifies protected inputs and the separate Rust/Python owners.
+
 - Before changing or explaining package-management configuration or behavior,
   consult the package manager's latest official documentation and check
   compatibility with the version used by the project.

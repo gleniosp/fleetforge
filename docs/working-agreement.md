@@ -76,6 +76,13 @@ combined PR; unrelated dependent work still waits for merged delivery.
 
 ## Implementation and readiness
 
+Repository `check`, `format-check` and CI are read-only. The installed Prek
+pre-commit hook may run repository-wide host `fix`, including eligible
+untracked files. Changes to tracked/staged files stop the commit for review and
+restaging; do not automatically stage fixes. Preserve unstaged tracked edits
+through Prek's snapshot and conflict recovery behaviour. Untracked files remain
+visible and may be formatted. Device formatting remains explicitly scoped.
+
 Implement the agreed scope on its agreed branch. Resolve a concrete missing
 contract through a focused decision or bounded experiment under
 [ADR 0003](adr/0003-bounded-decisions-and-evidence.md). Accepted design is not
@@ -110,16 +117,16 @@ For maintainer-agent work, the maintainer leads implementation through local
 review, commits, publication, and PR review. Authorization persists across
 requests, but applies only to the operations actually requested:
 
-| Maintainer request | Authorized next action |
-| --- | --- |
-| Find the next task | Read live scope and recommend an issue and branch |
-| Work on the issue on the created/agreed branch | Implement, validate, and leave changes for local review |
-| Give a commit message | Return Conventional Commit text only |
-| Create a commit | Perform the explicitly requested commit of reviewed work |
-| Prepare PR content | Return title/body text for review |
-| Raise the PR | Inspect Git state/full branch diff, push reviewed commits, and create the PR or reuse the existing one |
-| Address review feedback | Make and validate requested changes locally, then follow the same review/commit flow |
-| Publish committed updates | Push the reviewed commits and update the existing PR as requested |
+| Maintainer request                             | Authorized next action                                                                                 |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Find the next task                             | Read live scope and recommend an issue and branch                                                      |
+| Work on the issue on the created/agreed branch | Implement, validate, and leave changes for local review                                                |
+| Give a commit message                          | Return Conventional Commit text only                                                                   |
+| Create a commit                                | Perform the explicitly requested commit of reviewed work                                               |
+| Prepare PR content                             | Return title/body text for review                                                                      |
+| Raise the PR                                   | Inspect Git state/full branch diff, push reviewed commits, and create the PR or reuse the existing one |
+| Address review feedback                        | Make and validate requested changes locally, then follow the same review/commit flow                   |
+| Publish committed updates                      | Push the reviewed commits and update the existing PR as requested                                      |
 
 Implementation alone does not authorize staging, commits, pushes, or PR
 creation. A commit-message request never executes a commit. The maintainer

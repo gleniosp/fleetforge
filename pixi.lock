@@ -21,6 +21,7 @@ environments:
   default:
     channels:
     - url: https://conda.anaconda.org/conda-forge/
+    - url: https://prefix.dev/github-releases/
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -64,6 +65,7 @@ environments:
   device:
     channels:
     - url: https://conda.anaconda.org/conda-forge/
+    - url: https://prefix.dev/github-releases/
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -120,9 +122,11 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/termcolor-3.3.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/tomlkit-0.15.2-pyh5ded981_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/tzdata-2026c-h151e31d_0.conda
+      - conda: https://prefix.dev/github-releases/linux-64/dprint-0.63.0-hb0f4dca_0.conda
   host:
     channels:
     - url: https://conda.anaconda.org/conda-forge/
+    - url: https://prefix.dev/github-releases/
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -179,6 +183,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/termcolor-3.3.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/tomlkit-0.15.2-pyh5ded981_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/tzdata-2026c-h151e31d_0.conda
+      - conda: https://prefix.dev/github-releases/linux-64/dprint-0.63.0-hb0f4dca_0.conda
       linux-aarch64:
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/_openmp_mutex-4.5-20_gnu.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/binutils_impl_linux-aarch64-2.46.1-default_h5f4c503_103.conda
@@ -234,6 +239,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/termcolor-3.3.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/tomlkit-0.15.2-pyh5ded981_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/tzdata-2026c-h151e31d_0.conda
+      - conda: https://prefix.dev/github-releases/linux-aarch64/dprint-0.63.0-he8cfe8b_0.conda
       osx-arm64:
       - conda: https://conda.anaconda.org/conda-forge/noarch/_python_abi3_support-1.0-hd8ed1ab_3.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/argcomplete-3.7.2-pyhcf101f3_0.conda
@@ -276,6 +282,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/wrapt-2.5.1-py315hc6682d9_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/yaml-0.2.5-h74c22ad_3.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstd-1.5.7-hf451053_7.conda
+      - conda: https://prefix.dev/github-releases/osx-arm64/dprint-0.63.0-h60d57d3_0.conda
 packages:
 - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
   build_number: 20
@@ -1742,3 +1749,27 @@ packages:
     - zstd >=1.5.7,<1.6.0a0
   size: 433687
   timestamp: 1786599629846
+- conda: https://prefix.dev/github-releases/linux-64/dprint-0.63.0-hb0f4dca_0.conda
+  sha256: dae32b9e30ad35fe9d177cfee339635663832ffeadc718480f2f2e3becc7048f
+  md5: 0da5b50073a3e366639d24ca2f3a9ed6
+  attestations_sha256: 5b8bb92aa9b78dc7983dccbb739a50e32966d125d6fede22f3fc495f74a657ff
+  license: MIT
+  run_exports: {}
+  size: 9439427
+  timestamp: 1791773268124
+- conda: https://prefix.dev/github-releases/linux-aarch64/dprint-0.63.0-he8cfe8b_0.conda
+  sha256: 79bd4748728108e25be21160cc274dfe65cf4da7cf96d76f9564a41ef91789ca
+  md5: e42b5a0583dd9552159f4042758f94d4
+  attestations_sha256: dcb3900a1e5de81d192f1f93f562753bd60e03976cac15448bb484031ae21ff4
+  license: MIT
+  run_exports: {}
+  size: 8692559
+  timestamp: 1791773216832
+- conda: https://prefix.dev/github-releases/osx-arm64/dprint-0.63.0-h60d57d3_0.conda
+  sha256: 5f813e43b522b431daa571cab8e48bb0b80af769c70df73735b0473acea8683c
+  md5: 653df052a15e1f099065b1948b450541
+  attestations_sha256: f630af1d2e9e9c060c6f4057da18ccb76da07559eba33e2447783cbfbbd4beba
+  license: MIT
+  run_exports: {}
+  size: 8017358
+  timestamp: 1791773249498

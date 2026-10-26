@@ -1,16 +1,11 @@
 root = true
 
-[*]
+# Only files without a dedicated formatter. Add fallback formats here as needed.
+# dprint.json owns documents/configuration; rustfmt owns Rust; #12 owns Python.
+[{*.txt,*.sh,Dockerfile,LICENSE,.editorconfig,.gitignore,.gitattributes}]
 charset = utf-8
 end_of_line = lf
 insert_final_newline = true
 indent_style = space
 indent_size = 2
 trim_trailing_whitespace = true
-
-[*.{rs,py}]
-indent_size = 4
-
-[*.md]
-# Two trailing spaces can be a Markdown hard line break.
-trim_trailing_whitespace = false

@@ -37,10 +37,7 @@
     "command": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "argv",
-        "cwd"
-      ],
+      "required": ["argv", "cwd"],
       "properties": {
         "argv": {
           "type": "array",

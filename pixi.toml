@@ -2,7 +2,7 @@
 name = "fleetforge"
 license = "Apache-2.0"
 license-file = "LICENSE"
-channels = ["conda-forge"]
+channels = ["conda-forge", "https://prefix.dev/github-releases"]
 platforms = ["linux-64", "linux-aarch64", "osx-arm64"]
 requires-pixi = ">=0.83.0"
 
@@ -26,10 +26,21 @@ exec cargo --config 'build.build-dir="target"' clean --locked --target-dir targe
 [feature.lint.dependencies]
 prek = "=0.5.7"
 commitizen = "=4.19.2"
+dprint = { version = "=0.63.0", channel = "https://prefix.dev/github-releases" }
 
 [feature.lint.tasks]
-setup = { depends-on = ["hooks-install"], description = "Install contributor tools and Git hooks" }
-check = { cmd = "prek run --all-files --stage pre-commit", description = "Run repository hooks; exclude device checks and tests" }
+setup = { depends-on = [
+  "format-setup",
+  "hooks-install",
+], description = "Prepare the pinned formatter plugin and install Git hooks" }
+check = { depends-on = [
+  "format-check",
+  "hooks-validate",
+], description = "Run host source/configuration checks directly; no device checks/tests" }
+fix = { depends-on = ["format"], description = "Apply host formatting fixes across the repository" }
+format-setup = "dprint install"
+format = "dprint fmt --allow-no-files --"
+format-check = "dprint check --allow-no-files --"
 hooks-install = "prek install"
 hooks-validate = "prek validate-config prek.toml"
 commit-check = "cz check --commit-msg-file"

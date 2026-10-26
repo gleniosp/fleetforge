@@ -31,18 +31,12 @@
     }
   ],
   "entrypoint": {
-    "argv": [
-      "bin/python",
-      "app/main.py"
-    ],
+    "argv": ["bin/python", "app/main.py"],
     "cwd": "."
   },
   "health": {
     "kind": "ros2-probe-v1",
-    "argv": [
-      "bin/python",
-      "app/health.py"
-    ],
+    "argv": ["bin/python", "app/health.py"],
     "cwd": ".",
     "expected_behavior": "counter-step-2",
     "startup_timeout_ms": 30000,

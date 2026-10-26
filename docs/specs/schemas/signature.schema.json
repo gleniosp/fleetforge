@@ -2,11 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "schema_version",
-    "descriptor_digest",
-    "signature"
-  ],
+  "required": ["schema_version", "descriptor_digest", "signature"],
   "properties": {
     "schema_version": {
       "const": 1

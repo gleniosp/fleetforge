@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "dprint.dprint",
+    "editorconfig.editorconfig",
+    "oxc.oxc-vscode",
+    "rust-lang.rust-analyzer",
+    "vadimcn.vscode-lldb"
+  ]
+}

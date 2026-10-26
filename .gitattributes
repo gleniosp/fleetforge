@@ -1,2 +1,5 @@
 # Normalize text to LF while leaving detected binary files untouched.
 * text=auto eol=lf
+
+# Canonical release descriptors are hashed/signed as exact bytes, without final LF.
+**/release.json -text

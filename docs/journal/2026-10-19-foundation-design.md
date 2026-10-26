@@ -80,32 +80,32 @@ during this review.
 
 This audits the design and planned verification, not implemented behavior.
 
-| # | Question | Resolution and verification owner |
-| --- | --- | --- |
-| 1 | Every MVP capability has a milestone and test? | Traceability maps all eleven IDs to delivery and verification issues |
-| 2 | Observability starts early? | M2 diagnostics; M3 events; M4 synchronization/API; M6 console |
-| 3 | Dashboard uses actual state? | MVP-09 and M6-04 require real API/workload assertions |
-| 4 | Requested, accepted, executing, succeeded and recovered differ? | Ownership/sequence/lifecycle contracts keep them separate |
-| 5 | Release catalog explicit? | MVP-02 and M1-01 define immutable identity/digest lookup |
-| 6 | Delivery differs from activation? | Setup provisions bytes; protocol sends identity; local lifecycle activates |
-| 7 | Offline installs a fresh environment? | MVP-10 A/D and M1-05 require absent target environment and real package bytes |
-| 8 | Internet and operator disconnections tested independently? | MVP-10 A/B/C with positive and negative path probes |
-| 9 | Single operator authority explicit? | Fixed boundary, ADR 0002 and M4-01 |
-| 10 | Generations durable across restart? | MVP-06, M4-02 and M7-06 |
-| 11 | Duplicate/stale/conflicting instructions safe? | Reconciliation response table and M4-03/M4-06 |
-| 12 | Database, files and processes reconciled? | Crash-consistency invariants and M3-05/M7-05 |
-| 13 | Recovery differs from requested rollback? | Separate definitions; rollback is a new generation |
-| 14 | Diagnostics bounded and observable? | MVP-07; event pruning/gap and API/UI verification |
-| 15 | Stale reports represented honestly? | Freshness contract; M4-05 and M6-02/M6-04 |
-| 16 | Deterministic fault injection? | M5-03/M7 use actual faults and explicit phase/acceptance barriers |
-| 17 | Docker state independent? | MVP-08; M5-01/M5-04 assert private identities/volumes/caches |
-| 18 | Bootstrap excludes product infrastructure? | MVP-01 and ADR 0001; no runtime files in this task |
-| 19 | Tasks perform meaningful work? | Task contract and M0-05; no task placeholders created |
-| 20 | MVP needs no future capability? | Explicit scope boundary and blocker-graph audit |
-| 21 | Production security limits documented? | Trusted-local security boundary and FUT-06 gate |
-| 22 | Cloud optional to local operation? | ADR 0002; central data is projection/administration |
-| 23 | Investigations bounded and timely? | ADR 0003 and milestone-owned experiment table |
-| 24 | Docs self-contained and GitHub-consistent? | Documentation ownership map, real roadmap links and requirement traceability |
+| #   | Question                                                        | Resolution and verification owner                                             |
+| --- | --------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| 1   | Every MVP capability has a milestone and test?                  | Traceability maps all eleven IDs to delivery and verification issues          |
+| 2   | Observability starts early?                                     | M2 diagnostics; M3 events; M4 synchronization/API; M6 console                 |
+| 3   | Dashboard uses actual state?                                    | MVP-09 and M6-04 require real API/workload assertions                         |
+| 4   | Requested, accepted, executing, succeeded and recovered differ? | Ownership/sequence/lifecycle contracts keep them separate                     |
+| 5   | Release catalog explicit?                                       | MVP-02 and M1-01 define immutable identity/digest lookup                      |
+| 6   | Delivery differs from activation?                               | Setup provisions bytes; protocol sends identity; local lifecycle activates    |
+| 7   | Offline installs a fresh environment?                           | MVP-10 A/D and M1-05 require absent target environment and real package bytes |
+| 8   | Internet and operator disconnections tested independently?      | MVP-10 A/B/C with positive and negative path probes                           |
+| 9   | Single operator authority explicit?                             | Fixed boundary, ADR 0002 and M4-01                                            |
+| 10  | Generations durable across restart?                             | MVP-06, M4-02 and M7-06                                                       |
+| 11  | Duplicate/stale/conflicting instructions safe?                  | Reconciliation response table and M4-03/M4-06                                 |
+| 12  | Database, files and processes reconciled?                       | Crash-consistency invariants and M3-05/M7-05                                  |
+| 13  | Recovery differs from requested rollback?                       | Separate definitions; rollback is a new generation                            |
+| 14  | Diagnostics bounded and observable?                             | MVP-07; event pruning/gap and API/UI verification                             |
+| 15  | Stale reports represented honestly?                             | Freshness contract; M4-05 and M6-02/M6-04                                     |
+| 16  | Deterministic fault injection?                                  | M5-03/M7 use actual faults and explicit phase/acceptance barriers             |
+| 17  | Docker state independent?                                       | MVP-08; M5-01/M5-04 assert private identities/volumes/caches                  |
+| 18  | Bootstrap excludes product infrastructure?                      | MVP-01 and ADR 0001; no runtime files in this task                            |
+| 19  | Tasks perform meaningful work?                                  | Task contract and M0-05; no task placeholders created                         |
+| 20  | MVP needs no future capability?                                 | Explicit scope boundary and blocker-graph audit                               |
+| 21  | Production security limits documented?                          | Trusted-local security boundary and FUT-06 gate                               |
+| 22  | Cloud optional to local operation?                              | ADR 0002; central data is projection/administration                           |
+| 23  | Investigations bounded and timely?                              | ADR 0003 and milestone-owned experiment table                                 |
+| 24  | Docs self-contained and GitHub-consistent?                      | Documentation ownership map, real roadmap links and requirement traceability  |
 
 Additional failure rule: recovered A with desired B remains visibly unsatisfied;
 a terminal failed generation does not automatically retrigger indefinitely.
