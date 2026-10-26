@@ -8,24 +8,22 @@ repo = "builtin"
 hooks = [
   { id = "check-case-conflict" },
   { id = "check-merge-conflict" },
-  { id = "check-added-large-files", args = ["--maxkb=1024"] },
-  { id = "check-json" },
-  { id = "check-toml" },
-  { id = "check-yaml" },
-  { id = "end-of-file-fixer", args = ["--check"] },
-  { id = "trailing-whitespace", args = ["--check", "--markdown-linebreak-ext=md"] },
+  { id = "check-added-large-files", args = [
+    "--maxkb=1024",
+  ] },
 ]
 
 [[repos]]
 repo = "local"
 
 [[repos.hooks]]
-id = "hooks-validate"
-name = "Validate hook configuration"
+id = "fix"
+name = "Apply repository fixes"
 language = "system"
-entry = "pixi run --locked -e host hooks-validate"
+entry = "pixi run --locked -e host fix"
 always_run = true
 pass_filenames = false
+stages = ["pre-commit"]
 
 [[repos.hooks]]
 id = "commit-check"

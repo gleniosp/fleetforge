@@ -104,6 +104,11 @@ Pixi/Cargo contributor toolchain for your host and build the agent bootstrap
 diagnostic. Contributor-host support and managed-device runtime support are
 separate; the guide records prerequisites and validation limits.
 
+Before handing off document/configuration changes, run the canonical
+[formatting and check commands](docs/guides/development.md#repository-formatting)
+and review the diff. Pre-commit may apply formatter fixes and stop the commit;
+review and restage those fixes before retrying.
+
 For documentation changes, inspect links and heading fragments, current contract
 consistency, and the diff; follow [docs/AGENTS.md](docs/AGENTS.md). Use available
 tools and record their actual commands and limits. Temporary review helpers do

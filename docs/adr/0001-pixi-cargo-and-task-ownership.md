@@ -2,7 +2,7 @@
 
 - **Status:** Accepted.
 - **Date:** 2026-10-19
-- **Updated:** 2026-10-24
+- **Updated:** 2026-10-26
 - **Requirement:** [MVP-01](../product/requirements.md#mvp-01--engineering-foundation)
 
 ## Context
@@ -21,8 +21,10 @@ Distinct task names preserve host/device check scope on Linux without separate
 device features. Host and device select lint/test alongside default; device
 restricts platforms to linux-64. One solve group aligns shared versions.
 The [task reference](../guides/tasks.md#pixi-configuration-conventions) owns
-configuration conventions. Repository validation uses Prek built-ins in check-only
-mode; device Rust formatting/linting uses rustfmt/Clippy.
+configuration conventions. Host validation directly composes focused checks;
+Prek combines commit-safety built-ins, a repository-wide fix hook and commit
+message validation under [ADR 0007](0007-repository-formatting.md);
+device Rust formatting/linting uses rustfmt/Clippy.
 Use the
 native Rust package, its transitive Linux linker dependencies and explicit
 host SDK/linker prerequisites on macOS; avoid redundant activation/compiler packages and virtual-package overrides

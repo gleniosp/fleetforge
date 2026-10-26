@@ -9,11 +9,11 @@ Use host-installed Git and Pixi 0.83+ on `PATH`, including when hooks run.
 Fresh installs need HTTPS access to GitHub and the configured package channels.
 CI pins Pixi 0.83.0 to verify the minimum supported version.
 
-| Developer host | Pixi platform | Prerequisites outside Pixi |
-| --- | --- | --- |
-| Linux x86_64 / ARM64 | `linux-64` / `linux-aarch64` | glibc 2.28+, Git, shell utilities and current HTTPS CA certificates |
-| Apple Silicon macOS | `osx-arm64` | macOS 13+, Xcode Command Line Tools (Git, linker and SDK) |
-| Windows through Ubuntu on WSL2 | matching Linux platform | WSL2/Ubuntu plus the Linux prerequisites |
+| Developer host                 | Pixi platform                | Prerequisites outside Pixi                                          |
+| ------------------------------ | ---------------------------- | ------------------------------------------------------------------- |
+| Linux x86_64 / ARM64           | `linux-64` / `linux-aarch64` | glibc 2.28+, Git, shell utilities and current HTTPS CA certificates |
+| Apple Silicon macOS            | `osx-arm64`                  | macOS 13+, Xcode Command Line Tools (Git, linker and SDK)           |
+| Windows through Ubuntu on WSL2 | matching Linux platform      | WSL2/Ubuntu plus the Linux prerequisites                            |
 
 On Ubuntu (including Ubuntu inside WSL2):
 
@@ -69,11 +69,13 @@ pixi run --locked -e host setup
 ```
 
 Pixi installs the required host environment before the task runs; `setup` then
-installs the pre-commit and commit-msg hooks. Rerun it after moving the checkout
+preloads the checksum-pinned dprint Wasm plugin and installs the pre-commit and
+commit-msg hooks. Rerun it after moving the checkout
 or recreating the environment. It does not install host Git, Pixi or platform
 SDKs. Other `pixi run --locked` tasks also install their required environment
 automatically; hooks still need this explicit per-clone setup. To install the
-environments without installing hooks, use `pixi install --locked --all`.
+environments without installing hooks, use `pixi install --locked --all`, then
+`pixi run --locked -e host format-setup` to preload the formatter plugin.
 
 The [task reference](tasks.md) explains environment selection and task scopes;
 the [manifest](../../pixi.toml) owns exact commands and pins.
@@ -88,8 +90,9 @@ pixi run --locked -e device device-test
 pixi run --locked -e device device-build
 ```
 
-In the device environment on Linux x86_64, run both `device-check` and `device-test`: checks inspect formatting, lints and hook
-configuration; tests execute separately. The [task reference](tasks.md) lists
+In the device environment on Linux x86_64, run both `device-check` and
+`device-test`: checks inspect Rust formatting and lints; tests execute
+separately. The [task reference](tasks.md) lists
 focused checks, deliberate formatting/fixes and cleanup. Build output is ignored
 under `target/`, environments under `.pixi/`; Cargo also uses its user cache.
 Non-mutating checks must preserve tracked source and both lockfiles.
@@ -101,6 +104,71 @@ invocations return 0 with empty executable stderr, though Cargo may print
 build/run progress there. [CLI tests](../../apps/agent/tests/cli.rs) own detailed
 output and failure expectations.
 
+## Repository formatting
+
+```sh
+pixi run --locked -e host fix
+pixi run --locked -e host check
+```
+
+`fix` composes the current host fixes (`format`). `format` rewrites eligible
+documents/configuration, including untracked files;
+review the resulting diff before handoff. `format-check` checks the same scope
+without writing. Both accept optional file/directory paths. `check` directly
+composes `format-check` and hook-configuration validation,
+without running Prek hooks. It covers eligible working-tree files, including
+untracked files. Add component lint checks/fixes to these aggregates only when
+their owning code arrives. Contributors and agents should format, check and
+review their changes before handing them off.
+
+[dprint.json](../../dprint.json) owns Markdown, JSON/JSONC, YAML and TOML
+selection, exclusions and layout. One versioned, SHA-256-pinned Oxc Wasm plugin
+provides these formatters; no Node/npm or separate Oxfmt installation is needed.
+The executable is locked through Pixi; plugin bytes are separately pinned in
+the dprint configuration and cached by dprint. Initial setup needs network
+access to the package channel and GitHub plugin release. Warm-cache formatting
+needs those inputs available locally. To upgrade, deliberately update the
+executable pin/lock or plugin URL/checksum, then rerun setup and validation.
+
+The pinned plugin defaults supply two-space indentation, LF/final newline and
+preserved prose wrapping. Its configuration disables embedded-code formatting
+without adding configuration for absent languages. Dependency locks and
+generated output are excluded. Readable release-fixture JSON is formatted; its
+payload strings and encoded canonical vectors retain their decoded values.
+Canonical `release.json` descriptors are excluded by filename, and Git attributes
+disable text/newline conversion for them. This protects exact bytes; it does not
+validate JCS encoding. Additional signed/canonical inputs need explicit protection
+with their owning delivery. Ordinary pretty printing changes exact bytes even
+when property order is retained.
+Review Markdown tables, hard breaks, examples and meaningful string contents.
+
+[EditorConfig](../../.editorconfig) applies only to listed fallback files without
+a dedicated formatter: plain text, shell/Docker inputs and miscellaneous text
+configuration. It does not compete with dprint, Rust's device-scoped rustfmt or
+#12's Python owner. Add newly introduced fallback formats explicitly. dprint
+does not read EditorConfig; formatted output is shared across editor/CLI, while
+indentation during typing and file-encoding preferences remain editor behaviours.
+
+### Editor integration
+
+Open the repository root as the workspace and run setup first. The committed
+[extension recommendations](../../.vscode/extensions.json) select dprint,
+EditorConfig, rust-analyzer and CodeLLDB, plus the optional Oxc recommendation.
+[VS Code settings](../../.vscode/settings.json)
+route supported document/configuration saves to
+`./.pixi/envs/host/bin/dprint`; the same project configuration/plugin serves
+CLI and editor. Stable formatting is enabled to match the CLI's default passes.
+No indentation/newline/layout options are duplicated in VS Code settings.
+
+Other editors can use the same executable with `dprint lsp` or their dprint
+integration. The canonical CLI commands remain the fallback. Rust editor tools
+need the locked Rust toolchain on their environment's `PATH`; launching a fresh
+editor process from the host environment can supply it. Extension recommendations
+do not install another compiler or expand managed-device support. One-off
+validation of CLI/editor-service consistency and hooks is recorded in
+the [delivery journal](../journal/2026-10-26-repository-formatting.md); no
+formatter-specific regression suite is installed.
+
 ## Local hooks and commit validation
 
 The setup task above installs hooks. To check the working tree:
@@ -109,7 +177,7 @@ The setup task above installs hooks. To check the working tree:
 pixi run --locked -e host check
 ```
 
-[prek.toml](../../prek.toml) configures pre-commit source checks and commit-msg
+[prek.toml](../../prek.toml) configures pre-commit formatting/checks and commit-msg
 validation; tests run separately. See the
 [task reference](tasks.md#hooks-and-commit-messages) for installation caveats,
 staged-content behavior and manual message checks. Follow the
@@ -118,10 +186,13 @@ staged-content behavior and manual message checks. Follow the
 ## PR checks
 
 The [workflow](../../.github/workflows/pr-checks.yml) runs contributor setup,
-hooks/configuration and commit validation in `host` on all three native hosts.
+direct host checks and commit validation on all three native hosts. A separate
+Prek invocation skips `fix` and runs only the three commit-safety built-ins: case
+conflicts, merge conflicts and large added files.
 The Linux-only `device` job uses device-prefixed tasks to format/lint, build
-and test the agent. Repository `check` runs Prek built-ins and validates hook configuration;
-agent Rust checks stay in the device job. The
+and test the agent. Repository `check` directly composes focused checks; it never invokes the hook
+runner. Agent Rust checks
+stay in the device job. The
 aggregate **Repository checks** requires both scopes; CI does not start a
 long-running agent/demo. Fork runs may need maintainer approval.
 

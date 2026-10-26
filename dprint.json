@@ -1,0 +1,10 @@
+{
+  "includes": ["**/*.{md,json,jsonc,yaml,yml,toml}"],
+  "excludes": [".git/**", ".pixi/**", "target/**", "**/*.lock", "**/release.json"],
+  "oxc": {
+    "embeddedLanguageFormatting": "off"
+  },
+  "plugins": [
+    "https://github.com/dprint/dprint-plugin-oxc/releases/download/0.47.0/plugin.wasm@531f729b3ebf18203a07b9c2da869eef5003130ac6a8936c2eca28cf6ee8b20b"
+  ]
+}

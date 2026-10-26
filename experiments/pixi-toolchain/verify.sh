@@ -6,7 +6,7 @@ export PATH=/usr/local/bin:/usr/bin:/bin
 export PIXI_NO_CONFIG=true
 export PIXI_NO_PROGRESS=true
 
-for tool in rustup rustc cargo cc gcc ld prek cz; do
+for tool in rustup rustc cargo cc gcc ld prek cz dprint; do
     if command -v "$tool"; then
         printf 'Unexpected host tool: %s\n' "$tool" >&2
         exit 1
@@ -17,8 +17,10 @@ git --version
 
 work=$(mktemp -d /tmp/fleetforge-toolchain.XXXXXX)
 cp /source/pixi.toml /source/pixi.lock /source/Cargo.toml /source/Cargo.lock /source/LICENSE "$work/"
+cp /source/dprint.json /source/prek.toml /source/.cz.toml /source/.editorconfig /source/.gitignore /source/.gitattributes "$work/"
 mkdir -p "$work/apps"
 cp -r /source/apps/agent "$work/apps/"
+cp -r /source/.vscode "$work/"
 cd "$work"
 
 snapshot() {
@@ -66,8 +68,9 @@ for environment in default device; do
             ! command -v prek
             ! command -v cz
             ! command -v python
+            ! command -v dprint
         else
-            for tool in prek cz; do
+            for tool in prek cz dprint; do
                 path=$(command -v "$tool")
                 printf "%s=%s\n" "$tool" "$path"
                 case "$path" in "$CONDA_PREFIX"/bin/*) ;; *) exit 1 ;; esac
@@ -85,6 +88,9 @@ done
 
 pixi run --locked -e host prek --version
 pixi run --locked -e host cz version
+pixi run --locked -e host dprint --version
+pixi run --locked -e host format-setup
+pixi run --locked -e host format-check
 pixi run --locked -e device cargo fmt --all -- --check
 pixi run --locked -e device cargo clippy --workspace --all-targets --locked --offline -- -D warnings
 pixi run --locked cargo build --workspace --release --locked --offline

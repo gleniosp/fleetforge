@@ -27,43 +27,43 @@ There are three scopes:
 
 ## Domain terminology
 
-| Term | Meaning |
-| --- | --- |
-| Asset | Maintainable robot identified by `asset_id` |
-| Device | Managed computer/endpoint identified by `device_id`, distinct from an asset or agent process |
-| Tenant | Owning organization/context identified separately by `tenant_id` |
-| Assignment | Binding of asset, device, tenant and logical deployment authority, identified by `assignment_id` |
-| Authority | Single deployment writer for an assignment, identified by `authority_id`; operator denotes its local service/UI role |
-| Fleet | Configured selection of assets/devices, independent of network addresses |
-| Release | Immutable publisher-signed descriptor and its application, Pixi manifest and lockfile inputs |
-| Release catalog | Mapping from supported release IDs to immutable descriptors/digests |
-| Desired state | Authorized target release and descriptor digest for an assignment/device at a generation |
-| Generation | Durable increasing counter scoped to authority/assignment/device |
-| Request ID | Identity recognizing retries, separately at API submission and instruction delivery |
-| Acceptance | Agent validated and committed an instruction; execution may still be pending |
-| Deployment attempt | Correlated effort to satisfy an accepted generation |
-| Active release | Software associated with the actual managed workload; absent/unknown are explicit |
-| Known-good release | Software that previously passed workload health verification |
-| Automatic recovery | Restore and verify known-good software after failed deployment |
-| Requested rollback | Issue a new generation targeting a retained previous release |
-| Observation | Last received source snapshot with identity, sequence, source time and freshness |
-| Durable event | Bounded persisted operational history, separate from stdout and security decision records |
+| Term               | Meaning                                                                                                              |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| Asset              | Maintainable robot identified by `asset_id`                                                                          |
+| Device             | Managed computer/endpoint identified by `device_id`, distinct from an asset or agent process                         |
+| Tenant             | Owning organization/context identified separately by `tenant_id`                                                     |
+| Assignment         | Binding of asset, device, tenant and logical deployment authority, identified by `assignment_id`                     |
+| Authority          | Single deployment writer for an assignment, identified by `authority_id`; operator denotes its local service/UI role |
+| Fleet              | Configured selection of assets/devices, independent of network addresses                                             |
+| Release            | Immutable publisher-signed descriptor and its application, Pixi manifest and lockfile inputs                         |
+| Release catalog    | Mapping from supported release IDs to immutable descriptors/digests                                                  |
+| Desired state      | Authorized target release and descriptor digest for an assignment/device at a generation                             |
+| Generation         | Durable increasing counter scoped to authority/assignment/device                                                     |
+| Request ID         | Identity recognizing retries, separately at API submission and instruction delivery                                  |
+| Acceptance         | Agent validated and committed an instruction; execution may still be pending                                         |
+| Deployment attempt | Correlated effort to satisfy an accepted generation                                                                  |
+| Active release     | Software associated with the actual managed workload; absent/unknown are explicit                                    |
+| Known-good release | Software that previously passed workload health verification                                                         |
+| Automatic recovery | Restore and verify known-good software after failed deployment                                                       |
+| Requested rollback | Issue a new generation targeting a retained previous release                                                         |
+| Observation        | Last received source snapshot with identity, sequence, source time and freshness                                     |
+| Durable event      | Bounded persisted operational history, separate from stdout and security decision records                            |
 
 ## Fixed MVP boundary
 
-| Concern | Contract |
-| --- | --- |
-| Ownership | One configured tenant, three assets with one device/agent each; schema permits asset-to-many-devices without orchestration |
-| Authority | One local Rust/Tokio authority and private SQLite; manually configured/provisioned peers |
-| Agents | Independent Rust/Tokio agents, private SQLite/state/runtime/cache and credentials |
-| Software | Small headless ROS 2 Jazzy Python A/B releases, each with independent Pixi manifest/lock/runtime |
-| Release availability | Pre-provisioned immutable inputs and all dependency package bytes |
-| Device transport | Device-initiated direct WebSocket over TLS 1.3 mutual TLS; bidirectional push |
-| Trust | Registry authorization, detached Ed25519 signatures, protected agent/workload OS boundaries |
-| Lifecycle | Separate preparation, controlled stop/start, health verification, recovery and explicit rollback |
-| Interface | Authenticated local API with bounded stored-projection polling; SvelteKit/TypeScript console |
+| Concern                   | Contract                                                                                                                                        |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ownership                 | One configured tenant, three assets with one device/agent each; schema permits asset-to-many-devices without orchestration                      |
+| Authority                 | One local Rust/Tokio authority and private SQLite; manually configured/provisioned peers                                                        |
+| Agents                    | Independent Rust/Tokio agents, private SQLite/state/runtime/cache and credentials                                                               |
+| Software                  | Small headless ROS 2 Jazzy Python A/B releases, each with independent Pixi manifest/lock/runtime                                                |
+| Release availability      | Pre-provisioned immutable inputs and all dependency package bytes                                                                               |
+| Device transport          | Device-initiated direct WebSocket over TLS 1.3 mutual TLS; bidirectional push                                                                   |
+| Trust                     | Registry authorization, detached Ed25519 signatures, protected agent/workload OS boundaries                                                     |
+| Lifecycle                 | Separate preparation, controlled stop/start, health verification, recovery and explicit rollback                                                |
+| Interface                 | Authenticated local API with bounded stored-projection polling; SvelteKit/TypeScript console                                                    |
 | Device runtime/simulation | Managed agent/workloads and Docker Compose: Linux x86_64, Ubuntu 24.04 reference container; actual RoboStack/Pixi combination must be validated |
-| Visibility | Bounded logs/events, source freshness, desired/accepted/active/outcome and per-device partial results |
+| Visibility                | Bounded logs/events, source freshness, desired/accepted/active/outcome and per-device partial results                                           |
 
 The [architecture](../architecture/overview.md) owns identity, trust, protocol
 and failure invariants; capability acceptance below does not imply
@@ -99,7 +99,10 @@ from deployed workload runtimes. Use `prek.toml`, local
 pre-commit and commit-msg hooks, and matching CI validation. Introduce Ruff
 linting/formatting and mypy with the first Python code; keep them out of
 deployed workloads. Rust uses rustfmt and Clippy. Checks must preserve tracked
-sources and lockfiles; format/fix are explicitly mutating. Cleaning must
+sources and lockfiles; format/fix are explicitly mutating. Pre-commit may apply
+repository-wide host fixes, including eligible untracked files. Tracked/staged
+fixes stop the commit for review and restaging; repository checks and CI remain
+read-only. Cleaning must
 preserve operational state. Add tasks and packages only when they perform
 meaningful work.
 
@@ -241,14 +244,14 @@ console reports observed outcomes and stale/unknown state honestly.
 
 Test these independently, with verified network conditions and fresh fixtures:
 
-| Scenario | Preconditions/action | Required result |
-| --- | --- | --- |
-| A: internet unavailable | A healthy; B files/packages local; B environment absent; operator reachable | Fresh locked offline B preparation, execution, and health verification without downloads |
-| B: operator lost after acceptance | Prove durable robot acceptance, then disconnect operator | Robot completes or recovers; reconnect synchronizes actual state and available events |
-| C: robot lost before delivery | Disconnect robot, then persist new operator intent | Intent stays pending; latest relevant generation is safely delivered on reconnect |
-| D: package bytes missing | Fresh environment, incomplete cache, internet blocked | B preparation fails clearly; healthy A remains safe |
-| E: agent interrupted | Stop at controlled deployment stages; retain storage | Startup inspects SQLite, filesystem, and processes, then resumes or recovers safely |
-| F: operator restarted | Persist intent; interrupt around delivery/acknowledgment | Authority/generations survive, with no lost intent, reuse, or unintended redeployment |
+| Scenario                          | Preconditions/action                                                        | Required result                                                                          |
+| --------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| A: internet unavailable           | A healthy; B files/packages local; B environment absent; operator reachable | Fresh locked offline B preparation, execution, and health verification without downloads |
+| B: operator lost after acceptance | Prove durable robot acceptance, then disconnect operator                    | Robot completes or recovers; reconnect synchronizes actual state and available events    |
+| C: robot lost before delivery     | Disconnect robot, then persist new operator intent                          | Intent stays pending; latest relevant generation is safely delivered on reconnect        |
+| D: package bytes missing          | Fresh environment, incomplete cache, internet blocked                       | B preparation fails clearly; healthy A remains safe                                      |
+| E: agent interrupted              | Stop at controlled deployment stages; retain storage                        | Startup inspects SQLite, filesystem, and processes, then resumes or recovers safely      |
+| F: operator restarted             | Persist intent; interrupt around delivery/acknowledgment                    | Authority/generations survive, with no lost intent, reuse, or unintended redeployment    |
 
 Credential expiry prevents new authorization and terminates or revalidates
 existing sessions; accepted local execution continues subject to trusted
@@ -287,15 +290,15 @@ dependency on future capabilities.
 
 ## Non-functional requirements
 
-| ID | Contract | Verification approach |
-| --- | --- | --- |
-| NFR-01 | Durably persist accepted intent, identity, generations, and recovery metadata | Migration, abrupt restart, lost-ack, and crash-boundary tests |
-| NFR-02 | Protect active/known-good inputs; serialize incompatible activation; bound retries | Preparation/activation/recovery failure and concurrency tests |
-| NFR-03 | Reproduce tooling and release environments with owned committed lockfiles | Clean Linux setup, locked validation, fresh runtime installs |
-| NFR-04 | Explain meaningful transitions and uncertainty with bounded diagnostics | Event/API/UI assertions, retention and stale-state tests |
+| ID     | Contract                                                                                                                              | Verification approach                                                                                                                   |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| NFR-01 | Durably persist accepted intent, identity, generations, and recovery metadata                                                         | Migration, abrupt restart, lost-ack, and crash-boundary tests                                                                           |
+| NFR-02 | Protect active/known-good inputs; serialize incompatible activation; bound retries                                                    | Preparation/activation/recovery failure and concurrency tests                                                                           |
+| NFR-03 | Reproduce tooling and release environments with owned committed lockfiles                                                             | Clean Linux setup, locked validation, fresh runtime installs                                                                            |
+| NFR-04 | Explain meaningful transitions and uncertainty with bounded diagnostics                                                               | Event/API/UI assertions, retention and stale-state tests                                                                                |
 | NFR-05 | Bound messages/pages/queues/output/history/timeouts/retries/disk; reserve critical recovery space; fair command/state/history service | Finite values and overload behavior per implementation; reject unavailable capacity before acceptance; synthetic-peer/resource fixtures |
-| NFR-06 | Authenticate and authorize peers/operators; verify signed inputs; protect keys/state from workloads; validate IDs/paths/versions | Wrong-peer/key/assignment, tamper, expiry, CSRF, unsafe-path and real OS permission tests |
-| NFR-07 | Keep contracts migratable and documentation consistent with real evidence | Schema/protocol compatibility tests, ADR and traceability review |
+| NFR-06 | Authenticate and authorize peers/operators; verify signed inputs; protect keys/state from workloads; validate IDs/paths/versions      | Wrong-peer/key/assignment, tamper, expiry, CSRF, unsafe-path and real OS permission tests                                               |
+| NFR-07 | Keep contracts migratable and documentation consistent with real evidence                                                             | Schema/protocol compatibility tests, ADR and traceability review                                                                        |
 
 Exact limits and supported Linux host requirements must be specified and tested
 when their implementation arrives. These are testable goals, not current service
@@ -329,20 +332,20 @@ All twelve IDs remain deferred until explicitly activated. The [future
 architecture](../architecture/future.md) owns their constraints and evidence
 gates; the [roadmap](../roadmap.md#future-platform) links delivery milestones.
 
-| ID | Capability boundary |
-| --- | --- |
-| FUT-01 | Authenticated discovery/membership, justified alternate transports, NAT and optional relays extending secure direct WSS |
-| FUT-02 | Signed/authorized selected-state replication and anti-entropy; per-type conflicts and device-fenced authority transfer |
-| FUT-03 | Authorized content-addressed artifacts, resumable P2P delivery and peer/edge caches protecting local execution |
-| FUT-04 | Canaries/waves, fresh-health gates, scheduling, safe concurrency, pause/resume and rollout UI |
-| FUT-05 | Extend MVP ROS 2 into selected Gazebo/advanced robotics and security/platform/safety-gated physical pilots |
-| FUT-06 | Production enrollment, credential lifecycle, signing/metadata hardening, incident runbooks and independent security review |
-| FUT-07 | Optional bounded OTel/log/metric/trace export, storage, dashboards and alerts independent of execution |
-| FUT-08 | Validated native/ARM64 matrix, installation/boot supervision and compatible agent/schema upgrade recovery |
-| FUT-09 | Organizations/roles/delegation, isolation/quotas at all boundaries, ownership transfer and historical privacy |
+| ID     | Capability boundary                                                                                                                        |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| FUT-01 | Authenticated discovery/membership, justified alternate transports, NAT and optional relays extending secure direct WSS                    |
+| FUT-02 | Signed/authorized selected-state replication and anti-entropy; per-type conflicts and device-fenced authority transfer                     |
+| FUT-03 | Authorized content-addressed artifacts, resumable P2P delivery and peer/edge caches protecting local execution                             |
+| FUT-04 | Canaries/waves, fresh-health gates, scheduling, safe concurrency, pause/resume and rollout UI                                              |
+| FUT-05 | Extend MVP ROS 2 into selected Gazebo/advanced robotics and security/platform/safety-gated physical pilots                                 |
+| FUT-06 | Production enrollment, credential lifecycle, signing/metadata hardening, incident runbooks and independent security review                 |
+| FUT-07 | Optional bounded OTel/log/metric/trace export, storage, dashboards and alerts independent of execution                                     |
+| FUT-08 | Validated native/ARM64 matrix, installation/boot supervision and compatible agent/schema upgrade recovery                                  |
+| FUT-09 | Organizations/roles/delegation, isolation/quotas at all boundaries, ownership transfer and historical privacy                              |
 | FUT-10 | Optional central API/PostgreSQL with tenant context from the first migration, administration, projections and explicit authority placement |
-| FUT-11 | Service-driven provider/IaC evaluation, isolated environments, managed resources, delivery, secrets/teardown and backup drills |
-| FUT-12 | Measured hosted API/jobs/gateways/ingestion/blob architecture, tenant placement/cells, reliability and cost guardrails |
+| FUT-11 | Service-driven provider/IaC evaluation, isolated environments, managed resources, delivery, secrets/teardown and backup drills             |
+| FUT-12 | Measured hosted API/jobs/gateways/ingestion/blob architecture, tenant placement/cells, reliability and cost guardrails                     |
 
 Hardened device operations and peer reachability/artifact delivery take priority
 after MVP; SaaS stays optional. Future numbering is thematic rather than an
