@@ -25,15 +25,15 @@ The [security contract](security.md#signed-inputs) owns signing/trust
 requirements. After authentication, authorization and validation, apply these
 rules:
 
-| Received instruction | Required handling |
-| --- | --- |
-| Wrong identity/assignment/authority/key, invalid signature, malformed or unsupported version | Reject before acceptance or process effects |
-| Insufficient bounded acceptance capacity | Reject overload before durable acceptance |
-| Lower generation | Reject stale |
-| Same generation, identical immutable payload semantics | Reuse persisted acceptance/outcome, regardless of transport/signature representation |
-| Same generation, conflicting payload | Reject conflict |
-| Higher generation targeting already healthy active software | Commit and satisfy without process replacement |
-| Higher generation targeting different software | Commit and reconcile through one serialized deployment worker |
+| Received instruction                                                                         | Required handling                                                                    |
+| -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Wrong identity/assignment/authority/key, invalid signature, malformed or unsupported version | Reject before acceptance or process effects                                          |
+| Insufficient bounded acceptance capacity                                                     | Reject overload before durable acceptance                                            |
+| Lower generation                                                                             | Reject stale                                                                         |
+| Same generation, identical immutable payload semantics                                       | Reuse persisted acceptance/outcome, regardless of transport/signature representation |
+| Same generation, conflicting payload                                                         | Reject conflict                                                                      |
+| Higher generation targeting already healthy active software                                  | Commit and satisfy without process replacement                                       |
+| Higher generation targeting different software                                               | Commit and reconcile through one serialized deployment worker                        |
 
 Commit accepted intent and its event before application acknowledgment.
 Transport receipt is not this acknowledgment. Lost acknowledgments permit replay
@@ -90,18 +90,18 @@ retries.
 
 ## Disconnected and restored state
 
-| Condition | Contract |
-| --- | --- |
-| Internet lost, local authority reachable | New authorized local deployments work with trusted local inputs/resources |
-| Authority lost after durable acceptance | Agent completes/restarts/recovers accepted work locally |
-| Device unreachable before delivery | Intent stays pending; deliver only latest relevant intent after reconnect |
-| All authorized sources unreachable | Do not invent new desired state |
-| Network credential expires | Block new authorizations, terminate or revalidate sessions; accepted local work continues subject to trusted inputs/resources |
-| Revocation while offline | No instantaneous revocation guarantee; specify enforcement when connectivity returns |
-| Corrupt/unreadable database | Fail explicitly, preserving evidence; never silently reset state/identity |
-| Stale authority backup with lost request ledger | Quarantine ambiguous state; do not raise counters and replay old intent automatically |
-| Projection rebuild/restore | Do not replay commands or replace device-local execution truth |
-| Future authority transfer | Require device-side fencing/confirmation; unreachable transfer stays pending |
+| Condition                                       | Contract                                                                                                                      |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Internet lost, local authority reachable        | New authorized local deployments work with trusted local inputs/resources                                                     |
+| Authority lost after durable acceptance         | Agent completes/restarts/recovers accepted work locally                                                                       |
+| Device unreachable before delivery              | Intent stays pending; deliver only latest relevant intent after reconnect                                                     |
+| All authorized sources unreachable              | Do not invent new desired state                                                                                               |
+| Network credential expires                      | Block new authorizations, terminate or revalidate sessions; accepted local work continues subject to trusted inputs/resources |
+| Revocation while offline                        | No instantaneous revocation guarantee; specify enforcement when connectivity returns                                          |
+| Corrupt/unreadable database                     | Fail explicitly, preserving evidence; never silently reset state/identity                                                     |
+| Stale authority backup with lost request ledger | Quarantine ambiguous state; do not raise counters and replay old intent automatically                                         |
+| Projection rebuild/restore                      | Do not replay commands or replace device-local execution truth                                                                |
+| Future authority transfer                       | Require device-side fencing/confirmation; unreachable transfer stays pending                                                  |
 
 ## Bounded synchronization and freshness
 

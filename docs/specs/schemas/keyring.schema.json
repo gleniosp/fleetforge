@@ -2,10 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "schema_version",
-    "publishers"
-  ],
+  "required": ["schema_version", "publishers"],
   "properties": {
     "schema_version": {
       "const": 1
@@ -16,11 +13,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "key_id",
-          "algorithm",
-          "public_key"
-        ],
+        "required": ["key_id", "algorithm", "public_key"],
         "properties": {
           "key_id": {
             "$ref": "common.schema.json#/$defs/id"

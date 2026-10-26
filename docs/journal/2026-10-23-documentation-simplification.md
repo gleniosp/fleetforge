@@ -146,7 +146,7 @@ Git-tracked Markdown plus new journal entries and does not fetch external URLs
 or parse arbitrary HTML/Markdown extensions. It passed for 42 Markdown files
 and 287 relative links/fragments, with no errors.
 
-```sh
+````sh
 python3 - <<'PY'
 from pathlib import Path
 import re
@@ -188,7 +188,7 @@ print(f'Checked {len(files)} Markdown files and {count} relative links/fragments
 print('\n'.join(errors) if errors else 'No errors.')
 raise SystemExit(bool(errors))
 PY
-```
+````
 
 ## Limits
 

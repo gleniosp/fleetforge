@@ -360,12 +360,12 @@ the managed application are separate processes with different permissions.
 
 Other parts support those responsibilities:
 
-| Part | Responsibility in this journey |
-| --- | --- |
-| Trusted setup | An administrator or setup automation supplies protected trust, release files, package bytes and catalog entries before MVP deployment |
-| Pixi | Resolves/locks dependencies during release preparation and installs the environment when the agent invokes it on a robot |
-| Application and health probe | Run the release's ROS behavior and participate in health checks; the agent evaluates the evidence |
-| Console/UI | Lets the operator request a change and displays observations received through the authority |
+| Part                         | Responsibility in this journey                                                                                                        |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Trusted setup                | An administrator or setup automation supplies protected trust, release files, package bytes and catalog entries before MVP deployment |
+| Pixi                         | Resolves/locks dependencies during release preparation and installs the environment when the agent invokes it on a robot              |
+| Application and health probe | Run the release's ROS behavior and participate in health checks; the agent evaluates the evidence                                     |
+| Console/UI                   | Lets the operator request a change and displays observations received through the authority                                           |
 
 For example, the authority can record that a robot should run release B while
 the agent reports that release A is still running. Those are the requested and

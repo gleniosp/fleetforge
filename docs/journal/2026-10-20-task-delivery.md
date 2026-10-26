@@ -64,25 +64,25 @@ scenarios below. This is a manual policy walkthrough using the current Git/GitHu
 state and clearly hypothetical publication cases. It is not an independent agent
 run or an execution of GitHub mutations.
 
-| Request/state examined | Result of applying the skill and agreement |
-| --- | --- |
-| Find next work in the live snapshot | Task-delivery selects #2 by active milestone, P0 priority, stable ID and delivered #1/#85 prerequisites, despite the backlog label and milestone text still referring to #85 as next |
-| Maintainer creates the proposed branch, then requests implementation | Confirm the actual branch and clean starting tree; implement the agreed issue and checks on that branch |
-| Proposed branch exists only as a suggestion | Recommend the name; creating/switching still requires explicit direction |
-| Implementation is complete locally | Hand off changes, evidence and limits for local review; the request has not authorized staging or publication |
-| Request only a commit message | Return `docs: codify maintainer-led task delivery` as text; Git state stays unchanged |
-| Several reviewed commits belong to one issue | Maintain the same issue branch; each requested commit follows local review; PR assessment covers the whole series |
-| Request only PR title/body | Prepare content from the full change and template; return text without push or PR creation |
-| Explicitly raise a PR with reviewed committed work | Discover the default branch, inspect all Git state and existing PRs, push reviewed commits and create/reuse the PR |
-| A branch PR already exists | Inspect its base/scope/review, reuse it, and publish requested updates without creating a duplicate |
-| Raise a PR with uncommitted/unreviewed changes | Report the files needing review/commit disposition before publication; do not silently stage or omit them |
-| PR feedback requests a correction | Inspect full current scope, implement locally, rerun affected checks and update evidence/content, then use local review and requested commit/publication steps |
-| Request or opportunity to self-approve, merge, or enable auto-merge | Preserve the maintainer-only approval/merge boundary; another task starts when requested after merge |
-| Hypothetical combined #3/#4 delivery | Use a broader branch starting with issue 3; include complete #3 and #4 work with reviewable internal order and separate `Closes #3` and `Closes #4` references; partial #3 work does not make #4 unblocked |
-| A blocker has checked boxes or an unmerged PR | Keep it undelivered for independent downstream selection; the complete combined-PR exception requires both slices |
-| Milestone has no unchecked boxes but lacks integration exit evidence | Report the missing evidence; do not claim completion or close the milestone |
-| Future milestone is open or a necessary tool is unavailable | Require deliberate future activation or disclose access/check limits; neither state grants scope or permission |
-| Concrete upstream gap or protected filesystem write | Use the agreement's specific authorization path; record an actionable handoff when upstream publication is not authorized |
+| Request/state examined                                               | Result of applying the skill and agreement                                                                                                                                                                 |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Find next work in the live snapshot                                  | Task-delivery selects #2 by active milestone, P0 priority, stable ID and delivered #1/#85 prerequisites, despite the backlog label and milestone text still referring to #85 as next                       |
+| Maintainer creates the proposed branch, then requests implementation | Confirm the actual branch and clean starting tree; implement the agreed issue and checks on that branch                                                                                                    |
+| Proposed branch exists only as a suggestion                          | Recommend the name; creating/switching still requires explicit direction                                                                                                                                   |
+| Implementation is complete locally                                   | Hand off changes, evidence and limits for local review; the request has not authorized staging or publication                                                                                              |
+| Request only a commit message                                        | Return `docs: codify maintainer-led task delivery` as text; Git state stays unchanged                                                                                                                      |
+| Several reviewed commits belong to one issue                         | Maintain the same issue branch; each requested commit follows local review; PR assessment covers the whole series                                                                                          |
+| Request only PR title/body                                           | Prepare content from the full change and template; return text without push or PR creation                                                                                                                 |
+| Explicitly raise a PR with reviewed committed work                   | Discover the default branch, inspect all Git state and existing PRs, push reviewed commits and create/reuse the PR                                                                                         |
+| A branch PR already exists                                           | Inspect its base/scope/review, reuse it, and publish requested updates without creating a duplicate                                                                                                        |
+| Raise a PR with uncommitted/unreviewed changes                       | Report the files needing review/commit disposition before publication; do not silently stage or omit them                                                                                                  |
+| PR feedback requests a correction                                    | Inspect full current scope, implement locally, rerun affected checks and update evidence/content, then use local review and requested commit/publication steps                                             |
+| Request or opportunity to self-approve, merge, or enable auto-merge  | Preserve the maintainer-only approval/merge boundary; another task starts when requested after merge                                                                                                       |
+| Hypothetical combined #3/#4 delivery                                 | Use a broader branch starting with issue 3; include complete #3 and #4 work with reviewable internal order and separate `Closes #3` and `Closes #4` references; partial #3 work does not make #4 unblocked |
+| A blocker has checked boxes or an unmerged PR                        | Keep it undelivered for independent downstream selection; the complete combined-PR exception requires both slices                                                                                          |
+| Milestone has no unchecked boxes but lacks integration exit evidence | Report the missing evidence; do not claim completion or close the milestone                                                                                                                                |
+| Future milestone is open or a necessary tool is unavailable          | Require deliberate future activation or disclose access/check limits; neither state grants scope or permission                                                                                             |
+| Concrete upstream gap or protected filesystem write                  | Use the agreement's specific authorization path; record an actionable handoff when upstream publication is not authorized                                                                                  |
 
 The task-delivery skill routes implementation and commit-message handoff; the
 pull-request skill distinguishes content, publication, updates, and feedback;

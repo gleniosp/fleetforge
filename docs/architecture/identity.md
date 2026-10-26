@@ -6,14 +6,14 @@ rationale.
 
 ## Identity model
 
-| Identity | Meaning and lifetime |
-| --- | --- |
-| `asset_id` | Maintainable robot; may survive replacement of a managed computer |
-| `device_id` | Managed computer/endpoint; stable across restart, software update and credential rotation |
-| `tenant_id` | Owning tenant, distinct from network topology and deployment authority |
-| `authority_id` | Logical deployment writer, distinct from its host/process/connection |
-| `assignment_id` | Binding of asset, device, owning tenant and logical authority |
-| Agent instance | Ephemeral process incarnation, separate from persistent device identity |
+| Identity        | Meaning and lifetime                                                                      |
+| --------------- | ----------------------------------------------------------------------------------------- |
+| `asset_id`      | Maintainable robot; may survive replacement of a managed computer                         |
+| `device_id`     | Managed computer/endpoint; stable across restart, software update and credential rotation |
+| `tenant_id`     | Owning tenant, distinct from network topology and deployment authority                    |
+| `authority_id`  | Logical deployment writer, distinct from its host/process/connection                      |
+| `assignment_id` | Binding of asset, device, owning tenant and logical authority                             |
+| Agent instance  | Ephemeral process incarnation, separate from persistent device identity                   |
 
 `asset_id` and `device_id` are distinct strongly typed canonical uppercase
 ULIDs. Validate exactly 26 Crockford characters from

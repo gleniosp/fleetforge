@@ -72,18 +72,18 @@ Restored valid fixture source/configuration between independent injections.
 These initial staged-content checks exercised the same underlying format/lint
 commands; final aggregate routing was checked separately below.
 
-| Fixture input / command | Result |
-| --- | --- |
-| Valid documentation-only commit | 0; source and commit-message hooks execute |
-| `git commit -m 'incorrect subject'` with a staged sentinel | 1; message rejected, HEAD unchanged |
+| Fixture input / command                                                                                                                               | Result                                                                         |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Valid documentation-only commit                                                                                                                       | 0; source and commit-message hooks execute                                     |
+| `git commit -m 'incorrect subject'` with a staged sentinel                                                                                            | 1; message rejected, HEAD unchanged                                            |
 | Stage `fn main()->io::Result<ExitCode>{` in place of the formatted `main` signature, then leave the formatted correction unstaged; try a valid commit | 1; staged format error rejected, unstaged correction restored, index unchanged |
-| Stage formatted source, leave that formatting error unstaged; try a valid commit | 0; staged source passes, unstaged error restored |
-| Run `hooks-check` on that unstaged format error | 1; current-tree check sees it, source unchanged |
-| Add `let unused_hook_sentinel = 1;` inside `main`; run `hooks-check` | 1; Clippy rejects the warning |
-| Add untracked `apps/agent/tests/hook_untracked.rs` containing `compile_error!("untracked hook sentinel");`; run `hooks-check` | 1; workspace compilation sees untracked input |
-| Append an unstaged comment to `prek.toml`, stage only another file, then try a valid commit | 1; prek refuses unstaged hook configuration and preserves it |
-| Replace `prek.toml` with `this is not valid TOML`; run `hooks-validate` and `check` | 1 for both; configuration failure propagates |
-| Stage only deletion of the sentinel; try a valid commit | 0; source checks still run |
+| Stage formatted source, leave that formatting error unstaged; try a valid commit                                                                      | 0; staged source passes, unstaged error restored                               |
+| Run `hooks-check` on that unstaged format error                                                                                                       | 1; current-tree check sees it, source unchanged                                |
+| Add `let unused_hook_sentinel = 1;` inside `main`; run `hooks-check`                                                                                  | 1; Clippy rejects the warning                                                  |
+| Add untracked `apps/agent/tests/hook_untracked.rs` containing `compile_error!("untracked hook sentinel");`; run `hooks-check`                         | 1; workspace compilation sees untracked input                                  |
+| Append an unstaged comment to `prek.toml`, stage only another file, then try a valid commit                                                           | 1; prek refuses unstaged hook configuration and preserves it                   |
+| Replace `prek.toml` with `this is not valid TOML`; run `hooks-validate` and `check`                                                                   | 1 for both; configuration failure propagates                                   |
+| Stage only deletion of the sentinel; try a valid commit                                                                                               | 0; source checks still run                                                     |
 
 Prek logged restoration after both successful and failed staged checks. Failed
 checks preserved injected source bytes. After restoring valid inputs,
@@ -102,15 +102,15 @@ fn check_test_split_sentinel() {
 }
 ```
 
-| Command with the injected test | Result |
-| --- | --- |
-| `pixi run --locked -e dev check` | 0; no test execution |
-| `pixi run --locked -e dev rust-check` | 0; no test execution |
-| `pixi run --locked -e dev hooks-check` | 0; repository hook passes |
-| Stage it and run `git commit -m 'test: verify pre-commit uses check without tests'` | 0; installed source/message hooks pass |
-| `pixi run --locked -e dev test` | 101; sentinel test fails |
-| `pixi run --locked -e dev rust-test` | 101; sentinel test fails |
-| `pixi run --locked -e dev agent-test` | 101; sentinel test fails in the selected package |
+| Command with the injected test                                                      | Result                                           |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `pixi run --locked -e dev check`                                                    | 0; no test execution                             |
+| `pixi run --locked -e dev rust-check`                                               | 0; no test execution                             |
+| `pixi run --locked -e dev hooks-check`                                              | 0; repository hook passes                        |
+| Stage it and run `git commit -m 'test: verify pre-commit uses check without tests'` | 0; installed source/message hooks pass           |
+| `pixi run --locked -e dev test`                                                     | 101; sentinel test fails                         |
+| `pixi run --locked -e dev rust-test`                                                | 101; sentinel test fails                         |
+| `pixi run --locked -e dev agent-test`                                               | 101; sentinel test fails in the selected package |
 
 Restored source and committed it in the fixture. Added a fixture-only lint task:
 
@@ -131,27 +131,27 @@ For each message, wrote a UTF-8 file whose path contained a space and ran
 `pixi run --locked -e dev commit-check "$MESSAGE_FILE"`. Its bytes remained
 unchanged on success and failure.
 
-| Input | Exit |
-| --- | --- |
-| `build(hooks): validate commit messages`, blank line, body, blank line, `Refs #6` | 0 |
-| `feat(api)!: change the interface`, blank line, `BREAKING CHANGE: remove the old call` | 0 |
-| `revert: restore the previous behavior` | 0 |
-| `Merge pull request #123 from example/branch` | 0 |
+| Input                                                                                                                              | Exit    |
+| ---------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `build(hooks): validate commit messages`, blank line, body, blank line, `Refs #6`                                                  | 0       |
+| `feat(api)!: change the interface`, blank line, `BREAKING CHANGE: remove the old call`                                             | 0       |
+| `revert: restore the previous behavior`                                                                                            | 0       |
+| `Merge pull request #123 from example/branch`                                                                                      | 0       |
 | `incorrect subject`, empty message, `fixup! feat: change behavior`, `squash! feat: change behavior`, or `Revert "earlier subject"` | 14 each |
-| Missing argument to `commit-check` | 13 |
+| Missing argument to `commit-check`                                                                                                 | 13      |
 
 Used `pixi run --locked -e dev commit-check-range RANGE`:
 
-| Revision input / fixture history | Exit |
-| --- | --- |
-| Missing range argument | 13 |
-| `HEAD` with only a valid root commit | 0 |
-| `ROOT..HEAD` after a valid second commit | 0 |
-| `HEAD..HEAD` | 3 |
-| `missing-ref..HEAD` | 23 |
-| `ROOT..HEAD` or `HEAD` after adding `incorrect historical subject` | 14 |
-| `BASE..HEAD` after valid divergent branch commits and `git merge --no-ff valid-side -m "Merge branch 'valid-side'"` | 0 |
-| Same pattern with an `invalid side history` commit merged from the second parent | 14; invalid side commit identified |
+| Revision input / fixture history                                                                                    | Exit                               |
+| ------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| Missing range argument                                                                                              | 13                                 |
+| `HEAD` with only a valid root commit                                                                                | 0                                  |
+| `ROOT..HEAD` after a valid second commit                                                                            | 0                                  |
+| `HEAD..HEAD`                                                                                                        | 3                                  |
+| `missing-ref..HEAD`                                                                                                 | 23                                 |
+| `ROOT..HEAD` or `HEAD` after adding `incorrect historical subject`                                                  | 14                                 |
+| `BASE..HEAD` after valid divergent branch commits and `git merge --no-ff valid-side -m "Merge branch 'valid-side'"` | 0                                  |
+| Same pattern with an `invalid side history` commit merged from the second parent                                    | 14; invalid side commit identified |
 
 `BASE` was main's commit immediately before each branch was created. Constructed
 bad history only in the fixture with
