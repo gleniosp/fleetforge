@@ -77,8 +77,11 @@ descriptor, files, Pixi manifest/lockfile, entrypoint, and health contract. The
 catalog maps a stable release ID to its descriptor/digest and local location.
 The [version 1 release specification](../specs/releases.md) owns descriptor,
 path/schema, canonical signing, catalog collision and ROS probe interface rules.
-Its schemas and review fixtures specify the contract; runtime enforcement and
-real ROS evidence remain with the subsequent M1 deliveries.
+Its schemas and review fixtures specify the contract. The
+[unsigned A/B workload fixture](../../examples/ros-workloads/README.md) and
+[compatibility experiment](../experiments/0002-ros-workload-runtime.md) establish
+real ROS behavior in the reference container. Production input/trust enforcement
+remains with the subsequent M1 deliveries.
 
 Before deployment scenarios, provision each relevant robot with release inputs
 and all dependency bytes needed for offline installation. The operator sends
@@ -230,8 +233,9 @@ health. Earlier process-unit fixtures may stay small/generic. Gazebo,
 hardware/navigation and physical pilots are deferred extensions of this real MVP
 slice.
 
-Validate the actual RoboStack/Pixi package combination in
-[M1-02](https://github.com/gleniosp/fleetforge/issues/11). Preserve/reproduce an
+The [M1-02 compatibility experiment](../experiments/0002-ros-workload-runtime.md)
+records the actual RoboStack/Pixi package combination and isolated health checks.
+Preserve/reproduce an
 upstream gap rather than silently substituting a generic mock; follow the
 [bounded upstream policy](../README.md#bounded-upstream-collaboration). [ROS
 REP-2000](https://www.ros.org/reps/rep-2000.html) supplies distro/platform

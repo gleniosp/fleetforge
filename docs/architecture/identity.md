@@ -6,6 +6,9 @@ rationale.
 
 ## Identity model
 
+The [glossary](../product/glossary.md) defines asset, device, tenant, authority
+and assignment. The table below specifies their identifiers and lifetimes.
+
 | Identity        | Meaning and lifetime                                                                      |
 | --------------- | ----------------------------------------------------------------------------------------- |
 | `asset_id`      | Maintainable robot; may survive replacement of a managed computer                         |

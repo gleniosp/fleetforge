@@ -1,0 +1,12 @@
+[workspace]
+name = "fleetforge-ros-counter-a-v1"
+channels = ["https://prefix.dev/robostack-jazzy", "conda-forge"]
+platforms = ["linux-64"]
+requires-pixi = ">=0.83.0"
+
+[dependencies]
+# Python executes the application/probe; these ROS packages supply their APIs.
+python = "=3.14.10"
+ros-jazzy-rclpy = "=7.1.12"
+ros-jazzy-std-msgs = "=5.3.8"
+ros-jazzy-lifecycle-msgs = "=2.0.4"

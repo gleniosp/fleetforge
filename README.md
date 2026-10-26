@@ -14,10 +14,20 @@ Accepted work can finish or recover without the authority when trusted inputs
 and resources are local. A reachable local authority can issue new deployments
 without public internet.
 
+> [!TIP]
+> **Follow the software from release to robot.**
+> The [illustrated walkthrough](docs/guides/releases-explained.md) explains the
+> planned flow step by step: creating and approving a release, requesting a
+> deployment, preparing its environment, running it, checking health, and recovering
+> from failure. It introduces the concepts as they appear, with connected examples.
+
 ## Current state
 
-FleetForge currently provides a Rust bootstrap diagnostic and a locked
-build/check toolchain. Fleet operation is not implemented yet.
+FleetForge currently provides a Rust bootstrap diagnostic, a locked build/check
+toolchain and unsigned headless ROS 2 Jazzy A/B workload fixtures. The
+[workload demonstration](examples/ros-workloads/README.md) verifies real ROS
+behavior and isolated health on Linux x86_64. Fleet operation is not implemented
+yet.
 
 Develop on **Linux (x86_64/ARM64), Apple Silicon macOS, or Windows through WSL2**.
 Device apps and their runtimes currently target **Linux x86_64 (`linux-64`)**;
@@ -43,13 +53,6 @@ It prints `fleetforge-agent 0.1.0 (x86_64-linux; bootstrap diagnostic)` and exit
 
 ## Planned MVP
 
-> [!TIP]
-> **Follow the software from release to robot.**
-> The [illustrated walkthrough](docs/guides/releases-explained.md) explains the
-> planned flow step by step: creating and approving a release, requesting a
-> deployment, preparing its environment, running it, checking health, and recovering
-> from failure. It introduces the concepts as they appear, with connected examples.
-
 - One local Rust/Tokio authority and three independent device agents with SQLite.
 - Separate asset/device identities and tenant/authority/assignment context.
 - Real headless ROS 2 Jazzy Python A/B releases in independent Pixi environments.
@@ -71,7 +74,7 @@ future measured target.
 ## Read and contribute
 
 Start with the [documentation map](docs/README.md),
-[requirements](docs/product/requirements.md), and
+[glossary](docs/product/glossary.md), [requirements](docs/product/requirements.md), and
 [architecture](docs/architecture/overview.md). The [roadmap](docs/roadmap.md)
 links to GitHub delivery owners; [traceability](docs/traceability.md) maps
 requirements to issues and intended verification. [ADRs](docs/adr/README.md)

@@ -60,7 +60,7 @@ SvelteKit, and other task families only with real workflows. Language formatters
 own code layout; shared editor defaults must agree with them.
 
 Git is a host development/CI prerequisite, not an agent runtime requirement.
-Each planned ROS workload release owns a separate runtime manifest/lock; the
+Each [ROS workload release](../../examples/ros-workloads/README.md) owns a separate runtime manifest/lock; the
 planned frontend owns its npm lock. Commit relevant locks and validate without
 rewriting tracked source or resolution. Explicit format/fix commands may edit
 source. Ordinary clean/shutdown preserves operational state; reset is separate.
@@ -73,6 +73,11 @@ The [release specification](../specs/releases.md#inputs-installed-environments-a
 owns the distinction between signed immutable release inputs, provisioned package
 bytes and generated release-specific environments. Actual offline cache and ROS
 compatibility evidence belongs to the M1 workload/cache deliveries.
+The [workload runtime experiment](../experiments/0002-ros-workload-runtime.md)
+records locked A/B execution and activation on Ubuntu 24.04, including the
+transitive build/test package footprint. The fixture invokes Pixi with explicit
+release manifest paths to prepare/activate independent workspaces; it never
+switches the root tooling environment.
 
 ## Alternatives and consequences
 

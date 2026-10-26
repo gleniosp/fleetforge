@@ -27,27 +27,9 @@ There are three scopes:
 
 ## Domain terminology
 
-| Term               | Meaning                                                                                                              |
-| ------------------ | -------------------------------------------------------------------------------------------------------------------- |
-| Asset              | Maintainable robot identified by `asset_id`                                                                          |
-| Device             | Managed computer/endpoint identified by `device_id`, distinct from an asset or agent process                         |
-| Tenant             | Owning organization/context identified separately by `tenant_id`                                                     |
-| Assignment         | Binding of asset, device, tenant and logical deployment authority, identified by `assignment_id`                     |
-| Authority          | Single deployment writer for an assignment, identified by `authority_id`; operator denotes its local service/UI role |
-| Fleet              | Configured selection of assets/devices, independent of network addresses                                             |
-| Release            | Immutable publisher-signed descriptor and its application, Pixi manifest and lockfile inputs                         |
-| Release catalog    | Mapping from supported release IDs to immutable descriptors/digests                                                  |
-| Desired state      | Authorized target release and descriptor digest for an assignment/device at a generation                             |
-| Generation         | Durable increasing counter scoped to authority/assignment/device                                                     |
-| Request ID         | Identity recognizing retries, separately at API submission and instruction delivery                                  |
-| Acceptance         | Agent validated and committed an instruction; execution may still be pending                                         |
-| Deployment attempt | Correlated effort to satisfy an accepted generation                                                                  |
-| Active release     | Software associated with the actual managed workload; absent/unknown are explicit                                    |
-| Known-good release | Software that previously passed workload health verification                                                         |
-| Automatic recovery | Restore and verify known-good software after failed deployment                                                       |
-| Requested rollback | Issue a new generation targeting a retained previous release                                                         |
-| Observation        | Last received source snapshot with identity, sequence, source time and freshness                                     |
-| Durable event      | Bounded persisted operational history, separate from stdout and security decision records                            |
+The [glossary](glossary.md) is the shared reference for project concepts and
+supporting vocabulary. The requirements below specify required behavior and
+acceptance criteria.
 
 ## Fixed MVP boundary
 
