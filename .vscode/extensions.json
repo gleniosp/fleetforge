@@ -1,7 +1,10 @@
 {
   "recommendations": [
+    "charliermarsh.ruff",
     "dprint.dprint",
     "editorconfig.editorconfig",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
     "oxc.oxc-vscode",
     "rust-lang.rust-analyzer",
     "vadimcn.vscode-lldb"

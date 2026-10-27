@@ -1,11 +1,21 @@
 {
-  "dprint.path": "./.pixi/envs/host/bin/dprint",
+  "dprint.path": "${workspaceFolder}/.pixi/envs/host/bin/dprint",
   "dprint.ensureStableFormat": true,
+  "python.defaultInterpreterPath": "${workspaceFolder}/.pixi/envs/host/bin/python",
+  "ruff.path": ["${workspaceFolder}/.pixi/envs/host/bin/ruff"],
+  "ruff.configurationPreference": "filesystemFirst",
   "[markdown][json][jsonc][yaml][toml]": {
     "editor.defaultFormatter": "dprint.dprint",
     "editor.formatOnSave": true
   },
   "[rust]": {
     "editor.defaultFormatter": "rust-lang.rust-analyzer"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "never",
+      "source.organizeImports.ruff": "never"
+    }
   }
 }
