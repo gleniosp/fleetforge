@@ -6,9 +6,10 @@ channels = ["conda-forge", "https://prefix.dev/github-releases"]
 platforms = ["linux-64", "linux-aarch64", "osx-arm64"]
 requires-pixi = ">=0.83.0"
 
-# Shared compiler tools; device commands are explicitly named and Linux-only.
+# Shared language tools; device commands are explicitly named and Linux-only.
 [dependencies]
 rust = "=1.98.1"
+python = "=3.14.10"
 
 [target.linux-64.tasks]
 device-build = { depends-on = ["agent-build"] }
@@ -27,6 +28,8 @@ exec cargo --config 'build.build-dir="target"' clean --locked --target-dir targe
 prek = "=0.5.7"
 commitizen = "=4.19.2"
 dprint = { version = "=0.63.0", channel = "https://prefix.dev/github-releases" }
+ruff = "=0.17.3"
+mypy = "=2.4.0"
 
 [feature.lint.tasks]
 setup = { depends-on = [
@@ -36,8 +39,12 @@ setup = { depends-on = [
 check = { depends-on = [
   "format-check",
   "hooks-validate",
+  "python-check",
 ], description = "Run host source/configuration checks directly; no device checks/tests" }
-fix = { depends-on = ["format"], description = "Apply host formatting fixes across the repository" }
+fix = { depends-on = [
+  "format",
+  "python-fix",
+], description = "Apply host formatting and safe Python fixes across mutable source" }
 format-setup = "dprint install"
 format = "dprint fmt --allow-no-files --"
 format-check = "dprint check --allow-no-files --"
@@ -45,6 +52,14 @@ hooks-install = "prek install"
 hooks-validate = "prek validate-config prek.toml"
 commit-check = "cz check --commit-msg-file"
 commit-check-range = "cz check --rev-range"
+python-check = { depends-on = ["python-format-check", "python-lint", "python-typecheck"] }
+python-format = "ruff format ."
+python-format-check = "ruff format --check ."
+python-lint = "ruff check ."
+python-fix = { cmd = "ruff check --fix --extend-exclude releases .", depends-on = [
+  "python-format",
+] }
+python-typecheck = "mypy examples/ros-workloads && mypy releases/ros-counter-a-v1/app && mypy releases/ros-counter-b-v1/app"
 
 [feature.lint.target.linux-64.tasks]
 device-check = { depends-on = ["device-format-check", "device-lint"] }
@@ -58,14 +73,19 @@ agent-format = "cargo fmt -p fleetforge-agent"
 agent-lint = "cargo clippy --locked -p fleetforge-agent --all-targets -- -D warnings"
 agent-fix = "cargo clippy --fix --locked -p fleetforge-agent --all-targets -- -D warnings"
 
-# Cargo supplies test execution; no additional test package is needed.
-[feature.test]
-# No host test suite exists yet; add real test tasks with host components.
+[feature.test.dependencies]
+pytest = "=9.1.1"
+
+[feature.test.tasks]
+test = { depends-on = [
+  "python-test",
+], description = "Run portable Python fixture regressions; no ROS runtime required" }
+python-test = "python -B -m pytest -m 'not ros'"
 
 [feature.test.target.linux-64.tasks]
 device-test = { depends-on = ["agent-test", "ros-workloads-test"] }
 agent-test = "cargo test --locked -p fleetforge-agent"
-ros-workloads-test = { cmd = "bash examples/ros-workloads/run-demo.sh", description = "Verify unsigned A/B fixtures using separate Linux ROS runtime workspaces" }
+ros-workloads-test = { cmd = "python -B -m pytest -m ros", description = "Verify unsigned A/B fixtures using separate Linux ROS runtime workspaces" }
 
 [environments]
 default = { solve-group = "toolchain" }

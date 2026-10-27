@@ -274,19 +274,8 @@ class Release:
         ) from last_error
 
 
-def main() -> None:
+def verify_workloads(pixi: str, fixture: Path, source: Path) -> None:
     """Exercise independent runtimes, positive health and deliberate failures."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("pixi", help="absolute path to the Pixi executable")
-    parser.add_argument(
-        "fixture", type=Path, help="disposable installed release copies"
-    )
-    parser.add_argument(
-        "source", type=Path, help="source repository to check for mutation"
-    )
-    arguments = parser.parse_args()
-    pixi = arguments.pixi
-    fixture, source = arguments.fixture.resolve(), arguments.source.resolve()
     before = snapshot(source / "releases")
     logs = fixture / "logs"
     logs.mkdir()
@@ -299,6 +288,44 @@ def main() -> None:
     domain = 30 + secrets.randbelow(50)
     a_env = a.context(domain)
     b_env = b.context(domain + 1)
+    # Exercise the real entrypoints, including failure before ROS initialization.
+    invalid_invocations: tuple[tuple[Literal["main", "health"], str, str, str], ...] = (
+        (
+            "main",
+            "FLEETFORGE_PROCESS_INSTANCE_ID",
+            "invalid",
+            "invalid process instance",
+        ),
+        ("health", "FLEETFORGE_HEALTH_NONCE", "invalid", "invalid health nonce"),
+        (
+            "health",
+            "FLEETFORGE_DESCRIPTOR_DIGEST",
+            "sha256:" + "0" * 64,
+            "release identity",
+        ),
+    )
+    for release, environment in ((a, a_env), (b, b_env)):
+        for name, variable, value, reason in invalid_invocations:
+            invalid = subprocess.run(
+                release.command(name),
+                cwd=release.root,
+                env={**environment, variable: value},
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            require(
+                invalid.returncode == 1
+                and not invalid.stdout.strip()
+                and reason in invalid.stderr,
+                "invalid invocation did not fail clearly: "
+                + invalid.stdout
+                + invalid.stderr,
+            )
+    print(
+        "PASS: invalid process identity, health nonce and descriptor digest rejected",
+        flush=True,
+    )
     with a.running(a_env) as a_child, b.running(b_env) as b_child:
         a.ready(a_env, a_child)
         b.ready(b_env, b_child)
@@ -330,11 +357,35 @@ def main() -> None:
         a.probe({**a_env, "ROS_DOMAIN_ID": str(domain + 1)}, False)
         print("PASS: ROS domain isolation", flush=True)
         control = source / "examples/ros-workloads/lifecycle.py"
+        unavailable = subprocess.run(
+            [str(a.python), str(control), "deactivate", "--timeout", "0.2"],
+            env={**a_env, "FLEETFORGE_PROCESS_INSTANCE_ID": secrets.token_hex(16)},
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        require(
+            unavailable.returncode == 1
+            and not unavailable.stdout.strip()
+            and "lifecycle service unavailable" in unavailable.stderr,
+            "unavailable lifecycle service did not fail within its deadline",
+        )
+        print(
+            "PASS: lifecycle control has a bounded unavailable-service failure",
+            flush=True,
+        )
+        transition_timeout = a.descriptor["health"]["startup_timeout_ms"] / 1000
         subprocess.run(
-            [str(a.python), str(control), "deactivate"],
+            [
+                str(a.python),
+                str(control),
+                "deactivate",
+                "--timeout",
+                str(transition_timeout),
+            ],
             env=a_env,
             check=True,
-            timeout=5,
+            timeout=transition_timeout + 5,
         )
         reason = a.probe(a_env, False)
         require(
@@ -344,7 +395,16 @@ def main() -> None:
         require(a_child.poll() is None, "inactive workload unexpectedly died")
         print("PASS: live inactive lifecycle fails health", flush=True)
         subprocess.run(
-            [str(a.python), str(control), "activate"], env=a_env, check=True, timeout=5
+            [
+                str(a.python),
+                str(control),
+                "activate",
+                "--timeout",
+                str(transition_timeout),
+            ],
+            env=a_env,
+            check=True,
+            timeout=transition_timeout + 5,
         )
         a.ready(a_env, a_child)
         # A remains live while B is independently prepared/run, and is still usable.
@@ -385,6 +445,22 @@ def main() -> None:
         "PASS: independent A/B environments, real ROS behavior, fresh nonce/identity, "
         "lifecycle/domain/endpoint isolation, retained unchanged release inputs",
         flush=True,
+    )
+
+
+def main() -> None:
+    """Run the same verification as pytest from the standalone demo."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("pixi", help="absolute path to the Pixi executable")
+    parser.add_argument(
+        "fixture", type=Path, help="disposable installed release copies"
+    )
+    parser.add_argument(
+        "source", type=Path, help="source repository to check for mutation"
+    )
+    arguments = parser.parse_args()
+    verify_workloads(
+        arguments.pixi, arguments.fixture.resolve(), arguments.source.resolve()
     )
 
 

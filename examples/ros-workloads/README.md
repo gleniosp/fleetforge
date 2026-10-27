@@ -136,15 +136,24 @@ records the exact package set and platform limits.
 
 The scripts have different jobs:
 
-| Script               | Role                                                                                                                            |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `run-demo.sh`        | Creates disposable A/B copies, installs their locked environments, then runs helper regressions and ROS checks using A's Python |
-| `check_workloads.py` | Starts the ROS applications, runs health and failure checks, and stops/reaps its child processes                                |
-| `lifecycle.py`       | Requests activation/deactivation through the real ROS lifecycle service for the inactive-node check                             |
-| `test_helpers.py`    | Runs ten standard-library regressions for wire parsing, process cleanup and startup probe deadlines                             |
+| Script               | Role                                                                                                     |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| `run-demo.sh`        | Creates disposable A/B copies, installs their locked environments, then runs ROS checks using A's Python |
+| `check_workloads.py` | Starts the ROS applications, runs health and failure checks, and stops/reaps its child processes         |
+| `lifecycle.py`       | Requests activation/deactivation through the real ROS lifecycle service for the inactive-node check      |
+| `test_helpers.py`    | Pytest regressions for wire parsing, process cleanup and startup deadlines                               |
+| `test_ros.py`        | Runs the real ROS verification through pytest in disposable runtime copies                               |
+| `test_identity.py`   | Pytest cases for valid, missing and invalid A/B identity context                                         |
 
 Each copy owns a separate `.pixi/envs/default`; source releases and locks stay
 unchanged.
+
+Run the portable regressions with `pixi run --locked -e host test` and the
+Ruff/mypy checks with `pixi run --locked -e host python-check`. These use root
+contributor tools without installing ROS; the direct demonstration continues
+to use only the releases' runtime dependencies. The
+[development guide](../../docs/guides/development.md#python-tooling-and-workload-tests)
+owns Python tool configuration and the immutable formatting boundary.
 
 ## Workload and probe interface
 
@@ -190,9 +199,16 @@ The checks cover independent installed environments, release file fingerprints,
 A/B behavior/identity, wrong endpoint/domain, deliberately misrouted neighbor,
 live inactive lifecycle, stopped workload, stale attempt after restart, and a
 child with the wrong counter algorithm despite matching identity. They also
-check source inputs remain byte-for-byte unchanged. Deployment startup
-scheduling, ongoing supervision and privilege isolation belong to later slices;
-#12 adds dedicated Python tooling and the broader workload test suite.
+check source inputs remain byte-for-byte unchanged. Real entrypoint failure
+checks reject invalid process identity, health nonce and descriptor digest
+with nonzero exit and no success output. Deployment startup scheduling,
+ongoing supervision and privilege isolation belong to later slices.
+
+The demonstration's lifecycle-control helper shares one deadline across service
+discovery and the transition response, using the descriptor's startup budget
+(30 seconds here). Its parent allows five additional seconds for Python/ROS
+startup and cleanup. Cold discovery may take more than two seconds; an unavailable
+service still fails within the configured deadline.
 
 ## Runtime dependencies and upgrades
 

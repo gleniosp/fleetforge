@@ -13,12 +13,8 @@ for release in ros-counter-a-v1 ros-counter-b-v1; do
   "$pixi_executable" install --locked --manifest-path "$fixture_root/$release/pixi.toml"
 done
 
-# The fixture itself uses A's Python standard library, with no host Python needed.
+# The fixture uses A's Python standard library, with no host Python/pytest needed.
 "$pixi_executable" run --locked --clean-env \
   --manifest-path "$fixture_root/ros-counter-a-v1/pixi.toml" \
-  python -B "$repo_root/examples/ros-workloads/test_helpers.py"
-
-"$pixi_executable" run --locked --clean-env \
-  --manifest-path "$fixture_root/ros-counter-a-v1/pixi.toml" \
-  python "$repo_root/examples/ros-workloads/check_workloads.py" \
+  python -B "$repo_root/examples/ros-workloads/check_workloads.py" \
   "$pixi_executable" "$fixture_root" "$repo_root"

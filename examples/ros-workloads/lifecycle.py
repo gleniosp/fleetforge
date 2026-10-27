@@ -1,6 +1,7 @@
 """Local demonstration control used to prove inactive nodes fail health."""
 
 import argparse
+import math
 import os
 import sys
 import time
@@ -12,10 +13,13 @@ from rclpy.node import Node
 
 
 def main() -> None:
-    """Request a real lifecycle transition and wait at most four seconds."""
+    """Request a real transition within one discovery/response deadline."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("transition", choices=("activate", "deactivate"))
+    parser.add_argument("--timeout", type=float, default=4.0)
     arguments = parser.parse_args()
+    if not math.isfinite(arguments.timeout) or arguments.timeout <= 0:
+        parser.error("--timeout must be a finite positive number of seconds")
     transition_id = {
         "activate": Transition.TRANSITION_ACTIVATE,
         "deactivate": Transition.TRANSITION_DEACTIVATE,
@@ -30,8 +34,10 @@ def main() -> None:
         client = node.create_client(
             ChangeState, f"/fleetforge/i_{instance}/counter/change_state"
         )
-        deadline = time.monotonic() + 4.0
-        if not client.wait_for_service(timeout_sec=2.0):
+        deadline = time.monotonic() + arguments.timeout
+        if not client.wait_for_service(
+            timeout_sec=max(0.0, deadline - time.monotonic())
+        ):
             raise RuntimeError("lifecycle service unavailable")
         request = ChangeState.Request()
         request.transition.id = transition_id

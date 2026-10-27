@@ -1,8 +1,8 @@
 # Task reference
 
 Select non-default scopes explicitly: `pixi run --locked -e host TASK` for
-contributor work and `pixi run --locked -e device TASK` for device work. Default
-Rust tooling needs no environment flag. The [manifest](../../pixi.toml) owns
+contributor work and `pixi run --locked -e device TASK` for device work. Shared
+language tools need no environment flag. The [manifest](../../pixi.toml) owns
 commands and versions; the [development guide](development.md) owns setup.
 
 ## Pixi configuration conventions
@@ -32,6 +32,11 @@ commands and versions; the [development guide](development.md) owns setup.
 | `check`                                | Compose read-only host formatting/configuration checks              | `host`      |
 | `fix`                                  | Apply current host fixes across the repository                      | `host`      |
 | `format`, `format-check`               | Rewrite/check eligible document/configuration files; optional paths | `host`      |
+| `python-check`                         | Compose Ruff format-check/lint and mypy for Python source           | `host`      |
+| `python-format`, `python-format-check` | Rewrite/check mutable Python support and tests                      | `host`      |
+| `python-lint`, `python-typecheck`      | Inspect all Python source, including immutable A/B payloads         | `host`      |
+| `python-fix`                           | Format and apply safe Ruff fixes to mutable Python support/tests    | `host`      |
+| `test`, `python-test`                  | Run portable wire, identity and process-boundary regressions        | `host`      |
 | `format-setup`                         | Download and compile the pinned Wasm plugin                         | `host`      |
 | `device-build`, `agent-build`          | Build device apps or just the agent                                 | `device`    |
 | `device-check`, `agent-check`          | Device format-check and lint; no tests                              | `device`    |
@@ -44,27 +49,17 @@ commands and versions; the [development guide](development.md) owns setup.
 
 ### Feature and environment composition
 
-Default provides shared Rust and Linux-only device build/run/clean tasks.
-`lint` adds repository tooling/checks and Linux-only device source checks;
-`test` owns Linux-only device tests. Both host and device select lint/test and
-inherit default; device additionally restricts platforms to linux-64. Linux host
-can see device-prefixed commands, but ordinary `check` never invokes them.
-Callers select `-e host` or `-e device` explicitly to state the intended scope.
-All root environments share a solve group; workload runtime locks remain separate.
-The Linux-only `ros-workloads-test` fixture calls host-installed Pixi with each
-release's manifest path to install/activate independent runtime workspaces. It
-uses their Python, with no additional root Python or ROS dependency. This is
-explicit preparation of separate workspaces rather than selection of a different
-root tooling environment. The [workload guide](../../examples/ros-workloads/README.md)
-owns commands, cleanup, package-access requirements and reference validation.
+Shared language tools support every developer host. `host` selects contributor
+checks and portable tests; `device` also exposes the Linux x86_64 runtime
+checks. Ordinary host checks never start ROS workloads. All root environments
+share a solve group; release runtime locks remain independent.
 
-Host `check` composes `format-check` and `hooks-validate`; `fix` composes
-`format`. Add lint checks/fixes only with actual owning components. No host
-application test suite is introduced. `format`/`format-check` use one dprint
-configuration over current Markdown, JSON/JSONC, YAML and TOML, including
-eligible untracked files when no paths are supplied. The
-[formatting guide](development.md#repository-formatting) owns exclusions,
-configuration ownership and editor setup. Rust keeps its device-scoped tasks.
+The real ROS test installs disposable copies of each release with host-installed
+Pixi and runs their own interpreters. Contributor tools stay in the root
+workspace. The [workload guide](../../examples/ros-workloads/README.md) owns the
+fixture and its package-access requirements; the
+[development guide](development.md#python-tooling-and-workload-tests) explains
+Python checks and the immutable formatting boundary.
 
 Tasks run from the workspace root, including when invoked from a component
 directory. Forward CLI arguments after `--`:
@@ -95,10 +90,11 @@ may require contributor resolution; inspect prek's migration notice rather than
 force-overwriting them. Installation is separate from validation.
 
 [prek.toml](../../prek.toml) is the sole hook configuration. Pre-commit runs
-three non-formatting safety built-ins and a single repository-wide `fix` hook.
-Commit messages use the separate `commit-check` hook. There is no formatting
-check hook: use host `check` or `format-check` directly during development.
-CI runs the direct checks and invokes Prek with `--skip fix` for commit safety.
+three non-formatting safety built-ins and the repository-wide `fix` hook.
+Keep repository fixes in that aggregate, as required by the
+[working agreement](../working-agreement.md#implementation-and-readiness).
+Checks/tests run separately. Commit messages use `commit-check`; CI runs the
+direct checks/tests and invokes Prek with `--skip fix` for commit safety.
 
 The `fix` hook runs without filename arguments, so it covers all eligible files,
 including untracked drafts. Changes to tracked/staged content stop the commit:
