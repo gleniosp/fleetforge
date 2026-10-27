@@ -153,12 +153,24 @@ indentation during typing and file-encoding preferences remain editor behaviours
 
 Open the repository root as the workspace and run setup first. The committed
 [extension recommendations](../../.vscode/extensions.json) select dprint,
-EditorConfig, rust-analyzer and CodeLLDB, plus the optional Oxc recommendation.
+EditorConfig, Python, Pylance, Ruff, rust-analyzer and CodeLLDB, plus the optional
+Oxc recommendation.
 [VS Code settings](../../.vscode/settings.json)
 route supported document/configuration saves to
 `./.pixi/envs/host/bin/dprint`; the same project configuration/plugin serves
 CLI and editor. Stable formatting is enabled to match the CLI's default passes.
 No indentation/newline/layout options are duplicated in VS Code settings.
+
+Python defaults to the host interpreter and uses the locked host Ruff executable
+for linting and formatting. Ruff prefers filesystem configuration, keeping
+[pyproject.toml](../../pyproject.toml) authoritative. Use **Format Document** for
+Python; the existing release formatting exclusion also applies in the editor.
+Ruff fix-all and import organization on save are disabled because lint fixes can
+rewrite immutable release payloads. Apply deliberate fixes only to mutable source.
+If this workspace already has a selected Python interpreter, use **Python: Select
+Interpreter** to choose `.pixi/envs/host/bin/python`; the default setting only
+applies before an interpreter is selected. Pylance supplies editor navigation
+and completion; the canonical strict type check remains `python-typecheck`.
 
 Other editors can use the same executable with `dprint lsp` or their dprint
 integration. The canonical CLI commands remain the fallback. Rust editor tools
