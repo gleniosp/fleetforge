@@ -37,7 +37,8 @@ commands and versions; the [development guide](development.md) owns setup.
 | `device-check`, `agent-check`          | Device format-check and lint; no tests                              | `device`    |
 | `device-format-check`, `device-format` | Inspect/rewrite device source formatting                            | `device`    |
 | `device-lint`, `device-fix`            | Device lints and Cargo-safe fixes                                   | `device`    |
-| `device-test`, `agent-test`            | Execute device tests or just agent tests                            | `device`    |
+| `device-test`, `agent-test`            | Execute agent and ROS fixture tests, or just agent tests            | `device`    |
+| `ros-workloads-test`                   | Verify independent unsigned A/B ROS runtimes in disposable copies   | `device`    |
 | `agent-run`                            | Invoke the bootstrap diagnostic                                     | `device`    |
 | `device-clean`                         | Remove generated build output                                       | `device`    |
 
@@ -49,7 +50,13 @@ Default provides shared Rust and Linux-only device build/run/clean tasks.
 inherit default; device additionally restricts platforms to linux-64. Linux host
 can see device-prefixed commands, but ordinary `check` never invokes them.
 Callers select `-e host` or `-e device` explicitly to state the intended scope.
-All environments share a solve group; deployed runtime locks remain separate.
+All root environments share a solve group; workload runtime locks remain separate.
+The Linux-only `ros-workloads-test` fixture calls host-installed Pixi with each
+release's manifest path to install/activate independent runtime workspaces. It
+uses their Python, with no additional root Python or ROS dependency. This is
+explicit preparation of separate workspaces rather than selection of a different
+root tooling environment. The [workload guide](../../examples/ros-workloads/README.md)
+owns commands, cleanup, package-access requirements and reference validation.
 
 Host `check` composes `format-check` and `hooks-validate`; `fix` composes
 `format`. Add lint checks/fixes only with actual owning components. No host

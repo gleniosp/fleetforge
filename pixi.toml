@@ -63,8 +63,9 @@ agent-fix = "cargo clippy --fix --locked -p fleetforge-agent --all-targets -- -D
 # No host test suite exists yet; add real test tasks with host components.
 
 [feature.test.target.linux-64.tasks]
-device-test = { depends-on = ["agent-test"] }
+device-test = { depends-on = ["agent-test", "ros-workloads-test"] }
 agent-test = "cargo test --locked -p fleetforge-agent"
+ros-workloads-test = { cmd = "bash examples/ros-workloads/run-demo.sh", description = "Verify unsigned A/B fixtures using separate Linux ROS runtime workspaces" }
 
 [environments]
 default = { solve-group = "toolchain" }

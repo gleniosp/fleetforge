@@ -12,9 +12,9 @@ someone authorized to approve software endorsed those contents. We will build
 up how it answers those questions, starting with ordinary files.
 
 This is a walkthrough of the accepted design, not an executable tutorial.
-FleetForge currently provides its bootstrap diagnostic and contributor tooling;
-the application deployment described here still needs implementation. See the
-[README](../../README.md#current-state) for what runs today and the
+The application deployment described here still needs implementation. See the
+[README](../../README.md#current-state) for what runs today, the
+[glossary](../product/glossary.md) for quick term lookups, and the
 [release specification](../specs/releases.md) for the exact rules behind this guide.
 
 ## First, collect one software version into a release
@@ -336,6 +336,7 @@ When a valid deployment instruction requests `example-b-v1` with
 
 Only after all required input checks succeed can preparation begin. These are
 illustrative excerpts with symbolic values, not a signed release you can install.
+A **fixture** is a deliberately prepared example used for review or testing.
 The [complete review fixtures](../specs/fixtures/releases/README.md) provide
 concrete file sizes, hashes and exact-byte examples; their placeholder applications
 and deliberately invalid signature still do not form a runnable trusted release.
@@ -358,6 +359,8 @@ the application, and handles health and recovery. It owns what actually happens
 on that robot and reports what it observes. The robot is the host; the agent and
 the managed application are separate processes with different permissions.
 
+A **health probe** is a small program that checks whether the application
+actually behaves as expected. The agent runs it and evaluates its response.
 Other parts support those responsibilities:
 
 | Part                         | Responsibility in this journey                                                                                                        |
@@ -641,7 +644,8 @@ A live process alone does not prove that the application works. An old ROS
 process or a neighboring robot could also answer a careless health check.
 
 For each new workload process, the agent creates a fresh process-instance ID.
-For each probe it creates a fresh challenge, or **nonce**. The probe exchanges
+For each probe it creates a fresh, unpredictable challenge, or **nonce**, used
+for that one check. The probe exchanges
 that challenge with the actual workload through ROS and checks the response's
 release, descriptor digest, process identity and observed application behavior.
 
@@ -702,9 +706,16 @@ messages or perform these checks by hand.
 
 ## What the example releases demonstrate today
 
-A **fixture** is a deliberately prepared example used for review or testing.
-The [release fixtures](../specs/fixtures/releases/README.md) show how the contract
-fits together before real ROS workloads and signing tools exist.
+There are two kinds of examples. The
+[runnable ROS workloads](../../examples/ros-workloads/README.md) let developers
+install A/B in separate environments and check their actual behavior and health.
+They are unsigned and demonstrate the runtime foundation, not a complete
+deployment lifecycle. Their guide explains why the counter example is useful
+and how to run it.
+
+The [document review fixtures](../specs/fixtures/releases/README.md) show how the
+release contract's documents fit together. The details below describe those
+illustrative documents, separately from the runnable workloads.
 
 Their A/B descriptors have distinct IDs, fingerprints and intended behavior.
 The payloads are tiny placeholder texts, not working applications or valid Pixi
@@ -732,9 +743,9 @@ in the byte vectors. Each pair of hex characters represents one byte; the schema
 helper `hex_32_bytes`, for example, describes 32 raw bytes written as 64 hex
 characters. Decoding a vector recovers the exact bytes used for its fingerprint.
 
-The real ROS release delivery is #11, and actual generated signing fixtures and
-cryptographic rejection tests belong to #86. These review fixtures must not be
-installed or provisioned as trusted operational inputs.
+The runnable ROS workload delivery is #11; generated signing fixtures and
+cryptographic rejection tests belong to #86. These document review fixtures
+must not be installed or provisioned as trusted operational inputs.
 
 ## Manual setup now, separate lifecycle work later
 

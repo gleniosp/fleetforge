@@ -35,6 +35,13 @@ packages. Their presence in an installed environment does not relicense them
 under Apache-2.0 or constitute a completed redistribution audit. The current
 dependency identities are in `Cargo.lock` and `pixi.lock`.
 
+The [unsigned ROS workload fixtures](examples/ros-workloads/README.md) have
+independent runtime locks record the resolved package identities and declared
+licenses. Their
+[delivery review](docs/journal/2026-10-26-ros-workloads.md#dependency-provenance-review)
+records direct/transitive provenance findings and the limits of this source-only
+delivery.
+
 ## Images and release artifacts
 
 Before distributing a container image, executable, archive, ROS workload,

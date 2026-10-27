@@ -2,9 +2,12 @@
 
 **Status:** Accepted design for [M1-01 (#10)](https://github.com/gleniosp/fleetforge/issues/10)
 and [MVP-02](../product/requirements.md#mvp-02--reproducible-software-releases).
-Schemas and illustrative fixtures exist; a release reader, actual ROS workloads,
+Schemas, illustrative contract fixtures and
+[unsigned ROS workloads](../../examples/ros-workloads/README.md) exist. The
+[workload evidence](../experiments/0002-ros-workload-runtime.md) establishes
+bounded ROS behavior and activation compatibility. A production release reader,
 integrity checker and signature verifier are subsequent deliveries. This contract
-does not establish runtime or cryptographic verification evidence.
+does not establish cryptographic verification evidence.
 
 For an introduction to the terms, their purpose and the complete planned flow,
 read [From approved software to a running robot](../guides/releases-explained.md).
@@ -217,8 +220,11 @@ publisher can approve executable code; signatures do not make that code safe.
 
 The adapter prepares the selected environment and supplies the activation
 environment needed by ROS without executing descriptor-provided shell text.
-The #11 workload delivery must establish its Pixi/ROS activation and package
-compatibility. Clear inherited injection variables (including Python path/home
+The [#11 workload fixture](../../examples/ros-workloads/README.md) obtains the
+installed copy's activation variables with `pixi shell-hook --locked --json`,
+then spawns its environment's Python directly. Its
+[compatibility evidence](../experiments/0002-ros-workload-runtime.md) records the
+tested packages and host. Clear inherited injection variables (including Python path/home
 overrides), supply a controlled environment and disable writes of Python bytecode
 into release inputs. Mutable logs/data and Pixi outputs use separate paths.
 Manifest activation/build code is trusted release code too: it may only run
@@ -249,8 +255,11 @@ with fields `schema_version: 1`, `status: healthy`, `release_id`,
 Unknown/duplicate fields reject. The supervisor compares all identity/challenge
 fields to its current attempt and `observed_behavior` to signed
 `health.expected_behavior` (1–128 printable ASCII characters). The A/B fixture
-values `counter-step-1` and `counter-step-2` describe intended distinct ROS
-behavior; #11 defines and demonstrates the concrete service/message checks.
+values `counter-step-1` and `counter-step-2` describe distinct ROS behavior.
+The [workload fixture](../../examples/ros-workloads/README.md#workload-and-probe-interface)
+checks the active lifecycle service, then two challenge/reply samples carrying
+the fresh nonce and workload identity. The actual counter delta establishes the
+behavior; repeated requests for one sample return its cached value.
 An exit error, timeout, malformed/oversized response, wrong identity/challenge,
 inactive lifecycle or wrong behavior fails the probe. A dishonest compromised
 workload is outside this functional health guarantee.

@@ -91,11 +91,14 @@ pixi run --locked -e device device-build
 ```
 
 In the device environment on Linux x86_64, run both `device-check` and
-`device-test`: checks inspect Rust formatting and lints; tests execute
-separately. The [task reference](tasks.md) lists
+`device-test`: checks inspect Rust formatting and lints; tests execute the agent
+suite and bounded real ROS A/B fixtures separately. The ROS fixture installs
+independent runtime copies and needs package access or an existing cache. Its
+[guide](../../examples/ros-workloads/README.md) provides the focused command and
+Ubuntu 24.04 reference-container invocation. The [task reference](tasks.md) lists
 focused checks, deliberate formatting/fixes and cleanup. Build output is ignored
 under `target/`, environments under `.pixi/`; Cargo also uses its user cache.
-Non-mutating checks must preserve tracked source and both lockfiles.
+Non-mutating checks must preserve tracked source and all lockfiles.
 
 The [bootstrap CLI](../../apps/agent/src/main.rs) prints and exits; it does not
 start an operational agent. The README shows its supported invocations.
@@ -190,11 +193,12 @@ direct host checks and commit validation on all three native hosts. A separate
 Prek invocation skips `fix` and runs only the three commit-safety built-ins: case
 conflicts, merge conflicts and large added files.
 The Linux-only `device` job uses device-prefixed tasks to format/lint, build
-and test the agent. Repository `check` directly composes focused checks; it never invokes the hook
+and test the agent plus the bounded real ROS A/B fixture. Repository `check` directly composes focused checks; it never invokes the hook
 runner. Agent Rust checks
 stay in the device job. The
 aggregate **Repository checks** requires both scopes; CI does not start a
-long-running agent/demo. Fork runs may need maintainer approval.
+long-running agent or fleet demo. ROS fixture processes exit after their bounded
+checks. Fork runs may need maintainer approval.
 
 Reproduce the scopes locally, supplying actual commit IDs for the range:
 
@@ -215,8 +219,10 @@ see [CONTRIBUTING.md](../../CONTRIBUTING.md#pr-checks-and-maintainer-review).
 
 ## Locks and deliberate upgrades
 
-Commit both [pixi.lock](../../pixi.lock) (tools/system dependencies) and
-[Cargo.lock](../../Cargo.lock) (Rust dependencies). Neither supplies the host
+Commit [pixi.lock](../../pixi.lock) (tools/system dependencies),
+[Cargo.lock](../../Cargo.lock) (Rust dependencies), and each
+[workload release's](../../examples/ros-workloads/README.md) independent
+manifest/lock. These do not supply the host
 kernel/glibc, platform SDK/linker, Pixi executable or CA store. Use `pixi --locked`
 for ordinary
 installation/validation and Cargo's `--locked` for dependency-resolving commands;
