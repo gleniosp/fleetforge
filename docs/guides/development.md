@@ -84,6 +84,7 @@ the [manifest](../../pixi.toml) owns exact commands and pins.
 
 ```sh
 pixi run --locked -e host check
+pixi run --locked -e host test
 # Linux x86_64 device validation:
 pixi run --locked -e device device-check
 pixi run --locked -e device device-test
@@ -114,15 +115,11 @@ pixi run --locked -e host fix
 pixi run --locked -e host check
 ```
 
-`fix` composes the current host fixes (`format`). `format` rewrites eligible
-documents/configuration, including untracked files;
-review the resulting diff before handoff. `format-check` checks the same scope
-without writing. Both accept optional file/directory paths. `check` directly
-composes `format-check` and hook-configuration validation,
-without running Prek hooks. It covers eligible working-tree files, including
-untracked files. Add component lint checks/fixes to these aggregates only when
-their owning code arrives. Contributors and agents should format, check and
-review their changes before handing them off.
+`fix` applies repository formatting and safe Python fixes, including eligible
+untracked files. `check` validates the working tree without rewriting source
+or running hooks. Review the diff before handing changes off. The
+[task reference](tasks.md) lists focused commands; the manifest owns their exact
+composition.
 
 [dprint.json](../../dprint.json) owns Markdown, JSON/JSONC, YAML and TOML
 selection, exclusions and layout. One versioned, SHA-256-pinned Oxc Wasm plugin
@@ -148,7 +145,7 @@ Review Markdown tables, hard breaks, examples and meaningful string contents.
 [EditorConfig](../../.editorconfig) applies only to listed fallback files without
 a dedicated formatter: plain text, shell/Docker inputs and miscellaneous text
 configuration. It does not compete with dprint, Rust's device-scoped rustfmt or
-#12's Python owner. Add newly introduced fallback formats explicitly. dprint
+Ruff's Python formatting. Add newly introduced fallback formats explicitly. dprint
 does not read EditorConfig; formatted output is shared across editor/CLI, while
 indentation during typing and file-encoding preferences remain editor behaviours.
 
@@ -172,6 +169,22 @@ validation of CLI/editor-service consistency and hooks is recorded in
 the [delivery journal](../journal/2026-10-26-repository-formatting.md); no
 formatter-specific regression suite is installed.
 
+## Python tooling and workload tests
+
+Use `pixi run --locked -e host python-check` for Ruff and strict mypy checks,
+and `pixi run --locked -e host test` for portable pytest regressions. Run
+`pixi run --locked -e device device-test` on Linux x86_64 for the Rust tests and
+real ROS integration. The [workload guide](../../examples/ros-workloads/README.md)
+explains the demonstration and its failure cases.
+
+[pyproject.toml](../../pyproject.toml) owns Python tool policy; Pixi owns
+packages and commands. Accepted release payloads receive lint/type checks but
+are excluded from automatic formatting and fixes because their exact bytes
+are immutable. ROS interfaces without host typing information remain dynamic;
+the real runtime tests check their behavior. See the
+[delivery evidence](../journal/2026-10-27-python-workload-checks.md) for tested
+versions and limits.
+
 ## Local hooks and commit validation
 
 The setup task above installs hooks. To check the working tree:
@@ -189,8 +202,9 @@ staged-content behavior and manual message checks. Follow the
 ## PR checks
 
 The [workflow](../../.github/workflows/pr-checks.yml) runs contributor setup,
-direct host checks and commit validation on all three native hosts. A separate
-Prek invocation skips `fix` and runs only the three commit-safety built-ins: case
+direct host checks, portable Python tests and commit validation on all three
+native hosts. A separate Prek invocation skips `fix` and runs only the three
+commit-safety built-ins: case
 conflicts, merge conflicts and large added files.
 The Linux-only `device` job uses device-prefixed tasks to format/lint, build
 and test the agent plus the bounded real ROS A/B fixture. Repository `check` directly composes focused checks; it never invokes the hook
@@ -204,6 +218,7 @@ Reproduce the scopes locally, supplying actual commit IDs for the range:
 
 ```sh
 pixi run --locked -e host check
+pixi run --locked -e host test
 pixi run --locked -e host commit-check-range "$PR_BASE..$PR_HEAD"
 # Linux x86_64 only:
 pixi run --locked -e device device-check

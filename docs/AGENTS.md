@@ -6,6 +6,10 @@ Inherit [root agent guidance](../AGENTS.md). Use the
 
 - Edit the owning requirements, architecture contract, or ADR and update its
   affected references and traceability together. Keep navigation pages brief.
+- Write concise, natural prose that explains what the reader needs to do and
+  why. Explain purpose, main commands and non-obvious constraints; link to code
+  and configuration instead of restating settings or task definitions. Keep
+  agent writing instructions in the applicable `AGENTS.md`, not reader guides.
 - Follow the documentation map's current-state rule: keep revision narratives
   and factual historical evidence in journals or experiment reports. Keep ADR
   rationale relevant to the current decision. Preserve historical evidence; add

@@ -1,7 +1,7 @@
 root = true
 
 # Only files without a dedicated formatter. Add fallback formats here as needed.
-# dprint.json owns documents/configuration; rustfmt owns Rust; #12 owns Python.
+# dprint.json owns documents/configuration; rustfmt owns Rust; Ruff owns Python.
 [{*.txt,*.sh,Dockerfile,LICENSE,.editorconfig,.gitignore,.gitattributes}]
 charset = utf-8
 end_of_line = lf

@@ -58,6 +58,9 @@ jobs:
       - name: Check contributor configuration and formatting
         run: pixi run --locked -e host check
 
+      - name: Run portable Python fixture tests
+        run: pixi run --locked -e host test
+
       - name: Check commit safety without applying fixes
         run: pixi run --locked -e host prek run --all-files --stage pre-commit --skip fix
 

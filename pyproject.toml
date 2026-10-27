@@ -1,0 +1,32 @@
+[tool.ruff]
+target-version = "py314"
+extend-exclude = [".pixi", "target"]
+force-exclude = true
+cache-dir = ".pixi/cache/ruff"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+
+[tool.ruff.format]
+# Never rewrite accepted release payloads or invalidate their descriptor hashes.
+exclude = ["releases/**"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+cache_dir = ".pixi/cache/mypy"
+
+[[tool.mypy.overrides]]
+# These runtime-only ROS modules have no installed host typing interface.
+module = ["rclpy", "rclpy.*", "std_msgs", "std_msgs.*", "lifecycle_msgs", "lifecycle_msgs.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# Immutable ROS scripts inherit runtime classes without host type information.
+module = ["main", "health"]
+disallow_subclassing_any = false
+
+[tool.pytest.ini_options]
+testpaths = ["examples/ros-workloads"]
+addopts = "-ra --strict-markers -p no:cacheprovider"
+markers = ["ros: real Linux x86_64 ROS workload integration"]

@@ -76,6 +76,10 @@ combined PR; unrelated dependent work still waits for merged delivery.
 
 ## Implementation and readiness
 
+Keep pre-commit delegated to the repository-wide `fix` task. Add new repository
+fixes to that aggregate rather than adding component-specific Prek hooks;
+read-only checks and tests run through their canonical tasks and CI.
+
 Repository `check`, `format-check` and CI are read-only. The installed Prek
 pre-commit hook may run repository-wide host `fix`, including eligible
 untracked files. Changes to tracked/staged files stop the commit for review and

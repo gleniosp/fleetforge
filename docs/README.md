@@ -8,10 +8,8 @@ those records as dated evidence, with corrections rather than rewritten results.
 ADRs retain current decisions and their rationale, alternatives, consequences
 and revisit conditions; creation/update dates and status are useful metadata.
 
-Code and configuration own executable details. Guides explain purpose, main
-commands and non-obvious constraints rather than restating those files. Repeat
-only what readers need at an entry point. The latest explicit maintainer
-direction takes precedence; update affected owners and verification together.
+Code and configuration own executable details; guides explain workflows and
+non-obvious constraints.
 
 | Source                                                                 | Owns                                                                                                                 |
 | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
