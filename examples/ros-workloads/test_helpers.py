@@ -36,6 +36,7 @@ def test_rejects_duplicate_keys_non_objects_and_invalid_constants(
 
 
 def test_size_limit_counts_utf8_bytes(workload: ModuleType) -> None:
+    # Each é uses two UTF-8 bytes: below 4096 characters, above 4096 bytes.
     message = '{"value":"' + "é" * 2100 + '"}'
     assert len(message) < 4096
     with pytest.raises(ValueError, match="oversized"):

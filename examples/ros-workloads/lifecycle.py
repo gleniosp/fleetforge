@@ -16,7 +16,12 @@ def main() -> None:
     """Request a real transition within one discovery/response deadline."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("transition", choices=("activate", "deactivate"))
-    parser.add_argument("--timeout", type=float, default=4.0)
+    parser.add_argument(
+        "--timeout",
+        type=float,
+        default=4.0,
+        help="Combined discovery/transition deadline in seconds (default: %(default)s)",
+    )
     arguments = parser.parse_args()
     if not math.isfinite(arguments.timeout) or arguments.timeout <= 0:
         parser.error("--timeout must be a finite positive number of seconds")
