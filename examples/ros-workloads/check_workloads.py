@@ -54,6 +54,10 @@ def stop_process_group(child: subprocess.Popen[bytes]) -> None:
         child.wait(timeout=5)
 
 
+class ProbeTimeoutError(RuntimeError):
+    """A probe process exhausted its allotted verification time."""
+
+
 def run_probe_process(
     command: list[str], root: Path, environment: dict[str, str], timeout: float
 ) -> subprocess.CompletedProcess[str]:
@@ -69,7 +73,9 @@ def run_probe_process(
             timeout=timeout,
         )
     except subprocess.TimeoutExpired as error:
-        raise RuntimeError(f"health process exceeded {timeout:g}s deadline") from error
+        raise ProbeTimeoutError(
+            f"health process exceeded {timeout:g}s deadline"
+        ) from error
 
 
 class Release:
@@ -273,6 +279,34 @@ class Release:
             f"startup health deadline exceeded: {last_error}"
         ) from last_error
 
+    def inactive(self, env: dict[str, str], child: subprocess.Popen[bytes]) -> None:
+        """Require observed inactive state, allowing bounded fresh-probe discovery."""
+        deadline = (
+            time.monotonic() + self.descriptor["health"]["startup_timeout_ms"] / 1000
+        )
+        last_reason = "no probe completed"
+        while time.monotonic() < deadline:
+            require(child.poll() is None, "inactive workload unexpectedly died")
+            try:
+                reason = self.probe(env, False, timeout=deadline - time.monotonic())
+            except ProbeTimeoutError as error:
+                last_reason = str(error)
+            else:
+                require(
+                    child.poll() is None, "inactive workload died during verification"
+                )
+                if reason == "release_unhealthy: ROS lifecycle service is not active":
+                    return
+                # A new ROS participant can exhaust discovery before querying state.
+                # Other failures must remain failures rather than count as inactivity.
+                require(
+                    reason == "release_unhealthy: ROS health deadline exceeded",
+                    "unexpected inactive probe failure: " + reason,
+                )
+                last_reason = reason
+            time.sleep(min(0.1, max(0.0, deadline - time.monotonic())))
+        raise RuntimeError("inactive lifecycle deadline exceeded: " + last_reason)
+
 
 def verify_workloads(pixi: str, fixture: Path, source: Path) -> None:
     """Exercise independent runtimes, positive health and deliberate failures."""
@@ -387,12 +421,7 @@ def verify_workloads(pixi: str, fixture: Path, source: Path) -> None:
             check=True,
             timeout=transition_timeout + 5,
         )
-        reason = a.probe(a_env, False)
-        require(
-            "ROS lifecycle service is not active" in reason,
-            "inactive test did not observe the actual lifecycle state",
-        )
-        require(a_child.poll() is None, "inactive workload unexpectedly died")
+        a.inactive(a_env, a_child)
         print("PASS: live inactive lifecycle fails health", flush=True)
         subprocess.run(
             [

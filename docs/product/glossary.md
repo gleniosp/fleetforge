@@ -55,6 +55,13 @@ One prescribed way to write a document's bytes, including property order and
 spacing. It lets tools calculate matching hashes and signatures. See
 [canonical JSON](../guides/releases-explained.md#a-few-details-the-tooling-handles).
 
+## Contributor host
+
+The computer used to develop and check FleetForge. The repository's `host` Pixi
+environment contains contributor tools; it is separate from the agent and
+application environments on managed devices. One computer can represent several
+roles in a fixture. See [provisioning roles](../guides/release-provisioning.md#who-does-what).
+
 ## Dependency, direct and transitive
 
 A **dependency** is software another program needs. A **direct dependency** is
@@ -138,6 +145,14 @@ Fixed once published. Changing a release's inputs requires a new release ID,
 so a later retry cannot silently run different software under the same name.
 See [collecting a software version](../guides/releases-explained.md#first-collect-one-software-version-into-a-release).
 
+## Integrity and authenticity
+
+**Integrity** means that bytes match their expected definition, such as the file
+fingerprints in a descriptor. **Publisher authenticity** establishes approval by
+a trusted publisher through signature verification. Matching hashes alone does
+not establish that approval. See [release checks](../guides/release-provisioning.md#check-the-prepared-files)
+and [publisher signatures](../guides/releases-explained.md#establish-approval-a-publisher-two-keys-and-a-signature).
+
 ## Known-good release
 
 Software that previously passed workload health verification. See
@@ -169,6 +184,14 @@ also use **operator** for the authority's local service/UI role. The
 [deployment walkthrough](../guides/releases-explained.md#publisher-authority-and-device-have-separate-powers)
 distinguishes the person's request from the authority service's responsibilities.
 
+## Package cache
+
+Locally stored dependency package data that Pixi can use during installation.
+A lockfile identifies dependencies but does not contain their package bytes;
+an installed environment is the generated result. Cache completeness for a fresh
+offline installation requires separate evidence. See
+[the three software resources](../guides/release-provisioning.md#keep-the-three-software-resources-separate).
+
 ## Process-instance ID
 
 A fresh identifier for one running attempt of the application. Restarting the
@@ -181,6 +204,23 @@ Where software came from: its upstream project, version and package source.
 FleetForge also records license information for dependency review. See the
 [workload dependency review](../../examples/ros-workloads/README.md#dependency-review).
 Provenance records do not replace publisher signature verification.
+
+## Provisioner and provisioning
+
+A **provisioner** is the person or setup tool that places required inputs on a
+machine. **Release provisioning** places immutable release files and their local
+catalog where the authority or device can read them. It is separate from
+requesting a deployment and installing the application's environment. The current
+fixture tool copies unsigned A/B inputs; see
+[local provisioning](../guides/release-provisioning.md#prepare-authority-and-device-fixture-folders).
+
+## Publisher
+
+A person or system authorized to approve software releases by signing their
+descriptors. The publisher retains the private signing key; readers receive
+trusted public keys to verify approval. This role differs from the authority
+requesting deployment to a device. See
+[publisher approval](../guides/releases-explained.md#establish-approval-a-publisher-two-keys-and-a-signature).
 
 ## Release
 
@@ -195,6 +235,8 @@ and [exact release contract](../specs/releases.md#documents-and-identity).
 A local index mapping supported release IDs to immutable descriptors/digests
 and the directories containing their files. See
 [finding a release on disk](../guides/releases-explained.md#find-b-on-disk-the-catalog).
+The [provisioning guide](../guides/release-provisioning.md#what-is-a-catalog)
+shows the current local fixture layout and integrity tooling.
 
 ## Request ID
 
@@ -226,6 +268,13 @@ application; see the [workload interface](../../examples/ros-workloads/README.md
 The **workload** is the application FleetForge manages. Its **runtime** is the
 software environment needed to execute it, separate from contributor build and
 checking tools. See [independent release environments](../guides/releases-explained.md#first-collect-one-software-version-into-a-release).
+
+## Schema
+
+A description of a document's allowed structure, fields and values. FleetForge's
+[shared release JSON schemas](../../schemas/releases/v1/) catch structural mistakes; separate integrity and trust
+checks verify file contents and publisher approval. See
+[release documents](../specs/releases.md#documents-and-identity).
 
 ## Tenant
 

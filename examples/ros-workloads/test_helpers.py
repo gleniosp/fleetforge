@@ -86,7 +86,9 @@ def test_probe_timeout_has_actionable_retryable_error() -> None:
     expired = subprocess.TimeoutExpired("health", 0.25)
     with (
         patch("check_workloads.subprocess.run", side_effect=expired) as run,
-        pytest.raises(RuntimeError, match="health process exceeded 0.25s") as result,
+        pytest.raises(
+            check_workloads.ProbeTimeoutError, match="health process exceeded 0.25s"
+        ) as result,
     ):
         check_workloads.run_probe_process(["health"], Path("/tmp"), {}, 0.25)
     assert result.value.__cause__ is expired
@@ -140,3 +142,101 @@ def test_startup_deadline_preserves_last_probe_failure() -> None:
     ):
         check_workloads.Release.ready(release, {}, child)
     assert result.value.__cause__ is failure
+
+
+@pytest.mark.parametrize(
+    "discovery_failure",
+    [
+        "release_unhealthy: ROS health deadline exceeded",
+        check_workloads.ProbeTimeoutError("health process exceeded 5s deadline"),
+    ],
+)
+def test_inactive_requires_observed_state_after_discovery_timeout(
+    discovery_failure: str | Exception,
+) -> None:
+    release = Mock(spec=check_workloads.Release)
+    release.descriptor = {"health": {"startup_timeout_ms": 30000}}
+    child = Mock(spec=subprocess.Popen)
+    child.poll.return_value = None
+    clock = [10.0]
+    budgets: list[float] = []
+
+    def probe(environment: dict[str, str], healthy: bool, *, timeout: float) -> str:
+        assert not healthy
+        budgets.append(timeout)
+        clock[0] += 5.0
+        if len(budgets) == 1:
+            if isinstance(discovery_failure, Exception):
+                raise discovery_failure
+            return discovery_failure
+        return "release_unhealthy: ROS lifecycle service is not active"
+
+    def sleep(seconds: float) -> None:
+        clock[0] += seconds
+
+    release.probe.side_effect = probe
+    with (
+        patch("check_workloads.time.monotonic", side_effect=lambda: clock[0]),
+        patch("check_workloads.time.sleep", side_effect=sleep),
+    ):
+        check_workloads.Release.inactive(release, {}, child)
+    assert budgets == pytest.approx([30.0, 24.9])
+
+
+def test_inactive_discovery_timeout_never_counts_as_observed_state() -> None:
+    release = Mock(spec=check_workloads.Release)
+    release.descriptor = {"health": {"startup_timeout_ms": 30000}}
+    child = Mock(spec=subprocess.Popen)
+    child.poll.return_value = None
+    clock = [10.0]
+
+    def probe(environment: dict[str, str], healthy: bool, *, timeout: float) -> str:
+        clock[0] += timeout
+        return "release_unhealthy: ROS health deadline exceeded"
+
+    release.probe.side_effect = probe
+    with (
+        patch("check_workloads.time.monotonic", side_effect=lambda: clock[0]),
+        patch("check_workloads.time.sleep"),
+        pytest.raises(
+            RuntimeError,
+            match="inactive lifecycle deadline exceeded:.*ROS health deadline exceeded",
+        ),
+    ):
+        check_workloads.Release.inactive(release, {}, child)
+
+
+@pytest.mark.parametrize(
+    "failure",
+    [
+        "release_unhealthy: workload identity mismatch",
+        RuntimeError("unhealthy probe unexpectedly succeeded: healthy output"),
+    ],
+)
+def test_inactive_does_not_retry_unexpected_failure(failure: str | Exception) -> None:
+    release = Mock(spec=check_workloads.Release)
+    release.descriptor = {"health": {"startup_timeout_ms": 30000}}
+    release.probe.side_effect = [failure]
+    child = Mock(spec=subprocess.Popen)
+    child.poll.return_value = None
+    with (
+        patch("check_workloads.time.sleep") as sleep,
+        pytest.raises(RuntimeError, match="identity mismatch|unexpectedly succeeded"),
+    ):
+        check_workloads.Release.inactive(release, {}, child)
+    sleep.assert_not_called()
+
+
+@pytest.mark.parametrize("exit_status", [[0], [None, 0]])
+def test_inactive_rejects_dead_process_even_with_inactive_response(
+    exit_status: list[int | None],
+) -> None:
+    release = Mock(spec=check_workloads.Release)
+    release.descriptor = {"health": {"startup_timeout_ms": 30000}}
+    release.probe.return_value = (
+        "release_unhealthy: ROS lifecycle service is not active"
+    )
+    child = Mock(spec=subprocess.Popen)
+    child.poll.side_effect = exit_status
+    with pytest.raises(RuntimeError, match="inactive workload.*died"):
+        check_workloads.Release.inactive(release, {}, child)

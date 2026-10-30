@@ -37,6 +37,8 @@ commands and versions; the [development guide](development.md) owns setup.
 | `python-lint`, `python-typecheck`      | Inspect all Python source, including immutable A/B payloads         | `host`      |
 | `python-fix`                           | Format and apply safe Ruff fixes to mutable Python support/tests    | `host`      |
 | `test`, `python-test`                  | Run portable wire, identity and process-boundary regressions        | `host`      |
+| `release-check ROOT`                   | Check local catalog and immutable release integrity                 | `host`      |
+| `release-provision ROOT`               | Stage unsigned A/B catalog inputs for a local fixture               | `host`      |
 | `format-setup`                         | Download and compile the pinned Wasm plugin                         | `host`      |
 | `device-build`, `agent-build`          | Build device apps or just the agent                                 | `device`    |
 | `device-check`, `agent-check`          | Device format-check and lint; no tests                              | `device`    |
@@ -72,8 +74,8 @@ pixi run --locked -e device agent-run -- --version
 The [README](../../README.md#current-state) describes the diagnostic; the
 [development guide](development.md#build-and-inspect-the-bootstrap-package)
 explains its exit behavior. Commit tasks below accept their indicated argument;
-`format` and `format-check` accept optional paths. Other tasks have no supported
-extra arguments. Use explicit tool commands for other scopes.
+`format` and `format-check` accept optional paths. Release tasks accept the options in the [provisioning guide](release-provisioning.md).
+Other tasks have no supported extra arguments. Use explicit tool commands for other scopes.
 
 ## Hooks and commit messages
 

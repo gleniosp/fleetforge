@@ -19,7 +19,9 @@ non-obvious constraints.
 | [Architecture](architecture/overview.md)                               | Component/lifecycle boundaries and navigation to identity, coordination, security, and future architecture contracts |
 | [ADRs](adr/README.md)                                                  | Significant decisions, alternatives, rationale, consequences, and revisit conditions                                 |
 | [Release specification](specs/releases.md)                             | Immutable descriptor/catalog schemas, signed bytes, publisher keyring and ROS health interface                       |
+| [Release schemas](../schemas/releases/v1/)                             | Shared version 1 machine-readable release contracts; applications consume or bundle this source                      |
 | [ROS workload fixtures](../examples/ros-workloads/README.md)           | Independent unsigned A/B runtime inputs, actual counter/health behavior and bounded local/reference demonstration    |
+| [Release provisioning](guides/release-provisioning.md)                 | Host integrity checks and unsigned local A/B catalog provisioning                                                    |
 | [Roadmap](roadmap.md)                                                  | Navigation to GitHub milestones                                                                                      |
 | [Traceability](traceability.md)                                        | Requirement links to delivery owners, planned components, and verification methods                                   |
 | [GitHub issues](https://github.com/gleniosp/fleetforge/issues)         | Live task scope, dependencies, priority, checklists, and review/merge progress                                       |

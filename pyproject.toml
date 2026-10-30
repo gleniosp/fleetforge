@@ -27,6 +27,10 @@ module = ["main", "health"]
 disallow_subclassing_any = false
 
 [tool.pytest.ini_options]
-testpaths = ["examples/ros-workloads"]
+testpaths = ["examples/ros-workloads", "tools"]
 addopts = "-ra --strict-markers -p no:cacheprovider"
 markers = ["ros: real Linux x86_64 ROS workload integration"]
+
+[[tool.mypy.overrides]]
+module = ["jsonschema"]
+ignore_missing_imports = true
