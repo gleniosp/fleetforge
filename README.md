@@ -26,8 +26,9 @@ without public internet.
 FleetForge currently provides a Rust bootstrap diagnostic, a locked build/check
 toolchain and unsigned headless ROS 2 Jazzy A/B workload fixtures. The
 [workload demonstration](examples/ros-workloads/README.md) verifies real ROS
-behavior and isolated health on Linux x86_64. Fleet operation is not implemented
-yet.
+behavior and isolated health on Linux x86_64. Host [release integrity checks and catalog provisioning](docs/guides/release-provisioning.md)
+validate and copy these unsigned inputs without installing them. Fleet operation
+is not implemented yet.
 
 Develop on **Linux (x86_64/ARM64), Apple Silicon macOS, or Windows through WSL2**.
 Device apps and their runtimes currently target **Linux x86_64 (`linux-64`)**;

@@ -30,8 +30,12 @@ commitizen = "=4.19.2"
 dprint = { version = "=0.63.0", channel = "https://prefix.dev/github-releases" }
 ruff = "=0.17.3"
 mypy = "=2.4.0"
+jsonschema = ">=4.25,<5"
+referencing = ">=0.37,<1"
 
 [feature.lint.tasks]
+release-check = "python -B -m tools.releases.catalog check"
+release-provision = "python -B -m tools.releases.catalog provision"
 setup = { depends-on = [
   "format-setup",
   "hooks-install",
@@ -59,7 +63,7 @@ python-lint = "ruff check ."
 python-fix = { cmd = "ruff check --fix --extend-exclude releases .", depends-on = [
   "python-format",
 ] }
-python-typecheck = "mypy examples/ros-workloads && mypy releases/ros-counter-a-v1/app && mypy releases/ros-counter-b-v1/app"
+python-typecheck = "mypy tools && mypy examples/ros-workloads && mypy releases/ros-counter-a-v1/app && mypy releases/ros-counter-b-v1/app"
 
 [feature.lint.target.linux-64.tasks]
 device-check = { depends-on = ["device-format-check", "device-lint"] }

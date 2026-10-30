@@ -5,8 +5,9 @@ and [MVP-02](../product/requirements.md#mvp-02--reproducible-software-releases).
 Schemas, illustrative contract fixtures and
 [unsigned ROS workloads](../../examples/ros-workloads/README.md) exist. The
 [workload evidence](../experiments/0002-ros-workload-runtime.md) establishes
-bounded ROS behavior and activation compatibility. A production release reader,
-integrity checker and signature verifier are subsequent deliveries. This contract
+bounded ROS behavior and activation compatibility. The [host integrity checker and fixture provisioner](../guides/release-provisioning.md)
+implement #13. Publisher verification and a production runtime reader remain
+subsequent deliveries. This contract
 does not establish cryptographic verification evidence.
 
 For an introduction to the terms, their purpose and the complete planned flow,
@@ -14,9 +15,16 @@ read [From approved software to a running robot](../guides/releases-explained.md
 
 ## Documents and identity
 
-The [descriptor schema](schemas/release.schema.json), [catalog schema](schemas/catalog.schema.json),
-[signature schema](schemas/signature.schema.json) and [publisher keyring schema](schemas/keyring.schema.json)
-use JSON Schema Draft 2020-12. The rules below also apply: structural validation
+The [descriptor schema](../../schemas/releases/v1/release.schema.json), [catalog schema](../../schemas/releases/v1/catalog.schema.json),
+[signature schema](../../schemas/releases/v1/signature.schema.json) and [publisher keyring schema](../../schemas/releases/v1/keyring.schema.json)
+use JSON Schema Draft 2020-12. Their authoritative source is the shared
+[`schemas/releases/v1/`](../../schemas/releases/v1/) directory, independent of
+any application language. The Python checker reads these files from the checkout.
+When consumers become separately distributed applications, their builds must
+package or embed the required schemas from this source and resolve references
+locally. Do not maintain independent application copies as competing contracts.
+
+The rules below also apply: structural validation
 cannot check file bytes, uniqueness by ID/path, canonical encoding, trusted keys,
 or running processes. Reject unknown fields rather than ignore execution context.
 
@@ -155,8 +163,8 @@ health probe or workload execution until every applicable check succeeds:
    recheck current trust and input integrity, or rely on an equally protected
    verified snapshot whose immutability is enforced by ownership.
 
-If several faults exist, report the first failing stage. The actual checker
-arrives in #13, signature enforcement in #86 and deployment preparation in #20.
+If several faults exist, report the first failing stage. The host integrity checker is delivered in #13; signature enforcement belongs
+to #86 and deployment preparation to #20.
 Earlier unsigned workload demonstrations must not be presented as trusted
 deployment paths.
 
