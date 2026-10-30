@@ -4,8 +4,6 @@ This deliberately unsigned fixture is neither a release-check implementation
 nor a production supervisor. #13, #86 and the deployment slices own those.
 """
 
-from __future__ import annotations
-
 import argparse
 import hashlib
 import json
@@ -19,6 +17,19 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Literal, overload
+
+
+# Attempt identity is 128 bits; each health challenge is 256 bits (release contract).
+PROCESS_INSTANCE_BYTES = 16
+HEALTH_NONCE_BYTES = 32
+MAX_HEALTH_OUTPUT_BYTES = 4 * 1024
+# Demonstration budgets; these do not define the agent's production policy.
+PROCESS_EXIT_TIMEOUT_SECONDS = 5
+SHELL_HOOK_TIMEOUT_SECONDS = 60
+CONTROL_PROCESS_TIMEOUT_SECONDS = 5
+LIVENESS_POLL_INTERVAL_SECONDS = 0.1
+WRONG_BEHAVIOR_TIMEOUT_SECONDS = 30
+FAILURE_LOG_TAIL_CHARS = 8 * 1024
 
 
 def require(condition: bool, message: str) -> None:
@@ -45,13 +56,13 @@ def stop_process_group(child: subprocess.Popen[bytes]) -> None:
         # The child may exit between poll() and killpg(); still reap it below.
         pass
     try:
-        child.wait(timeout=5)
+        child.wait(timeout=PROCESS_EXIT_TIMEOUT_SECONDS)
     except subprocess.TimeoutExpired:
         try:
             os.killpg(child.pid, signal.SIGKILL)
         except ProcessLookupError:
             pass
-        child.wait(timeout=5)
+        child.wait(timeout=PROCESS_EXIT_TIMEOUT_SECONDS)
 
 
 class ProbeTimeoutError(RuntimeError):
@@ -110,7 +121,7 @@ class Release:
             check=True,
             capture_output=True,
             text=True,
-            timeout=60,
+            timeout=SHELL_HOOK_TIMEOUT_SECONDS,
         )
         self.activation = json.loads(result.stdout)["environment_variables"]
         self.environment = {**clean, **self.activation}
@@ -161,7 +172,8 @@ class Release:
             "ROS_DOMAIN_ID": str(domain),
             "FLEETFORGE_RELEASE_ID": self.descriptor["release_id"],
             "FLEETFORGE_DESCRIPTOR_DIGEST": self.digest,
-            "FLEETFORGE_PROCESS_INSTANCE_ID": instance or secrets.token_hex(16),
+            "FLEETFORGE_PROCESS_INSTANCE_ID": instance
+            or secrets.token_hex(PROCESS_INSTANCE_BYTES),
         }
 
     def command(self, name: Literal["main", "health"]) -> list[str]:
@@ -200,7 +212,9 @@ class Release:
                 stop_process_group(child)
                 if child.returncode != 0:
                     print(
-                        log_path.read_text(encoding="utf-8", errors="replace")[-8192:],
+                        log_path.read_text(encoding="utf-8", errors="replace")[
+                            -FAILURE_LOG_TAIL_CHARS:
+                        ],
                         file=sys.stderr,
                     )
 
@@ -226,7 +240,7 @@ class Release:
         self, env: dict[str, str], healthy: bool = True, *, timeout: float | None = None
     ) -> dict[str, object] | str:
         """Check a fresh nonce and exact identity, or require an unhealthy result."""
-        nonce = secrets.token_hex(32)
+        nonce = secrets.token_hex(HEALTH_NONCE_BYTES)
         current = {**env, "FLEETFORGE_HEALTH_NONCE": nonce}
         probe_timeout = self.descriptor["health"]["probe_timeout_ms"] / 1000
         if timeout is not None:
@@ -245,7 +259,10 @@ class Release:
             )
             return result.stderr.strip()
         require(result.returncode == 0, "health failed: " + result.stderr)
-        require(len(result.stdout.encode()) <= 4096, "oversized health output")
+        require(
+            len(result.stdout.encode()) <= MAX_HEALTH_OUTPUT_BYTES,
+            "oversized health output",
+        )
         value: dict[str, object] = json.loads(result.stdout)
         expected = {
             "schema_version": 1,
@@ -274,7 +291,12 @@ class Release:
                 return
             except RuntimeError as error:
                 last_error = error
-                time.sleep(min(0.1, max(0.0, deadline - time.monotonic())))
+                time.sleep(
+                    min(
+                        LIVENESS_POLL_INTERVAL_SECONDS,
+                        max(0.0, deadline - time.monotonic()),
+                    )
+                )
         raise RuntimeError(
             f"startup health deadline exceeded: {last_error}"
         ) from last_error
@@ -319,6 +341,7 @@ def verify_workloads(pixi: str, fixture: Path, source: Path) -> None:
         a.python.resolve() != b.python.resolve(), "A/B share an installed environment"
     )
     # Domains are local to this disposable fixture/container, never a signed release field.
+    # Pick 30..79, leaving three adjacent domains for restart/failure scenarios.
     domain = 30 + secrets.randbelow(50)
     a_env = a.context(domain)
     b_env = b.context(domain + 1)
@@ -346,7 +369,7 @@ def verify_workloads(pixi: str, fixture: Path, source: Path) -> None:
                 env={**environment, variable: value},
                 capture_output=True,
                 text=True,
-                timeout=5,
+                timeout=CONTROL_PROCESS_TIMEOUT_SECONDS,
             )
             require(
                 invalid.returncode == 1
@@ -365,7 +388,13 @@ def verify_workloads(pixi: str, fixture: Path, source: Path) -> None:
         b.ready(b_env, b_child)
         # Keep the old A process alive: its endpoint cannot answer a new attempt.
         a.probe(
-            {**a_env, "FLEETFORGE_PROCESS_INSTANCE_ID": secrets.token_hex(16)}, False
+            {
+                **a_env,
+                "FLEETFORGE_PROCESS_INSTANCE_ID": secrets.token_hex(
+                    PROCESS_INSTANCE_BYTES
+                ),
+            },
+            False,
         )
         print("PASS: unrelated endpoint cannot satisfy health", flush=True)
         # Deliberately route A's probe to B's domain/endpoint: reject its identity.
@@ -393,10 +422,15 @@ def verify_workloads(pixi: str, fixture: Path, source: Path) -> None:
         control = source / "examples/ros-workloads/lifecycle.py"
         unavailable = subprocess.run(
             [str(a.python), str(control), "deactivate", "--timeout", "0.2"],
-            env={**a_env, "FLEETFORGE_PROCESS_INSTANCE_ID": secrets.token_hex(16)},
+            env={
+                **a_env,
+                "FLEETFORGE_PROCESS_INSTANCE_ID": secrets.token_hex(
+                    PROCESS_INSTANCE_BYTES
+                ),
+            },
             capture_output=True,
             text=True,
-            timeout=5,
+            timeout=CONTROL_PROCESS_TIMEOUT_SECONDS,
         )
         require(
             unavailable.returncode == 1
@@ -419,7 +453,7 @@ def verify_workloads(pixi: str, fixture: Path, source: Path) -> None:
             ],
             env=a_env,
             check=True,
-            timeout=transition_timeout + 5,
+            timeout=transition_timeout + CONTROL_PROCESS_TIMEOUT_SECONDS,
         )
         a.inactive(a_env, a_child)
         print("PASS: live inactive lifecycle fails health", flush=True)
@@ -433,7 +467,7 @@ def verify_workloads(pixi: str, fixture: Path, source: Path) -> None:
             ],
             env=a_env,
             check=True,
-            timeout=transition_timeout + 5,
+            timeout=transition_timeout + CONTROL_PROCESS_TIMEOUT_SECONDS,
         )
         a.ready(a_env, a_child)
         # A remains live while B is independently prepared/run, and is still usable.
@@ -450,7 +484,7 @@ def verify_workloads(pixi: str, fixture: Path, source: Path) -> None:
     # The probe must observe the wrong delta rather than trust release metadata.
     faulty_env = a.context(domain + 3)
     with a.running(faulty_env, faulty_step=True) as child:
-        deadline = time.monotonic() + 30
+        deadline = time.monotonic() + WRONG_BEHAVIOR_TIMEOUT_SECONDS
         while True:
             require(child.poll() is None, "fault fixture exited")
             reason = a.probe(faulty_env, False)

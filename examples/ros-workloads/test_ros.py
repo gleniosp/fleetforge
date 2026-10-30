@@ -26,6 +26,7 @@ def test_real_ros_workloads(tmp_path: Path) -> None:
                 str(release / "pixi.toml"),
             ],
             check=True,
-            timeout=600,
+            # Installation gets ten minutes; workload startup uses its descriptor.
+            timeout=10 * 60,
         )
     verify_workloads(pixi, tmp_path, source)
