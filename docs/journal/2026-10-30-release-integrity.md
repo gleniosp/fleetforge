@@ -86,3 +86,35 @@ payloads remain unchanged; editing them requires new release identities.
 The portable suite passed (76 tests, one ROS integration test deselected) after
 the checker and helper refactor. Host formatting, Ruff, mypy and diff review passed.
 The real ROS integration run was not repeated for this readability change.
+
+## ROS inactive-state verification follow-up
+
+On 2026-10-30, the first attempt of [CI run 41077965284](https://github.com/gleniosp/fleetforge/actions/runs/41077965284)
+failed the existing inactive-lifecycle assertion; the maintainer's rerun passed
+without code changes. The assertion omitted the actual unhealthy probe reason,
+so the historical failure's precise cause is unconfirmed. Code review identified
+a one-shot dependency on a new ROS probe completing discovery before it could
+report the lifecycle state.
+
+The follow-up working tree on `feat/13-release-integrity-pr`, based on
+`537c935b7ca820422ba98949a1f060e17e3a41f6`, adds bounded inactive-state verification.
+It retries only the probe's ROS health deadline and its parent process timeout,
+within the existing descriptor startup budget. Success still requires an
+explicit inactive-state observation and a live workload. Unexpected unhealthy
+reasons, healthy responses and process exits fail immediately. Timeout failures
+include the last probe reason. Release payloads and their identities are unchanged.
+
+Validation on Linux x86_64 with the same locked Python/Pixi inputs described above:
+
+- `pixi run --locked -e host python-test`: 83 passed, one ROS test deselected.
+  New deterministic regressions cover recovery after discovery/process timeouts,
+  persistent timeout rejection, unexpected failures, and process exits.
+- Three consecutive `pixi run --locked -e device ros-workloads-test` runs passed,
+  each using fresh runtime copies: 31.27 s, 26.94 s and 28.38 s. The initial
+  restricted attempt could not acquire Pixi's package-cache lock; the actual
+  integration runs required sandbox escalation for cache access.
+- `pixi run --locked -e host format` and `pixi run --locked -e host check`:
+  formatting, Prek configuration, Ruff and strict mypy passed.
+
+These runs validate the bounded waiting behavior and real workload sequence;
+they do not establish the omitted error from the historical failed CI attempt.
