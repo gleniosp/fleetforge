@@ -1,0 +1,8 @@
+name: fleetforge-ros-demo
+services:
+  demo:
+    build:
+      context: ../..
+      dockerfile: examples/ros-workloads/Dockerfile
+    image: fleetforge-ros-demo:local
+    platform: linux/amd64

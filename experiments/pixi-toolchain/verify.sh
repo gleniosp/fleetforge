@@ -16,11 +16,17 @@ test "$(command -v git)" = /usr/bin/git
 git --version
 
 work=$(mktemp -d /tmp/fleetforge-toolchain.XXXXXX)
-cp /source/pixi.toml /source/pixi.lock /source/Cargo.toml /source/Cargo.lock /source/LICENSE "$work/"
-cp /source/dprint.json /source/prek.toml /source/.cz.toml /source/.editorconfig /source/.gitignore /source/.gitattributes "$work/"
-mkdir -p "$work/apps"
-cp -r /source/apps/agent "$work/apps/"
-cp -r /source/.vscode "$work/"
+trap 'rm -rf -- "$work"' EXIT
+# Copy named source/configuration inputs, never build outputs or local settings.
+for file in pixi.toml pixi.lock Cargo.toml Cargo.lock LICENSE \
+    dprint.json prek.toml .cz.toml .editorconfig .gitignore .gitattributes \
+    apps/agent/Cargo.toml apps/agent/src/main.rs apps/agent/tests/cli.rs \
+    .vscode/settings.json .vscode/extensions.json; do
+    test -f "/source/$file"
+    test ! -L "/source/$file"
+    mkdir -p "$work/$(dirname -- "$file")"
+    cp -- "/source/$file" "$work/$file"
+done
 cd "$work"
 
 snapshot() {
@@ -67,7 +73,6 @@ for environment in default device; do
         if [ "$PIXI_ENVIRONMENT_NAME" = default ]; then
             ! command -v prek
             ! command -v cz
-            ! command -v python
             ! command -v dprint
         else
             for tool in prek cz dprint; do

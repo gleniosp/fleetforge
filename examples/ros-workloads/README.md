@@ -99,29 +99,27 @@ containers enabled. These fixtures target `linux/amd64`; ARM hosts need amd64
 emulation, which Docker Desktop provides and which can run more slowly. See
 [Docker's platform guidance](https://docs.docker.com/build/building/multi-platform/).
 
-From the repository root, build the reference image and run it. In Bash or zsh
-(Linux or macOS):
+From the repository root, run:
 
 ```sh
-docker build --platform linux/amd64 --tag fleetforge-ros-evidence:issue-11 examples/ros-workloads
-docker run --rm --platform linux/amd64 \
-  --mount type=bind,src="$PWD",dst=/source,readonly \
-  fleetforge-ros-evidence:issue-11
+docker compose -f examples/ros-workloads/compose.yaml run --build --rm demo
 ```
 
-In PowerShell (Windows):
-
-```powershell
-docker build --platform linux/amd64 --tag fleetforge-ros-evidence:issue-11 examples/ros-workloads
-docker run --rm --platform linux/amd64 --mount "type=bind,src=$($PWD.Path),dst=/source,readonly" fleetforge-ros-evidence:issue-11
-```
+Docker builds an image containing only the required release files and check
+helpers, then runs the demonstration inside it. The host needs Docker with
+Compose; Bash and Pixi run inside the container. No host directories or package
+caches are mounted. Rebuilds pick up changes to the selected source inputs.
 
 The image copies Pixi from its
 [official container image](https://pixi.prefix.dev/latest/deployment/container/),
-pinned by version and digest in the Dockerfile. Only the repository is mounted
-from the host, read-only. The container uses its own Pixi executable and package
-cache. Docker requires daemon access; the container uses no privileged mode,
-public ports, host networking or hardware access.
+pinned by version and digest in the Dockerfile. It needs no privileged mode,
+public ports, host networking or hardware access. The demo returns nonzero when
+an install or behavior check fails; `--rm` removes its container afterward. Remove
+the project network when finished:
+
+```sh
+docker compose -f examples/ros-workloads/compose.yaml down
+```
 
 The reference run was verified on Linux x86_64. macOS, Windows and amd64
 emulation have not been verified for this demo.

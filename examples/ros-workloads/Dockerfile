@@ -10,4 +10,10 @@ RUN apt-get update \
 COPY --from=pixi /usr/local/bin/pixi /usr/local/bin/pixi
 
 ENV PIXI_NO_CONFIG=true
+COPY examples/releases/ros-counter-a-v1/pixi.toml examples/releases/ros-counter-a-v1/pixi.lock examples/releases/ros-counter-a-v1/release.json /source/examples/releases/ros-counter-a-v1/
+COPY examples/releases/ros-counter-a-v1/app/main.py examples/releases/ros-counter-a-v1/app/common.py examples/releases/ros-counter-a-v1/app/health.py /source/examples/releases/ros-counter-a-v1/app/
+COPY examples/releases/ros-counter-b-v1/pixi.toml examples/releases/ros-counter-b-v1/pixi.lock examples/releases/ros-counter-b-v1/release.json /source/examples/releases/ros-counter-b-v1/
+COPY examples/releases/ros-counter-b-v1/app/main.py examples/releases/ros-counter-b-v1/app/common.py examples/releases/ros-counter-b-v1/app/health.py /source/examples/releases/ros-counter-b-v1/app/
+COPY examples/ros-workloads/run-demo.sh examples/ros-workloads/check_workloads.py examples/ros-workloads/lifecycle.py /source/examples/ros-workloads/
+
 CMD ["bash", "/source/examples/ros-workloads/run-demo.sh"]
