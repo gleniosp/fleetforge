@@ -155,6 +155,47 @@ to use only the releases' runtime dependencies. The
 [development guide](../../docs/guides/development.md#python-tooling-and-workload-tests)
 owns Python tool configuration and the immutable formatting boundary.
 
+## Fresh offline installation experiment
+
+Use this experiment to check that local package bytes are enough to create a
+new environment without internet access. It needs Docker with Linux container
+support and Compose. From the repository root:
+
+```sh
+docker compose -f examples/ros-workloads/compose.offline.yaml run --build --rm verify
+```
+
+The [offline image](Dockerfile.offline) copies explicitly selected repository
+inputs. Online preparation signs/verifies disposable A/B releases and warms a
+dedicated package cache. Verification runs with networking disabled, requires
+absent target environments, checks missing-cache failure, then installs fresh
+A/B environments and verifies real ROS behavior and health.
+
+Preparation needs internet access to populate its cache. Verification reuses
+that cache through a Docker-managed volume while its own network is disabled.
+It returns nonzero if an expected install or ROS check fails. The volume retains
+inputs, generated environments and logs for inspection; preparation refuses to
+reuse it so an old environment cannot produce a false success.
+
+Inspect preparation logs if a run fails, then remove the disposable state before
+running the experiment again:
+
+```sh
+docker compose -f examples/ros-workloads/compose.offline.yaml logs prepare
+docker compose -f examples/ros-workloads/compose.offline.yaml down --volumes
+```
+
+The build uses the repository root because its inputs include root tooling,
+schemas and release fixtures. Explicit `COPY` instructions select the files put
+in the image. There are no host bind mounts. Allow disk space and downloads for
+contributor tooling and workload packages.
+
+The fixture targets Linux x86_64, matching the release locks. ARM hosts need
+amd64 emulation; Docker Desktop and emulation have not been verified here.
+The [experiment report](../../docs/experiments/0003-offline-package-cache.md)
+records results and limits. PR checks run this same regression in a parallel
+Linux job required by the aggregate Repository checks result.
+
 ## Workload and probe interface
 
 The interface that a future supervisor will use follows the

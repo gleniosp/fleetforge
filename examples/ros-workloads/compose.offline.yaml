@@ -1,0 +1,102 @@
+name: fleetforge-offline-cache
+
+x-experiment: &experiment
+  build:
+    context: ../..
+    dockerfile: examples/ros-workloads/Dockerfile.offline
+  image: fleetforge-offline-cache:issue-14
+  platform: linux/amd64
+  volumes:
+    - type: volume
+      source: fixture
+      target: /fixture
+
+services:
+  prepare:
+    <<: *experiment
+    entrypoint: [bash, -euo, pipefail, -c]
+    command:
+      - |
+        repo_root=/source
+        fixture_root=/fixture/run
+        export PIXI_NO_CONFIG=true
+        export PIXI_HOME="$$fixture_root/pixi-home"
+        export PIXI_CACHE_DIR="$$fixture_root/cache"
+        # Refuse reuse so prior environments/cache cannot establish false success.
+        mkdir "$$fixture_root"
+        mkdir "$$fixture_root/tooling"
+        cp -R "$$repo_root/pixi.toml" "$$repo_root/pixi.lock" "$$repo_root/LICENSE" "$$repo_root/tools" \
+          "$$repo_root/schemas" "$$fixture_root/tooling/"
+        cd "$$fixture_root/tooling"
+        # Contributor tools use their own cache and copied workspace, even in Docker.
+        export PIXI_CACHE_DIR="$$fixture_root/tools-cache"
+        pixi run --locked -e host release-sign generate "$$fixture_root/secret"
+        mkdir "$$fixture_root/releases"
+        for release in ros-counter-a-v1 ros-counter-b-v1; do
+          cp -R "$$repo_root/examples/releases/$$release" "$$fixture_root/releases/"
+          pixi run --locked -e host release-sign sign "$$fixture_root/releases/$$release" \
+            --private-key "$$fixture_root/secret/publisher.key" \
+            --keyring "$$fixture_root/secret/keyring.json"
+        done
+        pixi run --locked -e host release-provision "$$fixture_root/device" \
+          --source "$$fixture_root/releases" --keyring "$$fixture_root/secret/keyring.json"
+        # Only the public keyring is retained for reproduction; discard disposable key.
+        rm -- "$$fixture_root/secret/publisher.key"
+        export PIXI_CACHE_DIR="$$fixture_root/cache"
+        pixi --version
+        cat /etc/os-release
+        test ! -e "$$fixture_root/cache"
+        mkdir "$$fixture_root/warm"
+        for release in ros-counter-a-v1 ros-counter-b-v1; do
+          cp -R "$$fixture_root/device/$$release" "$$fixture_root/warm/"
+          pixi install --locked --no-config --manifest-path "$$fixture_root/warm/$$release/pixi.toml"
+          pixi list --locked --manifest-path "$$fixture_root/warm/$$release/pixi.toml" --json
+        done
+        du -sb "$$fixture_root/cache"
+        find "$$fixture_root/cache/pkgs" -name index.json -print | sort
+  verify:
+    <<: *experiment
+    network_mode: none
+    depends_on:
+      prepare:
+        condition: service_completed_successfully
+    entrypoint: [bash, -euo, pipefail, -c]
+    command:
+      - |
+        repo_root=/source
+        fixture_root=/fixture/run
+        pixi_executable=$$(command -v pixi)
+        export PIXI_NO_CONFIG=true
+        export PIXI_HOME="$$fixture_root/pixi-home"
+        export PIXI_CACHE_DIR="$$fixture_root/cache"
+        cat /proc/net/dev
+        cat /proc/net/route
+        test "$$(ls /sys/class/net)" = lo
+        mkdir "$$fixture_root/positive" "$$fixture_root/negative"
+        cp -R "$$fixture_root/device/ros-counter-b-v1" "$$fixture_root/negative/"
+        test ! -e "$$fixture_root/negative/ros-counter-b-v1/.pixi"
+        mkdir "$$fixture_root/empty-cache"
+        if PIXI_CACHE_DIR="$$fixture_root/empty-cache" pixi install --locked --offline --no-config \
+            --manifest-path "$$fixture_root/negative/ros-counter-b-v1/pixi.toml" \
+            >"$$fixture_root/missing-cache.log" 2>&1; then
+          echo "FAIL: empty cache unexpectedly installed B" >&2
+          exit 1
+        fi
+        cat "$$fixture_root/missing-cache.log"
+        grep -F "failed to fetch" "$$fixture_root/missing-cache.log"
+        grep -F "network access is disabled by offline mode" "$$fixture_root/missing-cache.log"
+        echo "PASS: absent B environment and empty cache produce nonzero offline failure"
+        for release in ros-counter-a-v1 ros-counter-b-v1; do
+          cp -R "$$fixture_root/device/$$release" "$$fixture_root/positive/"
+          test ! -e "$$fixture_root/positive/$$release/.pixi"
+          pixi install --locked --offline --no-config \
+            --manifest-path "$$fixture_root/positive/$$release/pixi.toml"
+          test -x "$$fixture_root/positive/$$release/.pixi/envs/default/bin/python"
+        done
+        PIXI_OFFLINE=true pixi run --locked --offline --clean-env --no-config \
+          --manifest-path "$$fixture_root/positive/ros-counter-a-v1/pixi.toml" \
+          python -B "$$repo_root/examples/ros-workloads/check_workloads.py" \
+          "$$pixi_executable" "$$fixture_root/positive" "$$repo_root"
+
+volumes:
+  fixture:

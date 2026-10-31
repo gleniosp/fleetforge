@@ -99,15 +99,41 @@ jobs:
           git diff --exit-code
           git diff --cached --exit-code
 
+  offline-release-checks:
+    name: Offline release regression (linux-64)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out the pull request
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Validate experiment configuration
+        run: docker compose -f examples/ros-workloads/compose.offline.yaml config --quiet
+      - name: Verify fresh offline releases and failure cases
+        run: docker compose -f examples/ros-workloads/compose.offline.yaml run --build --rm verify
+      - name: Show preparation logs
+        if: ${{ always() }}
+        run: docker compose -f examples/ros-workloads/compose.offline.yaml logs --no-color prepare
+      - name: Remove disposable experiment state
+        if: ${{ always() }}
+        run: docker compose -f examples/ros-workloads/compose.offline.yaml down --volumes
+      - name: Check tracked-file stability
+        if: ${{ always() }}
+        run: |
+          git diff --exit-code
+          git diff --cached --exit-code
+
   checks:
     name: Repository checks
-    needs: [host-checks, device-checks]
+    needs: [host-checks, device-checks, offline-release-checks]
     if: ${{ always() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - name: Require every developer host
+      - name: Require all checks
         env:
           DEVICE_RESULT: ${{ needs.device-checks.result }}
+          OFFLINE_RESULT: ${{ needs.offline-release-checks.result }}
           HOST_RESULT: ${{ needs.host-checks.result }}
-        run: test "$HOST_RESULT" = success && test "$DEVICE_RESULT" = success
+        run: test "$HOST_RESULT" = success && test "$DEVICE_RESULT" = success && test "$OFFLINE_RESULT" = success

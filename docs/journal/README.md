@@ -4,6 +4,7 @@ Dated records of implementation, validation and limitations, newest first.
 Historical commands describe the checkout at their recorded revision; later
 entries document changes to paths and behavior.
 
+- [2026-10-31 — Offline package cache](2026-10-31-offline-package-cache.md)
 - [2026-10-31 — Release examples and documentation navigation](2026-10-31-release-examples-navigation.md)
 - [2026-10-31 — Publisher trust delivery](2026-10-31-publisher-trust.md)
 - [2026-10-30 — Release integrity and local catalog provisioning](2026-10-30-release-integrity.md)

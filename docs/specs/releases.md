@@ -311,11 +311,15 @@ trust, catalog bindings, provisioning policy, supervision, health and recovery.
 The [latest official install documentation](https://pixi.prefix.dev/latest/reference/cli/pixi/install/)
 and locally inspected Pixi 0.83.0 help agree that `--locked` checks lock freshness
 and `--offline` fails when cache data is absent. Use the locked contract; frozen
-mode alone does not check manifest freshness. This is flag compatibility evidence,
-not proof of offline ROS installation. #14 must establish exact cache provisioning,
-commands and positive/missing-byte behavior under verified network isolation.
-No package layout, cache completeness, relocatability or offline success is
-assumed here. Future artifact transfer is owned by FUT-03.
+mode alone does not check manifest freshness. The [offline cache experiment](../experiments/0003-offline-package-cache.md)
+verifies fresh A/B installation and real ROS health with a dedicated populated
+cache, plus nonzero failure with an empty cache, under Docker network isolation.
+Use trusted online setup to populate a dedicated `PIXI_CACHE_DIR` from approved
+locks. Preserve its package data and metadata; do not treat its internal layout
+as a FleetForge format. This evidence covers Pixi 0.83.0 on Linux x86_64 with
+the same cache path. Relocation, other versions/platforms and full offline
+operation require their own evidence. Partial installation output never
+establishes readiness. Future artifact transfer is owned by FUT-03.
 
 ## Error vocabulary and review fixtures
 
