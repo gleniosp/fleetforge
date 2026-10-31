@@ -27,13 +27,16 @@ signature-message vectors; the future Rust reader can consume the same files.
 
 ## Dependency decision
 
-JSON Schema and lightweight parsed objects remain sufficient; no independently
-maintained Pydantic model/schema layer is needed. `cryptography` is a direct host
-tooling dependency for established Ed25519 primitives, bounded to `>=46,<51` and
-locked to 50.0.2. The solve adds CFFI 2.1.1, pycparser 3.12 and Python ABI support
-where needed, and reuses existing OpenSSL. Binary Conda packages avoid adding a
-host compiler requirement. All three existing developer platforms remain in the
-lock; no device runtime platform scope changed.
+No detailed comparison of Pydantic V2 with the existing JSON Schema and
+lightweight parsed objects was performed. The implementation keeps JSON Schema
+as the single release contract and adds no Pydantic dependency. The issue marks
+the model-layer question optional; reassess it only if typed models show a
+concrete benefit. `cryptography` is a direct host tooling dependency for
+established Ed25519 primitives, bounded to `>=46,<51` and locked to 50.0.2. The
+solve adds CFFI 2.1.1, pycparser 3.12 and Python ABI support where needed, and
+reuses existing OpenSSL. Binary Conda packages avoid adding a host compiler
+requirement. All three existing developer platforms remain in the lock; no
+device runtime platform scope changed.
 
 Consulted the [official Ed25519 API](https://cryptography.io/en/latest/hazmat/primitives/asymmetric/ed25519/)
 and [latest Pixi manifest reference](https://pixi.prefix.dev/latest/reference/pixi_manifest/).
