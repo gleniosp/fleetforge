@@ -337,7 +337,7 @@ When a valid deployment instruction requests `example-b-v1` with
 Only after all required input checks succeed can preparation begin. These are
 illustrative excerpts with symbolic values, not a signed release you can install.
 A **fixture** is a deliberately prepared example used for review or testing.
-The [complete review fixtures](../specs/fixtures/releases/README.md) provide
+The [complete review fixtures](../../examples/releases/conformance/v1/README.md) provide
 concrete file sizes, hashes and exact-byte examples; their placeholder applications
 and deliberately invalid signature still do not form a runnable trusted release.
 
@@ -713,7 +713,7 @@ They are unsigned and demonstrate the runtime foundation, not a complete
 deployment lifecycle. Their guide explains why the counter example is useful
 and how to run it.
 
-The [document review fixtures](../specs/fixtures/releases/README.md) show how the
+The [document review fixtures](../../examples/releases/conformance/v1/README.md) show how the
 release contract's documents fit together. The details below describe those
 illustrative documents, separately from the runnable workloads.
 
@@ -799,4 +799,4 @@ ID/digest bindings and explicit failure on conflicting inputs.
 For deeper reading, continue with the [release contract](../specs/releases.md),
 [trust decision](../adr/0006-signed-trust-and-privilege-boundaries.md),
 [coordination contract](../architecture/coordination.md), or
-[illustrative fixtures and failure cases](../specs/fixtures/releases/README.md).
+[illustrative fixtures and failure cases](../../examples/releases/conformance/v1/README.md).

@@ -27,7 +27,8 @@ FleetForge currently provides a Rust bootstrap diagnostic, a locked build/check
 toolchain and unsigned headless ROS 2 Jazzy A/B workload fixtures. The
 [workload demonstration](examples/ros-workloads/README.md) verifies real ROS
 behavior and isolated health on Linux x86_64. Host [release integrity checks and catalog provisioning](docs/guides/release-provisioning.md)
-validate and copy these unsigned inputs without installing them. Fleet operation
+validate and copy inputs without installing them; disposable signing tooling
+adds publisher verification for signed copies. Fleet operation
 is not implemented yet.
 
 Develop on **Linux (x86_64/ARM64), Apple Silicon macOS, or Windows through WSL2**.
@@ -74,13 +75,12 @@ future measured target.
 
 ## Read and contribute
 
-Start with the [documentation map](docs/README.md),
-[glossary](docs/product/glossary.md), [requirements](docs/product/requirements.md), and
-[architecture](docs/architecture/overview.md). The [roadmap](docs/roadmap.md)
-links to GitHub delivery owners; [traceability](docs/traceability.md) maps
-requirements to issues and intended verification. [ADRs](docs/adr/README.md)
-explain decisions; [journals](docs/README.md#reading-design-and-evidence) record
-factual evidence.
+Start with the [documentation map](docs/README.md). Browse
+[product scope](docs/product/README.md), [guides](docs/guides/README.md),
+[architecture](docs/architecture/README.md), [specifications](docs/specs/README.md),
+and [decisions](docs/adr/README.md). [Examples](examples/README.md) provide executable
+fixtures; [experiments](docs/experiments/README.md) and
+[journals](docs/journal/README.md) record evidence and limits.
 
 Use an agreed issue for substantial changes and follow the [working
 agreement](docs/working-agreement.md), including branch names such as

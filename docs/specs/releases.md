@@ -6,9 +6,9 @@ Schemas, illustrative contract fixtures and
 [unsigned ROS workloads](../../examples/ros-workloads/README.md) exist. The
 [workload evidence](../experiments/0002-ros-workload-runtime.md) establishes
 bounded ROS behavior and activation compatibility. The [host integrity checker and fixture provisioner](../guides/release-provisioning.md)
-implement #13. Publisher verification and a production runtime reader remain
-subsequent deliveries. This contract
-does not establish cryptographic verification evidence.
+implement integrity checks and optional publisher verification with an explicit
+keyring. The [publisher trust journal](../journal/2026-10-31-publisher-trust.md)
+records host verification evidence; the production runtime reader remains future work.
 
 For an introduction to the terms, their purpose and the complete planned flow,
 read [From approved software to a running robot](../guides/releases-explained.md).
@@ -112,7 +112,8 @@ use 64-character hex strings for 32 bytes; this helper name is not a release fie
 Provision matching public publisher bindings on authority and devices through
 trusted local setup; protect the keyring against workload writes. Keep private
 publisher keys solely on the signing host and out of source, devices and logs.
-Generate disposable fixture secrets in #86. Manual replacement first provisions
+The host signing tool generates disposable fixture secrets; see the
+[provisioning guide](../guides/release-provisioning.md#sign-disposable-ab-copies). Manual replacement first provisions
 a new ID/public key on required readers, then publishes new release IDs signed
 by it. Retain old public bindings and verified inputs while active/known-good
 releases require them. Removal is an explicit local distrust decision: inventory
@@ -163,8 +164,9 @@ health probe or workload execution until every applicable check succeeds:
    recheck current trust and input integrity, or rely on an equally protected
    verified snapshot whose immutability is enforced by ownership.
 
-If several faults exist, report the first failing stage. The host integrity checker is delivered in #13; signature enforcement belongs
-to #86 and deployment preparation to #20.
+If several faults exist, report the first failing stage. The host checker implements
+signature enforcement when given a keyring; its explicit integrity-only mode is
+for unsigned demonstrations. Deployment preparation belongs to #20.
 Earlier unsigned workload demonstrations must not be presented as trusted
 deployment paths.
 
@@ -202,6 +204,13 @@ Pixi resource; this ban describes release inputs, not all dependency internals.
 | Payload bytes         | 1 GiB per file, 4 GiB total per release                         |
 | Entrypoint/probe argv | 32 items, 1,024 characters each, no NUL                         |
 | Health probe stdout   | 4 KiB, one JSON object; stderr separately bounded by supervisor |
+
+The 4 KiB envelope maximum is a FleetForge input budget, not an Ed25519
+requirement. Ed25519 produces a 64-byte signature; the version 1 JSON envelope
+with a SHA-256 digest uses 257 bytes in compact encoding. The larger limit permits
+ordinary JSON whitespace while bounding reads and parser allocation. The exact
+4 KiB allowance is a conservative format policy, not a measured cryptographic
+minimum. Unsupported fields and encodings still reject within that limit.
 
 Reject limits before unbounded allocation; JSON nesting is at most 16 containers.
 Aggregate byte, encoded document, ordering and cross-field bounds need semantic
@@ -328,7 +337,7 @@ when available and bounded safe resource context; omit secrets. Input/preparatio
 failure must preserve the active workload. These codes do not declare attempt
 state or authorize a process stop.
 
-The [fixture guide](fixtures/releases/README.md) supplies A/B descriptors, hashes,
+The [fixture guide](../../examples/releases/conformance/v1/README.md) supplies A/B descriptors, hashes,
 catalog/keyring/envelope examples and a rejection matrix. Review it alongside
 the schemas and semantic rules. Implementation deliveries must turn these
 expectations into side-effect-aware runtime tests.

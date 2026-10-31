@@ -1,6 +1,6 @@
-"""Bounded release integrity checks and local, unsigned fixture provisioning.
+"""Bounded publisher/integrity checks and local fixture provisioning.
 
-No API in this module authorizes execution. Publisher authentication is owned by #86.
+Publisher verification is required by the CLI unless integrity-only is explicit.
 """
 
 import argparse
@@ -227,7 +227,11 @@ def snapshot(
 
 
 def validate(
-    root: Path, pixi: str, expected: tuple[str, str] | None = None
+    root: Path,
+    pixi: str,
+    expected: tuple[str, str] | None = None,
+    *,
+    keyring: Path | None,
 ) -> tuple[str, str]:
     data = (root / "release.json").read_bytes()
     descriptor = parse(data)
@@ -251,7 +255,10 @@ def validate(
         "catalog descriptor mismatch",
         "release_integrity",
     )
-    # #86 inserts publisher verification here before payload/Pixi validation.
+    if keyring is not None:
+        from tools.releases.trust import verify
+
+        verify(root, data, signing["key_id"], keyring)
     files = descriptor["files"]
     names = [item["path"] for item in files]
     require(names == sorted(set(names)), "unordered or duplicate payload paths")
@@ -383,7 +390,12 @@ def catalog(fd: int) -> dict[str, Any]:
 
 
 def check(
-    root: Path, pixi: str, requested: str | None = None, digest: str | None = None
+    root: Path,
+    pixi: str,
+    requested: str | None = None,
+    digest: str | None = None,
+    *,
+    keyring: Path | None,
 ) -> dict[str, Any]:
     with directory(root) as fd:
         value = catalog(fd)
@@ -403,16 +415,25 @@ def check(
             "requested digest conflicts",
             "release_conflict",
         )
-        with tempfile.TemporaryDirectory() as temporary:
+        # Host temp paths may contain system aliases (macOS /var -> /private/var).
+        # Resolve that trusted parent before creating our private snapshot; caller
+        # release roots and their contents still pass through no-follow traversal.
+        temporary_parent = Path(tempfile.gettempdir()).resolve(strict=True)
+        with tempfile.TemporaryDirectory(dir=temporary_parent) as temporary:
             with directory(root / entry["directory"]) as release_fd:
                 snapshot(release_fd, Path(temporary))
             validate(
-                Path(temporary), pixi, (entry["release_id"], entry["descriptor_digest"])
+                Path(temporary),
+                pixi,
+                (entry["release_id"], entry["descriptor_digest"]),
+                keyring=keyring,
             )
     return value
 
 
-def provision(source: Path, destination: Path, pixi: str) -> dict[str, Any]:
+def provision(
+    source: Path, destination: Path, pixi: str, *, keyring: Path | None
+) -> dict[str, Any]:
     """Publish a complete deterministic fixture tree, or verify an identical tree.
 
     Destination parent must be provisioner-owned. Concurrent writers are unsupported.
@@ -431,7 +452,7 @@ def provision(source: Path, destination: Path, pixi: str) -> dict[str, Any]:
             copied.mkdir()
             with directory(source / name) as fd:
                 snapshot(fd, copied)
-            identity = validate(copied, pixi)
+            identity = validate(copied, pixi, keyring=keyring)
             entries.append(
                 dict(
                     release_id=identity[0],
@@ -447,7 +468,7 @@ def provision(source: Path, destination: Path, pixi: str) -> dict[str, Any]:
         with directory(stage) as stage_fd:
             catalog(stage_fd)
         if destination.exists() or destination.is_symlink():
-            existing = check(destination, pixi)
+            existing = check(destination, pixi, keyring=keyring)
             require(
                 existing == value,
                 "existing catalog binding differs",
@@ -462,9 +483,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=["check", "provision"])
     parser.add_argument("root", type=Path)
-    parser.add_argument("--source", type=Path, default=Path("releases"))
+    parser.add_argument("--source", type=Path, default=Path("examples/releases"))
     parser.add_argument("--release-id")
     parser.add_argument("--digest")
+    trust = parser.add_mutually_exclusive_group(required=True)
+    trust.add_argument("--keyring", type=Path)
+    trust.add_argument("--integrity-only", action="store_true")
     args = parser.parse_args()
     try:
         pixi = shutil.which("pixi")
@@ -475,11 +499,13 @@ def main() -> None:
             "--digest requires --release-id",
         )
         value = (
-            provision(args.source, args.root, pixi)
+            provision(args.source, args.root, pixi, keyring=args.keyring)
             if args.action == "provision"
-            else check(args.root, pixi, args.release_id, args.digest)
+            else check(
+                args.root, pixi, args.release_id, args.digest, keyring=args.keyring
+            )
         )
-        print(json.dumps({"integrity_only": True, "catalog": value}))
+        print(json.dumps({"integrity_only": args.integrity_only, "catalog": value}))
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         code = (
             "release_unavailable"

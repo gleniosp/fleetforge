@@ -55,6 +55,13 @@ One prescribed way to write a document's bytes, including property order and
 spacing. It lets tools calculate matching hashes and signatures. See
 [canonical JSON](../guides/releases-explained.md#a-few-details-the-tooling-handles).
 
+## Conformance fixtures
+
+Shared test inputs with fixed expected answers for a format. Publisher and agent
+tests use the release fixtures to check canonical bytes, descriptor digests and
+signature messages. The running agent reads actual releases. See the
+[plain-language explanation](../../examples/releases/conformance/v1/README.md).
+
 ## Contributor host
 
 The computer used to develop and check FleetForge. The repository's `host` Pixi
@@ -119,7 +126,7 @@ the running workload. See [the release journey](../guides/releases-explained.md#
 
 A deliberately prepared example used for a repeatable check. It can be data,
 files or a runnable setup. FleetForge has both
-[document review fixtures](../specs/fixtures/releases/README.md) and
+[document review fixtures](../../examples/releases/conformance/v1/README.md) and
 [runnable ROS examples](../../examples/ros-workloads/README.md).
 
 ## Fleet

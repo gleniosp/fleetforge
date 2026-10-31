@@ -62,7 +62,7 @@ The container setup refresh used the working tree based on
 `07dfadee975b131caf4bbc5a6bcde259c2771191`.
 The original runtime checks used the working tree based on
 `1664879ae89bbcca9913ba2ca5878ff5b1a7d4e6`. The versioned inputs are the two
-[`releases/`](../../releases/) directories and the
+[`releases/`](../../examples/releases) directories and the
 [`examples/ros-workloads/`](../../examples/ros-workloads/README.md) fixture.
 Descriptors enumerate/hash their five payload files, including each independent
 manifest and lock. Both locks currently have SHA-256:

@@ -16,7 +16,7 @@ def test_real_ros_workloads(tmp_path: Path) -> None:
     assert pixi is not None, "host-installed Pixi is required"
     for release_id in ("ros-counter-a-v1", "ros-counter-b-v1"):
         release = tmp_path / release_id
-        shutil.copytree(source / "releases" / release_id, release)
+        shutil.copytree(source / "examples/releases" / release_id, release)
         subprocess.run(
             [
                 pixi,

@@ -11,31 +11,27 @@ and revisit conditions; creation/update dates and status are useful metadata.
 Code and configuration own executable details; guides explain workflows and
 non-obvious constraints.
 
-| Source                                                                 | Owns                                                                                                                 |
-| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| [README](../README.md)                                                 | Current capabilities, minimum host/tools and first run                                                               |
-| [Product requirements](product/requirements.md)                        | Vision, scope, required behavior, exclusions, and product acceptance                                                 |
-| [Glossary](product/glossary.md)                                        | Shared definitions of project concepts and supporting terms, with links to guides and detailed contracts             |
-| [Architecture](architecture/overview.md)                               | Component/lifecycle boundaries and navigation to identity, coordination, security, and future architecture contracts |
-| [ADRs](adr/README.md)                                                  | Significant decisions, alternatives, rationale, consequences, and revisit conditions                                 |
-| [Release specification](specs/releases.md)                             | Immutable descriptor/catalog schemas, signed bytes, publisher keyring and ROS health interface                       |
-| [Release schemas](../schemas/releases/v1/)                             | Shared version 1 machine-readable release contracts; applications consume or bundle this source                      |
-| [ROS workload fixtures](../examples/ros-workloads/README.md)           | Independent unsigned A/B runtime inputs, actual counter/health behavior and bounded local/reference demonstration    |
-| [Release provisioning](guides/release-provisioning.md)                 | Host integrity checks and unsigned local A/B catalog provisioning                                                    |
-| [Roadmap](roadmap.md)                                                  | Navigation to GitHub milestones                                                                                      |
-| [Traceability](traceability.md)                                        | Requirement links to delivery owners, planned components, and verification methods                                   |
-| [GitHub issues](https://github.com/gleniosp/fleetforge/issues)         | Live task scope, dependencies, priority, checklists, and review/merge progress                                       |
-| [GitHub milestones](https://github.com/gleniosp/fleetforge/milestones) | Delivery grouping, milestone exit criteria, and progress                                                             |
-| [Working agreement](working-agreement.md)                              | Task selection, delivery permissions, review/commit/publication flow, issue sizing, and milestone exit               |
-| [Contributing](../CONTRIBUTING.md)                                     | Public issue validation, fork/PR submissions, project decision ownership, and optional global GitHub CLI usage       |
-| [License](../LICENSE) and [third-party guidance](../THIRD_PARTY.md)    | Original project license and provenance/notice responsibilities for contributions and distributions                  |
-| [Security policy](../SECURITY.md)                                      | Supported scope, vulnerability reporting route, and reporting-service limits                                         |
-| [Code of conduct](../CODE_OF_CONDUCT.md)                               | Participation, conduct reports, and provisional maintainer-owned moderation                                          |
-| [Development guide](guides/development.md)                             | Contributor setup, checks, hooks and upgrades                                                                        |
-| [Release walkthrough](guides/releases-explained.md)                    | Introductory explanation of releases, trust and the planned deployment journey                                       |
-| [Task reference](guides/tasks.md)                                      | Task selection, scopes and operational caveats; exact definitions live in [pixi.toml](../pixi.toml)                  |
-| [Experiments](experiments/)                                            | Reproducible investigation of bounded technical questions                                                            |
-| [Journals](journal/)                                                   | Dated implementation/review evidence and limitations                                                                 |
+| Area                                   | Owns                                                                              |
+| -------------------------------------- | --------------------------------------------------------------------------------- |
+| [Product](product/README.md)           | Requirements, acceptance and shared terminology                                   |
+| [Guides](guides/README.md)             | Explanations, contributor workflows and operational instructions                  |
+| [Architecture](architecture/README.md) | Component boundaries and lifecycle, identity, coordination and security contracts |
+| [Specifications](specs/README.md)      | Shared formats and detailed interface rules                                       |
+| [ADRs](adr/README.md)                  | Significant decisions, rationale and revisit conditions                           |
+| [Experiments](experiments/README.md)   | Bounded technical investigations and reproducible evidence                        |
+| [Journals](journal/README.md)          | Dated delivery evidence and limitations                                           |
+| [Examples](../examples/README.md)      | Release fixtures, conformance inputs and ROS demonstrations                       |
+| [Schemas](../schemas/)                 | Authoritative machine-readable contracts                                          |
+
+The [project README](../README.md) owns current capabilities and first run.
+The [roadmap](roadmap.md) links delivery milestones; [traceability](traceability.md)
+maps requirements to implementation and verification owners. The
+[working agreement](working-agreement.md) owns maintainer task delivery, and
+[CONTRIBUTING](../CONTRIBUTING.md) owns public contribution workflows.
+[GitHub issues](https://github.com/gleniosp/fleetforge/issues) own live scope,
+blockers, priority and checklists; [milestones](https://github.com/gleniosp/fleetforge/milestones)
+own exit criteria and progress. Root policy files own licensing, provenance,
+security reporting and community conduct.
 
 Specifications accompany the behavior they define.
 
