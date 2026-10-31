@@ -222,7 +222,10 @@ The Linux-only `device` job uses device-prefixed tasks to format/lint, build
 and test the agent plus the bounded real ROS A/B fixture. Repository `check` directly composes focused checks; it never invokes the hook
 runner. Agent Rust checks
 stay in the device job. The
-aggregate **Repository checks** requires both scopes; CI does not start a
+aggregate **Repository checks** requires both scopes and the independent offline
+release regression job. That parallel Linux x86_64 job runs the
+[Compose experiment](../../examples/ros-workloads/README.md#fresh-offline-installation-experiment),
+prints preparation logs and always cleans up. CI does not start a
 long-running agent or fleet demo. ROS fixture processes exit after their bounded
 checks. Fork runs may need maintainer approval.
 

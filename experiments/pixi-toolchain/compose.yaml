@@ -1,0 +1,8 @@
+name: fleetforge-toolchain-check
+services:
+  verify:
+    build:
+      context: ../..
+      dockerfile: experiments/pixi-toolchain/Dockerfile
+    image: fleetforge-toolchain-check:local
+    platform: linux/amd64

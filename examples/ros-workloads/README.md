@@ -99,29 +99,27 @@ containers enabled. These fixtures target `linux/amd64`; ARM hosts need amd64
 emulation, which Docker Desktop provides and which can run more slowly. See
 [Docker's platform guidance](https://docs.docker.com/build/building/multi-platform/).
 
-From the repository root, build the reference image and run it. In Bash or zsh
-(Linux or macOS):
+From the repository root, run:
 
 ```sh
-docker build --platform linux/amd64 --tag fleetforge-ros-evidence:issue-11 examples/ros-workloads
-docker run --rm --platform linux/amd64 \
-  --mount type=bind,src="$PWD",dst=/source,readonly \
-  fleetforge-ros-evidence:issue-11
+docker compose -f examples/ros-workloads/compose.yaml run --build --rm demo
 ```
 
-In PowerShell (Windows):
-
-```powershell
-docker build --platform linux/amd64 --tag fleetforge-ros-evidence:issue-11 examples/ros-workloads
-docker run --rm --platform linux/amd64 --mount "type=bind,src=$($PWD.Path),dst=/source,readonly" fleetforge-ros-evidence:issue-11
-```
+Docker builds an image containing only the required release files and check
+helpers, then runs the demonstration inside it. The host needs Docker with
+Compose; Bash and Pixi run inside the container. No host directories or package
+caches are mounted. Rebuilds pick up changes to the selected source inputs.
 
 The image copies Pixi from its
 [official container image](https://pixi.prefix.dev/latest/deployment/container/),
-pinned by version and digest in the Dockerfile. Only the repository is mounted
-from the host, read-only. The container uses its own Pixi executable and package
-cache. Docker requires daemon access; the container uses no privileged mode,
-public ports, host networking or hardware access.
+pinned by version and digest in the Dockerfile. It needs no privileged mode,
+public ports, host networking or hardware access. The demo returns nonzero when
+an install or behavior check fails; `--rm` removes its container afterward. Remove
+the project network when finished:
+
+```sh
+docker compose -f examples/ros-workloads/compose.yaml down
+```
 
 The reference run was verified on Linux x86_64. macOS, Windows and amd64
 emulation have not been verified for this demo.
@@ -154,6 +152,47 @@ contributor tools without installing ROS; the direct demonstration continues
 to use only the releases' runtime dependencies. The
 [development guide](../../docs/guides/development.md#python-tooling-and-workload-tests)
 owns Python tool configuration and the immutable formatting boundary.
+
+## Fresh offline installation experiment
+
+Use this experiment to check that local package bytes are enough to create a
+new environment without internet access. It needs Docker with Linux container
+support and Compose. From the repository root:
+
+```sh
+docker compose -f examples/ros-workloads/compose.offline.yaml run --build --rm verify
+```
+
+The [offline image](Dockerfile.offline) copies explicitly selected repository
+inputs. Online preparation signs/verifies disposable A/B releases and warms a
+dedicated package cache. Verification runs with networking disabled, requires
+absent target environments, checks missing-cache failure, then installs fresh
+A/B environments and verifies real ROS behavior and health.
+
+Preparation needs internet access to populate its cache. Verification reuses
+that cache through a Docker-managed volume while its own network is disabled.
+It returns nonzero if an expected install or ROS check fails. The volume retains
+inputs, generated environments and logs for inspection; preparation refuses to
+reuse it so an old environment cannot produce a false success.
+
+Inspect preparation logs if a run fails, then remove the disposable state before
+running the experiment again:
+
+```sh
+docker compose -f examples/ros-workloads/compose.offline.yaml logs prepare
+docker compose -f examples/ros-workloads/compose.offline.yaml down --volumes
+```
+
+The build uses the repository root because its inputs include root tooling,
+schemas and release fixtures. Explicit `COPY` instructions select the files put
+in the image. There are no host bind mounts. Allow disk space and downloads for
+contributor tooling and workload packages.
+
+The fixture targets Linux x86_64, matching the release locks. ARM hosts need
+amd64 emulation; Docker Desktop and emulation have not been verified here.
+The [experiment report](../../docs/experiments/0003-offline-package-cache.md)
+records results and limits. PR checks run this same regression in a parallel
+Linux job required by the aggregate Repository checks result.
 
 ## Workload and probe interface
 
