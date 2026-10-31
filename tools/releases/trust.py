@@ -127,7 +127,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=["generate", "sign"])
     parser.add_argument("root", type=Path)
-    parser.add_argument("--key-id", default="unsigned-demo-publisher")
+    parser.add_argument("--key-id", default="demo-publisher-1")
     parser.add_argument("--private-key", type=Path)
     parser.add_argument("--keyring", type=Path)
     args = parser.parse_args()

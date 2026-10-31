@@ -18,7 +18,7 @@ PIXI = shutil.which("pixi") or "pixi"
 def signed(tmp_path: Path) -> tuple[Path, Path, Path]:
     tmp_path = tmp_path.resolve()
     secrets = tmp_path / "secrets"
-    generate(secrets, "unsigned-demo-publisher")
+    generate(secrets, "demo-publisher-1")
     source = tmp_path / "source"
     shutil.copytree(REPO / "examples/releases", source)
     keyring = secrets / "keyring.json"
@@ -82,7 +82,7 @@ def test_reject_before_pixi(
         if mutation == "unknown":
             keyring.write_bytes(canonical({"schema_version": 1, "publishers": []}))
         else:
-            generate(secrets.parent / "wrong", "unsigned-demo-publisher")
+            generate(secrets.parent / "wrong", "demo-publisher-1")
             keyring.write_bytes((secrets.parent / "wrong/keyring.json").read_bytes())
     elif mutation == "modified":
         descriptor = json.loads((release / "release.json").read_bytes())
@@ -143,7 +143,7 @@ def test_no_overwrite_and_private_permissions(signed: tuple[Path, Path, Path]) -
     assert secrets.stat().st_mode & 0o777 == 0o700
     assert (secrets / "publisher.key").stat().st_mode & 0o777 == 0o600
     with pytest.raises(FileExistsError):
-        generate(secrets, "unsigned-demo-publisher")
+        generate(secrets, "demo-publisher-1")
     with pytest.raises(FileExistsError):
         sign(root / "ros-counter-a-v1", secrets / "publisher.key", keyring)
     provision(root, root, PIXI, keyring=keyring)

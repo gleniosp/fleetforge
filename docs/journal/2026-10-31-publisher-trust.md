@@ -71,3 +71,36 @@ repository release tools. They and the release tasks now live in the base
 dependency/task tables, available to contributor environments without enabling
 lint. Managed workloads retain their separate release manifests. The updated
 lock also includes these dependencies in the default contributor environment.
+
+## Demo publisher identity
+
+The generated fixture keyring and A/B v1 descriptors use `demo-publisher-1`
+in place of `unsigned-demo-publisher`. Source: working tree based on
+`f5d3d43fc66895a671f1afd098bfcbb74a828dce`. The maintainer authorized revising
+these development examples in place. Only `signing.key_id` changes in each
+descriptor.
+Workload files, embedded release IDs, runtime manifests and locks are unchanged.
+
+This is a development-example revision authorized before these inputs serve as
+published deployment/recovery releases. Existing catalogs and signing fixtures
+using the old descriptors must be recreated. The published-release immutability
+contract remains in effect. Conformance fixtures and expected vectors are unchanged.
+
+| Release            | Revised descriptor digest                                                 |
+| ------------------ | ------------------------------------------------------------------------- |
+| `ros-counter-a-v1` | `sha256:3ad63f1c4ec0e8f15f6f70ceeb467471f6eecda4400b75c34af90697cf080cac` |
+| `ros-counter-b-v1` | `sha256:15113d835b62ded3288e6f09832a152c9b457b26d9e47177601af7c633067855` |
+
+Validation on Linux x86_64 with the host versions recorded above:
+
+- `pixi run --locked -e host python-test`: 102 passed, one ROS test deselected.
+- Manual execution of all four provisioning-guide shell blocks with a fresh
+  temporary base: passed with the new publisher ID and revised v1 descriptors.
+- Manual comparison with `git show f5d3d43:<path>` confirmed that each descriptor
+  changes only its key ID and all other v1 files retain their original bytes.
+- `pixi run --locked -e device ros-workloads-test`: one passed, 102 deselected;
+  actual ROS behavior and health checks passed for revised A/B v1 descriptors.
+- `pixi run --locked -e host python-fix`, `pixi run --locked -e host format`,
+  `pixi run --locked -e host check` and `git diff --check`: passed.
+
+Other host platforms and the reference container were not rerun.

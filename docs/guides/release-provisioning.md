@@ -28,8 +28,10 @@ pixi run --locked -e host release-sign sign /tmp/fleetforge-signing/releases/ros
 pixi run --locked -e host release-sign sign /tmp/fleetforge-signing/releases/ros-counter-b-v1 --private-key /tmp/fleetforge-signing/secret/publisher.key --keyring /tmp/fleetforge-signing/secret/keyring.json
 ```
 
-The generated key is disposable and the default local key ID matches the unsigned
-A/B descriptors. Signing adds a detached envelope to these copies and preserves
+The generated key is disposable. Its default local key ID, `demo-publisher-1`,
+matches the current A/B v1 descriptors. The label identifies which public key to
+use; signature verification establishes publisher approval. Signing adds a
+detached envelope to these copies and preserves
 all descriptor and payload bytes. Existing keys and signatures are never overwritten.
 Never use this fixture identity as an operational trust root. Provision only the
 public `keyring.json` to authority and device protected configuration; keep
