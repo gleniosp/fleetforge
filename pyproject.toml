@@ -9,7 +9,7 @@ select = ["E4", "E7", "E9", "F"]
 
 [tool.ruff.format]
 # Never rewrite accepted release payloads or invalidate their descriptor hashes.
-exclude = ["releases/**"]
+exclude = ["examples/releases/ros-counter-*/**"]
 
 [tool.mypy]
 python_version = "3.14"

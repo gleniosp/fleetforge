@@ -332,7 +332,7 @@ class Release:
 
 def verify_workloads(pixi: str, fixture: Path, source: Path) -> None:
     """Exercise independent runtimes, positive health and deliberate failures."""
-    before = snapshot(source / "releases")
+    before = snapshot(source / "examples/releases")
     logs = fixture / "logs"
     logs.mkdir()
     a = Release(fixture / "ros-counter-a-v1", pixi, logs)
@@ -498,10 +498,11 @@ def verify_workloads(pixi: str, fixture: Path, source: Path) -> None:
             flush=True,
         )
     require(
-        before == snapshot(source / "releases"), "source release files were modified"
+        before == snapshot(source / "examples/releases"),
+        "source release files were modified",
     )
     require(
-        not list((source / "releases").rglob(".pixi")),
+        not list((source / "examples/releases").rglob(".pixi")),
         "generated output in source inputs",
     )
     print(

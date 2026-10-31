@@ -15,7 +15,7 @@ from tools.releases.catalog import (
     provision,
 )
 
-SOURCE = Path(__file__).resolve().parents[2] / "releases"
+SOURCE = Path(__file__).resolve().parents[2] / "examples/releases"
 PIXI = shutil.which("pixi") or "pixi"
 
 
@@ -37,16 +37,16 @@ def tmp_path(tmp_path_factory: pytest.TempPathFactory) -> Path:
 @pytest.fixture
 def inputs(tmp_path: Path) -> Path:
     root = tmp_path / "inputs"
-    provision(SOURCE, root, PIXI)
+    provision(SOURCE, root, PIXI, keyring=None)
     return root
 
 
 def test_repeatable_and_read_only(inputs: Path, tmp_path: Path) -> None:
     before = fingerprints(SOURCE)
     copy_before = fingerprints(inputs)
-    value = check(inputs, PIXI)
-    assert provision(SOURCE, inputs, PIXI) == value
-    assert provision(SOURCE, tmp_path / "another", PIXI) == value
+    value = check(inputs, PIXI, keyring=None)
+    assert provision(SOURCE, inputs, PIXI, keyring=None) == value
+    assert provision(SOURCE, tmp_path / "another", PIXI, keyring=None) == value
     assert fingerprints(inputs) == copy_before
     assert fingerprints(SOURCE) == before
     assert not list(inputs.rglob(".pixi"))
@@ -137,15 +137,15 @@ def test_reject_release(inputs: Path, mutation: str, tmp_path: Path) -> None:
         )
         (inputs / "catalog.json").write_bytes(canonical(catalog))
     with pytest.raises((ReleaseError, OSError)):
-        check(inputs, PIXI)
+        check(inputs, PIXI, keyring=None)
 
 
 def test_catalog_failures(inputs: Path) -> None:
     original = (inputs / "catalog.json").read_bytes()
     with pytest.raises(ReleaseError, match="release_unavailable"):
-        check(inputs, PIXI, "unknown")
+        check(inputs, PIXI, "unknown", keyring=None)
     with pytest.raises(ReleaseError, match="release_conflict"):
-        check(inputs, PIXI, "ros-counter-a-v1", "sha256:" + "0" * 64)
+        check(inputs, PIXI, "ros-counter-a-v1", "sha256:" + "0" * 64, keyring=None)
     for field, value in [
         ("directory", "../escape"),
         ("descriptor_digest", "sha256:" + "0" * 64),
@@ -155,12 +155,12 @@ def test_catalog_failures(inputs: Path) -> None:
         catalog["releases"][0][field] = value
         (inputs / "catalog.json").write_bytes(canonical(catalog))
         with pytest.raises(ReleaseError):
-            check(inputs, PIXI)
+            check(inputs, PIXI, keyring=None)
     catalog = json.loads(original)
     catalog["releases"].append(catalog["releases"][0])
     (inputs / "catalog.json").write_bytes(canonical(catalog))
     with pytest.raises(ReleaseError, match="release_conflict"):
-        check(inputs, PIXI)
+        check(inputs, PIXI, keyring=None)
 
 
 def test_lock_drift_without_repair(tmp_path: Path) -> None:
@@ -177,7 +177,7 @@ def test_lock_drift_without_repair(tmp_path: Path) -> None:
     (release / "release.json").write_bytes(canonical(data))
     before = fingerprints(source)
     with pytest.raises(ReleaseError, match="manifest/lock consistency"):
-        provision(source, tmp_path / "destination", PIXI)
+        provision(source, tmp_path / "destination", PIXI, keyring=None)
     assert fingerprints(source) == before
     assert not (tmp_path / "destination").exists()
 
@@ -191,7 +191,7 @@ def test_conflicting_existing_binding(inputs: Path, tmp_path: Path) -> None:
     release.write_bytes(canonical(data))
     before = fingerprints(inputs)
     with pytest.raises(ReleaseError, match="release_conflict"):
-        provision(source, inputs, PIXI)
+        provision(source, inputs, PIXI, keyring=None)
     assert fingerprints(inputs) == before
 
 
@@ -206,14 +206,14 @@ def test_wrong_binding_rejects_before_pixi(
     value["releases"][0]["descriptor_digest"] = "sha256:" + "0" * 64
     (inputs / "catalog.json").write_bytes(canonical(value))
     with pytest.raises(ReleaseError, match="catalog descriptor mismatch"):
-        check(inputs, PIXI)
+        check(inputs, PIXI, keyring=None)
 
 
 def test_root_link_and_catalog_limit(inputs: Path, tmp_path: Path) -> None:
     link = tmp_path / "linked"
     link.symlink_to(inputs, target_is_directory=True)
     with pytest.raises(OSError):
-        check(link, PIXI)
+        check(link, PIXI, keyring=None)
     (inputs / "catalog.json").write_bytes(b" " * (1024 * 1024 + 1))
     with pytest.raises(ReleaseError, match="size limit"):
-        check(inputs, PIXI)
+        check(inputs, PIXI, keyring=None)

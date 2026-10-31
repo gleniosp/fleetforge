@@ -1,8 +1,56 @@
-# Release contract review fixtures
+# Release-format conformance fixtures, version 1
 
-These are illustrative inputs for the [version 1 release contract](../../releases.md),
-not installable ROS releases or trusted publisher signatures. #11 owns actual
-workloads/locks and #86 owns generated signing fixtures and cryptographic tests.
+Conformance means following the agreed format rules. These fixtures are small
+exercises with fixed expected answers, used by development tests. The running
+agent will read actual releases, signatures and its local publisher keyring;
+it will not load these examples or compare real releases with sample A or B.
+
+## Why publisher and agent tests share these files
+
+Python publishes and signs releases. The planned Rust agent verifies them.
+Both must interpret the [release contract](../../../../docs/specs/releases.md)
+consistently, because a signature protects exact bytes.
+
+For example, these simplified JSON documents contain the same information:
+
+```json
+{"name":"robot","version":1}
+```
+
+```json
+{ "version": 1, "name": "robot" }
+```
+
+Their spaces and member order differ, so their bytes differ. Canonical encoding
+chooses one precise byte representation. A reader checks that the stored
+descriptor already uses that representation; it must not silently repair it.
+
+For each sample descriptor, `vectors.json` records three expected results:
+
+1. **Canonical descriptor bytes:** the exact UTF-8 encoding required by the format.
+2. **Descriptor digest:** the SHA-256 fingerprint of those canonical bytes.
+3. **Signature message bytes:** `FleetForge.release.v1`, followed by one NUL byte,
+   followed by the canonical descriptor bytes. This is what the publisher signs.
+   A NUL is one byte, not the two printable characters `\0`.
+
+The [Python publishing tests](../../../../tools/releases/test_trust.py) check
+their outputs against these fixed answers.
+Rust reader tests will use the same files when that reader is implemented in #20.
+For example, an extra newline or missing NUL must fail even if one implementation
+can sign and verify its own incorrect output. Expected answers must stay independent
+of the implementation under test; do not regenerate them during a test.
+
+The current vectors cover encoding, digests and signature-message construction.
+They do not provide a known valid signature for each sample. Separate publisher
+tests generate disposable keys and signatures to check trusted input and rejection
+cases. Neither kind of test proves ROS behavior, application health or deployment
+recovery; those require their own runtime checks.
+
+## Files and their limits
+
+These are illustrative inputs, not installable ROS releases or operational trust
+roots. The [runnable A/B examples](../../README.md) have real payloads and locks;
+these samples deliberately use placeholders.
 
 | File                                                               | Purpose                                                                                                     |
 | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
@@ -28,8 +76,8 @@ never be provisioned as an operational trust root.
 Schema validation establishes shape only. In particular, `signature-shape.json`
 must pass its schema and must fail cryptographic verification. The payload
 texts are comments/placeholders, and manifest/lock consistency must fail if they
-are passed to an actual release checker. That deliberate limit avoids claiming
-ROS/package compatibility before #11. No fixture should be installed/executed.
+are passed to an actual release checker. The runnable A/B examples provide ROS/package compatibility evidence separately.
+These placeholder inputs must not be installed or executed.
 
 ## Review matrix
 
@@ -71,5 +119,5 @@ classify `release_unsupported` before reporting the generic schema failure.
 | Correct local inputs, missing cached package bytes under network isolation                                                    | `release_prepare_failed`, installation; actual proof belongs to #14                              |
 
 Review outcomes and reproducible shape/vector checks are recorded in the
-[delivery journal](../../../journal/2026-10-24-release-contract.md). This matrix
+[delivery journal](../../../../docs/journal/2026-10-24-release-contract.md). This matrix
 defines required expectations, not a report that runtime rejection tests passed.

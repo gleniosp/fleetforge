@@ -21,8 +21,8 @@ A's software separate, start B with its own dependencies, and distinguish B's
 actual behavior from a process that merely claims to be B. These examples let us
 exercise those boundaries before the deployment agent is implemented.
 
-[A](../../releases/ros-counter-a-v1/release.json) increments a counter by 1;
-[B](../../releases/ros-counter-b-v1/release.json) increments it by 2. Starting
+[A](../releases/ros-counter-a-v1/release.json) increments a counter by 1;
+[B](../releases/ros-counter-b-v1/release.json) increments it by 2. Starting
 from zero, two requests produce 1 then 2 for A, and 2 then 4 for B. This small,
 observable difference makes it possible to check the application through ROS
 messages rather than trusting its version label.
@@ -256,6 +256,6 @@ and required license texts and notices from the actual distribution inputs.
 The descriptors reserve `unsigned-demo-publisher` as an illustrative signing
 key ID. There is no signature file or trusted publisher binding. The
 demonstration checks local file fingerprints for accidental input changes;
-#13 owns production release-check and provisioning, and #86 owns signing and
-verification before deployment execution. Fresh offline installation, retained
+The [host release tools](../../docs/guides/release-provisioning.md) provide
+checking, provisioning and signing of disposable copies before deployment work. Fresh offline installation, retained
 dependency bytes and recovery remain separate deliveries.

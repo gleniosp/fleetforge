@@ -1,4 +1,4 @@
-# Check release files and prepare a local catalog
+# Sign, verify and provision release examples
 
 Imagine you have application versions **A** and **B**. Before a robot can run
 either one, its release files must be available locally and match their recorded
@@ -9,11 +9,39 @@ the full deployment story. Here we will use the same ideas for a smaller,
 executable example: prepare separate local folders representing the inputs an
 authority and a robot would receive.
 
-The current tools check **integrity**: whether the files match the release's
-recorded definition. They do not yet check the publisher's signature or run a
-deployment. Their output includes `integrity_only: true` to make that boundary
-visible. Signature verification belongs to
-[#86](https://github.com/gleniosp/fleetforge/issues/86).
+The tools verify publisher signatures and input integrity when given a local
+`--keyring`. They copy release inputs without installing or running workloads.
+The main workflow below signs copies of the A/B examples and verifies publisher
+approval. An optional integrity-only workflow is described separately below.
+
+## Sign disposable A/B copies
+
+Run from the repository root, with a new host-owned directory outside the checkout:
+
+```sh
+mkdir -m 700 /tmp/fleetforge-signing
+pixi run --locked -e host release-sign generate /tmp/fleetforge-signing/secret
+mkdir /tmp/fleetforge-signing/releases
+cp -R examples/releases/ros-counter-a-v1 /tmp/fleetforge-signing/releases/
+cp -R examples/releases/ros-counter-b-v1 /tmp/fleetforge-signing/releases/
+pixi run --locked -e host release-sign sign /tmp/fleetforge-signing/releases/ros-counter-a-v1 --private-key /tmp/fleetforge-signing/secret/publisher.key --keyring /tmp/fleetforge-signing/secret/keyring.json
+pixi run --locked -e host release-sign sign /tmp/fleetforge-signing/releases/ros-counter-b-v1 --private-key /tmp/fleetforge-signing/secret/publisher.key --keyring /tmp/fleetforge-signing/secret/keyring.json
+```
+
+The generated key is disposable and the default local key ID matches the unsigned
+A/B descriptors. Signing adds a detached envelope to these copies and preserves
+all descriptor and payload bytes. Existing keys and signatures are never overwritten.
+Never use this fixture identity as an operational trust root. Provision only the
+public `keyring.json` to authority and device protected configuration; keep
+`publisher.key` on the signing host, outside source control and logs. Distribute
+public bindings through trusted setup, independently of release inputs.
+
+Publisher approval and authority deployment authorization use separate keys.
+For manual replacement, provision a new public key ID on every required reader,
+then publish new release IDs signed by that key. Retain old public bindings while
+active and recovery releases need them. Inventory affected releases and provision
+trusted replacements before explicitly removing a binding; distrust can prevent
+restart or recovery. See the [trust contract](../specs/releases.md#canonical-bytes-and-detached-signature).
 
 ## Who does what?
 
@@ -22,8 +50,8 @@ responsibilities still differ:
 
 | Part             | Responsibility                                                                                     | Role in this example                                                                     |
 | ---------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Contributor host | Runs the FleetForge repository's development tools                                                 | Runs both commands from the root `host` Pixi environment                                 |
-| Publisher        | Approves a release by signing its descriptor                                                       | Signature creation and verification are subsequent work; A/B are unsigned fixtures       |
+| Contributor host | Runs the FleetForge repository's development tools                                                 | Runs the commands from the root `host` Pixi environment                                  |
+| Publisher        | Approves a release by signing its descriptor                                                       | Signs disposable copies; source A/B remain unsigned                                      |
 | Provisioner      | Places release inputs and a catalog on each machine that needs them                                | The contributor runs `release-provision` to prepare local fixture folders                |
 | Authority        | Records and sends the desired release for a device                                                 | Its fixture folder receives a copy of the release inputs; no authority service runs here |
 | Device agent     | Accepts authorized intent, prepares the application's environment, supervises it and checks health | Its device fixture folder receives another copy; no agent deployment runs here           |
@@ -118,18 +146,21 @@ Provisioned release root
 
 The catalog is an index, not proof of publisher approval. A changed file should
 fail its fingerprint check. A changed descriptor should fail the catalog's
-fingerprint check. Authenticating the publisher will add another check in #86.
+fingerprint check. Publisher verification also rejects changed approval bytes when a keyring is supplied.
 
 ## Prepare authority and device fixture folders
 
-Run these commands from the repository using host-installed Pixi. Choose an
-existing parent directory that you control, with no symlinks in its path. On
-Linux, this disposable example uses `/tmp`:
+Continue from the signing step above. Copy the public keyring into protected
+local trust configuration, then provision the signed inputs for authority and
+device fixtures. This copy represents trusted local setup; release files cannot
+grant themselves trust by including their own keyring. Private signing material
+stays in the signing host's `secret` directory.
 
 ```sh
-mkdir -p /tmp/fleetforge-fixtures
-pixi run --locked -e host release-provision /tmp/fleetforge-fixtures/authority
-pixi run --locked -e host release-provision /tmp/fleetforge-fixtures/device-1
+mkdir /tmp/fleetforge-signing/trust
+cp /tmp/fleetforge-signing/secret/keyring.json /tmp/fleetforge-signing/trust/keyring.json
+pixi run --locked -e host release-provision /tmp/fleetforge-signing/authority --source /tmp/fleetforge-signing/releases --keyring /tmp/fleetforge-signing/trust/keyring.json
+pixi run --locked -e host release-provision /tmp/fleetforge-signing/device-1 --source /tmp/fleetforge-signing/releases --keyring /tmp/fleetforge-signing/trust/keyring.json
 ```
 
 These commands run on the **contributor host**. The folder names describe their
@@ -137,7 +168,7 @@ intended fixture roles; they do not start services, create a robot or connect to
 another machine. Both receive independent copies of A and B:
 
 ```text
-Repository releases/                   Contributor host
+Signed release copies                   Contributor host
        |                                      |
        +-- release-provision -----------------+
                                               |
@@ -153,8 +184,9 @@ exactly. Repeating the same operation succeeds without changing the destination;
 conflicting contents are rejected. A release ID cannot silently acquire a new
 descriptor fingerprint.
 
-By default, the source is the repository's `releases/` directory. Use
-`--source PATH` to select a different trusted source containing the A/B folders.
+The default source is `examples/releases/`, whose committed A/B inputs are
+unsigned. This signed workflow selects the signed copies with `--source`.
+Only the two A/B folders are provisioned; conformance fixtures are not copied.
 This command is a fixture provisioner for these two releases, rather than a
 general release publishing or remote file transfer service.
 
@@ -163,8 +195,8 @@ general release publishing or remote file transfer service.
 Check every catalog entry, or select one release:
 
 ```sh
-pixi run --locked -e host release-check /tmp/fleetforge-fixtures/device-1
-pixi run --locked -e host release-check /tmp/fleetforge-fixtures/device-1 \
+pixi run --locked -e host release-check /tmp/fleetforge-signing/device-1 --keyring /tmp/fleetforge-signing/trust/keyring.json
+pixi run --locked -e host release-check /tmp/fleetforge-signing/device-1 --keyring /tmp/fleetforge-signing/trust/keyring.json \
   --release-id ros-counter-a-v1
 ```
 
@@ -179,9 +211,11 @@ The checker answers these questions:
 2. Does each descriptor have the expected structure and exact canonical encoding?
    Canonical encoding gives a descriptor one precise byte representation for hashing.
 3. Does its identity match the catalog and any requested fingerprint?
-4. Are all expected files present, with the recorded sizes and fingerprints,
+4. Does the signature envelope match the descriptor digest, and does its signature
+   verify with the public key bound to the descriptor's publisher ID?
+5. Are all expected files present, with the recorded sizes and fingerprints,
    and no unexpected files? Are working directories and health timings valid?
-5. Do the manifest and lockfile agree according to Pixi?
+6. Do the manifest and lockfile agree according to Pixi?
 
 A **schema** describes the allowed fields and values of a JSON document. Checking
 a schema catches mistakes such as a missing release ID or an unknown field.
@@ -191,9 +225,22 @@ such as whether `app/main.py` actually contains the expected bytes.
 For example, if someone edits A's `app/main.py` after provisioning, A's recorded
 fingerprint no longer matches. `release-check` fails instead of treating that
 folder as an intact copy of A. The tool checks temporary copies and leaves the
-source release files and locks untouched. Passing means the integrity checks
-succeeded; publisher authenticity and application health still require their
-own checks.
+source release files and locks untouched. With `--keyring`, passing establishes
+publisher authenticity against that local keyring and input integrity. It does not run the application or establish health.
+
+## Inspect unsigned inputs without publisher verification
+
+For an unsigned source inspection, select the mode explicitly and use a separate
+destination:
+
+```sh
+pixi run --locked -e host release-provision /tmp/fleetforge-signing/unsigned-device --integrity-only
+pixi run --locked -e host release-check /tmp/fleetforge-signing/unsigned-device --integrity-only
+```
+
+This checks file integrity and manifest/lock consistency. It reports
+`integrity_only: true` and does not establish publisher approval. Omitting both
+`--keyring` and `--integrity-only` fails; neither mode installs or activates a workload.
 
 ## Implementation boundaries and failure handling
 
@@ -213,10 +260,13 @@ and installed 0.83.0 help describe `--check` as implying `--dry-run`. This check
 can fail because inputs disagree or offline solver metadata is unavailable;
 it does not prove that cached packages are sufficient for an offline installation.
 
-Optional signature envelopes are copied with a 4 KiB limit but are not verified
-yet. #86 must add publisher verification before payload/Pixi validation and
-before any trusted execution path uses these inputs. The existing ROS
-demonstrations remain developer-owned unsigned experiments.
+Signature envelopes have a 4 KiB input budget, allowing JSON whitespace around
+a compact 257-byte envelope while bounding reads and parsing. This is a project
+format policy; the Ed25519 signature itself is 64 bytes. With a keyring, the
+checker verifies the envelope digest and publisher signature before payload/Pixi validation.
+The standalone ROS demonstration checks behavior and health; it does not verify
+publisher approval. Signing and verification are exercised by the host workflow
+and tests described here.
 
 Keep destination parents and release inputs protected from application writes.
 Run one provisioner at a time for a destination; concurrent writers and durable
@@ -231,8 +281,9 @@ The current checker reads schemas from this checkout; future application builds
 will package or embed them from that same source. This keeps publisher and agent
 contracts aligned without making installed applications depend on the docs tree.
 
-Two host dependencies help the checker use these schemas:
+The host release tools use three runtime dependencies:
 
+- `cryptography` provides Ed25519 signing and verification.
 - `jsonschema` validates JSON against the repository's Draft 2020-12 schemas.
 - `referencing` supplies their local schema registry, so schema links resolve
   from repository files without fetching schemas from the network.
@@ -241,7 +292,7 @@ They support contributor-side validation; they add no managed-device runtime
 requirement. The mypy exception for `jsonschema` tolerates that library's missing
 type information while keeping our own Python code in the normal type checks.
 
-Run `pixi run --locked -e host python-test` for the portable integrity and workload
-helper regressions. Host Python checks include the checker, provisioner and tests.
-The [delivery journal](../journal/2026-10-30-release-integrity.md) records checks
+Run `pixi run --locked -e host python-test` for portable publisher trust, integrity
+and workload helper regressions. Host Python checks include the checker, provisioner and tests.
+The [publisher trust journal](../journal/2026-10-31-publisher-trust.md) records checks
 actually performed and their limits.

@@ -161,7 +161,7 @@ unrelated changes or claims of executable runtime enforcement.
 
 ## Manual contract review and limits
 
-Manually reviewed every row in the [fixture matrix](../specs/fixtures/releases/README.md#review-matrix)
+Manually reviewed every row in the [fixture matrix](../../examples/releases/conformance/v1/README.md#review-matrix)
 against schemas and validation order: altered descriptor/payload bytes, missing
 signature or key, key/signature substitution, ID collisions, malformed paths,
 unsupported targets, limits and stale ROS identity/challenge. Unsupported version

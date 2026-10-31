@@ -13,7 +13,7 @@ def workload(
     request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
 ) -> ModuleType:
     root = Path(__file__).resolve().parents[2]
-    release = root / f"releases/ros-counter-{request.param}-v1"
+    release = root / f"examples/releases/ros-counter-{request.param}-v1"
     spec = importlib.util.spec_from_file_location(
         "fixture_common", release / "app/common.py"
     )

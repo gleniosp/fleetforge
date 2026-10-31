@@ -9,7 +9,7 @@ trap 'rm -rf -- "$fixture_root"' EXIT
 
 # Immutable source releases stay untouched; each copy owns its generated .pixi.
 for release in ros-counter-a-v1 ros-counter-b-v1; do
-  cp -R -- "$repo_root/releases/$release" "$fixture_root/$release"
+  cp -R -- "$repo_root/examples/releases/$release" "$fixture_root/$release"
   "$pixi_executable" install --locked --manifest-path "$fixture_root/$release/pixi.toml"
 done
 

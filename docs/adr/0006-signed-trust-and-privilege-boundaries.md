@@ -70,7 +70,7 @@ security, host-root containment or physical robot safety.
 
 [Ed25519 RFC 8032](https://www.rfc-editor.org/rfc/rfc8032) specifies the
 signature scheme; [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785) defines JCS.
-The [contract fixtures](../specs/fixtures/releases/README.md) and
+The [contract fixtures](../../examples/releases/conformance/v1/README.md) and
 [design review journal](../journal/2026-10-24-release-contract.md) record schema,
 byte-vector and manual rejection-case review, not signature verification.
 Use maintained libraries rather than implementing
