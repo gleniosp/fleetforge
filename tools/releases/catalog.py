@@ -415,7 +415,11 @@ def check(
             "requested digest conflicts",
             "release_conflict",
         )
-        with tempfile.TemporaryDirectory() as temporary:
+        # Host temp paths may contain system aliases (macOS /var -> /private/var).
+        # Resolve that trusted parent before creating our private snapshot; caller
+        # release roots and their contents still pass through no-follow traversal.
+        temporary_parent = Path(tempfile.gettempdir()).resolve(strict=True)
+        with tempfile.TemporaryDirectory(dir=temporary_parent) as temporary:
             with directory(root / entry["directory"]) as release_fd:
                 snapshot(release_fd, Path(temporary))
             validate(

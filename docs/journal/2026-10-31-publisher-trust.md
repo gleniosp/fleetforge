@@ -107,3 +107,39 @@ Validation on Linux x86_64 with the host versions recorded above:
   `pixi run --locked -e host check` and `git diff --check`: passed.
 
 Other host platforms and the reference container were not rerun.
+
+## CI correction: physical host temporary paths
+
+[PR #142's macOS ARM64 job](https://github.com/gleniosp/fleetforge/actions/runs/41203974413/job/124545190669)
+failed at `ca67edc59191379132a03ec928d23784f83cc02b`: 11 trust tests encountered
+`NotADirectoryError` while reopening checker-owned snapshots under `/var/folders`.
+The host's `/var` alias points to `/private/var`; strict no-follow traversal
+correctly rejects the alias. Linux x86_64/ARM64 host checks and Linux device
+checks passed. The aggregate repository check failed because the macOS job failed.
+
+The checker now resolves the host-provided temporary parent before creating its
+private snapshot directory. This is independent of OS names and leaves caller
+release roots, publisher keyrings and payloads under the existing no-follow
+rules. Catalog/request conflicts still reject before temporary storage is used.
+Provisioning already creates its staging directory beneath a validated destination
+parent and needs no change.
+
+Source: working tree based on `ca67edc59191379132a03ec928d23784f83cc02b`.
+Added `test_signed_check_with_symlinked_host_temp`, which configures a real
+symlink as Python's host temporary parent on Linux. Valid signed A/B inputs must
+pass; missing/invalid signatures must reject before Pixi runs. All cases assert
+unchanged input bytes and cleanup of temporary snapshots. The existing
+release-root, payload and directory-link rejection tests remain enabled.
+
+Validation on Linux x86_64, Python 3.14.10 and pytest 9.1.1:
+
+- `pixi run --locked -e host python -B -m pytest tools/releases/test_trust.py -k symlinked_host_temp`:
+  three failed with `NotADirectoryError` before the fix; three passed after it.
+- `pixi run --locked -e host python-test`: 105 passed, one ROS test deselected.
+- `pixi run --locked -e host python-fix`, `pixi run --locked -e host format`,
+  `pixi run --locked -e host check` and `git diff --check`: passed.
+
+Native macOS confirmation requires a CI run after publication of this correction.
+The Linux regression reproduces the filesystem condition; it is not native macOS
+execution evidence. ROS runtime tests were not rerun because workloads and their
+runtime inputs are unchanged.

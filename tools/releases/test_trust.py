@@ -197,3 +197,42 @@ def test_signing_cli(tmp_path: Path) -> None:
     from tools.releases.catalog import validate
 
     validate(release, PIXI, keyring=secrets / "keyring.json")
+
+
+@pytest.mark.parametrize("signature_state", ["valid", "missing", "invalid"])
+def test_signed_check_with_symlinked_host_temp(
+    signed: tuple[Path, Path, Path],
+    monkeypatch: pytest.MonkeyPatch,
+    signature_state: str,
+) -> None:
+    import tempfile
+
+    root, keyring, _ = signed
+    physical_temp = root.parent / "physical-temp"
+    physical_temp.mkdir()
+    temp_alias = root.parent / "temp-alias"
+    temp_alias.symlink_to(physical_temp, target_is_directory=True)
+    # Model macOS's host-provided /var -> /private/var temporary path on any host.
+    monkeypatch.setattr(tempfile, "tempdir", str(temp_alias))
+    signature = root / "ros-counter-a-v1/release.sig.json"
+    if signature_state == "missing":
+        signature.unlink()
+    elif signature_state == "invalid":
+        envelope = json.loads(signature.read_bytes())
+        envelope["signature"] = "00" * 64
+        signature.write_bytes(canonical(envelope))
+    before = {p: p.read_bytes() for p in root.rglob("*") if p.is_file()}
+
+    if signature_state == "valid":
+        assert len(check(root, PIXI, keyring=keyring)["releases"]) == 2
+    else:
+
+        def forbidden(*args: object, **kwargs: object) -> None:
+            pytest.fail("untrusted release reached Pixi through host temp alias")
+
+        monkeypatch.setattr("tools.releases.catalog.subprocess.run", forbidden)
+        with pytest.raises(ReleaseError, match="release_untrusted_publisher"):
+            check(root, PIXI, keyring=keyring)
+
+    assert all(p.read_bytes() == data for p, data in before.items())
+    assert not list(physical_temp.iterdir())
