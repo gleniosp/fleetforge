@@ -1,6 +1,8 @@
 # Identity and ownership
 
-**Status:** Accepted contract; schema and runtime implementation pending. [ADR
+**Status:** Accepted contract; typed IDs, configuration and liveness implemented.
+SQLite schema and trust/runtime protection remain pending. See the
+[agent specification](../specs/agent.md). [ADR
 0004](../adr/0004-asset-device-and-tenancy.md) records the decision and
 rationale.
 

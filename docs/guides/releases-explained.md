@@ -17,6 +17,11 @@ The application deployment described here still needs implementation. See the
 [glossary](../product/glossary.md) for quick term lookups, and the
 [release specification](../specs/releases.md) for the exact rules behind this guide.
 
+The device also needs identity and an assignment before it can participate in
+this flow. The [agent guide](agent.md#where-this-fits-in-fleetforge) explains who
+prepares those records, how they relate to release provisioning and deployment,
+and how to try the agent capabilities available today.
+
 ## First, collect one software version into a release
 
 A **release** is a fixed definition of one version of the application and its

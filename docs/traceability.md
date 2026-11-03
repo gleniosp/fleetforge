@@ -64,3 +64,7 @@ When behavior changes, update its owning contract, this mapping, affected
 verification and GitHub scope together. Historical journals and Git history
 preserve dated evidence; this file does not track completion percentages or
 production readiness.
+
+Typed identity, configuration and agent liveness evidence for #15 is recorded in
+the [agent foundation journal](journal/2026-11-03-agent-identity.md). Persistence,
+protected runtime and workload supervision remain subsequent M2 deliveries.
