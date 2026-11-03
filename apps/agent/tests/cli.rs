@@ -33,13 +33,15 @@ fn help_describes_the_supported_interface() {
         String::from_utf8(output.stdout).unwrap(),
         "FleetForge agent bootstrap diagnostic
 
-Usage: fleetforge-agent [--help | --version]
+Usage: fleetforge-agent [--help | --version | --config PATH | --new-id PATH]
 
 With no arguments, print the compiled package version and platform.
 
 Options:
   --help     Show this help
-  --version  Show the package version\n"
+  --version  Show the package version
+  --config PATH  Run the configured agent until SIGINT/SIGTERM
+  --new-id PATH  Provision one canonical ID in a new file\n"
     );
     assert!(output.stderr.is_empty());
 }
