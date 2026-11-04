@@ -68,7 +68,9 @@ source. Ordinary clean/shutdown preserves operational state; reset is separate.
 Pixi resolves, locks and installs environments. FleetForge owns desired state,
 authorization, supervision, health, activation/recovery and future artifact
 transfer/cache policy. Pixi does not supply fleet coordination or atomic process
-switching. Evaluate pixi-pack only when packaging needs justify it.
+switching. The [agent delivery contract](../architecture/agent-delivery.md) selects dedicated
+Pixi runtimes and pixi-pack as the intended agent delivery path, gated by #145.
+The root toolchain environment remains separate from installed device runtimes.
 The [release specification](../specs/releases.md#inputs-installed-environments-and-offline-preparation)
 owns the distinction between signed immutable release inputs, provisioned package
 bytes and generated release-specific environments. Actual offline cache and ROS

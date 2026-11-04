@@ -7,6 +7,7 @@ acceptance.
 
 | Contract owner                                | Subject                                                                                                 |
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [Agent delivery](agent-delivery.md)           | Agent environments, installation, services, upgrades and platform evidence                              |
 | [Identity](identity.md)                       | Asset/device lifecycle, tenancy and assignment history                                                  |
 | [Coordination](coordination.md)               | Authority, signed-intent semantics, selected transport, offline behavior, synchronization and freshness |
 | [Security](security.md)                       | Initial threat model, signatures, credentials and workload privilege boundary                           |
@@ -172,10 +173,10 @@ concepts arrive. Include tenant/asset/device/assignment/authority context from
 the first schema as required by [identity](identity.md); do not scaffold future
 central services or organization/role management.
 
-A bounded dedicated SQLite worker is the proposed access model; synchronous
+The [startup identity store](../specs/agent-storage.md) runs on a bounded blocking worker.
+A bounded dedicated SQLite worker is required when runtime writes arrive; synchronous
 database work must not monopolize Tokio executor threads. Local WAL, foreign
-keys, full synchronous durability, and busy handling are proposed settings to
-validate against actual storage/crash behavior. Durable records must detect
+keys, full synchronous durability, and busy handling are implemented for startup identity storage; see its delivery evidence for validation limits. Durable records must detect
 inconsistent identity and corrupt/unreadable state without silently replacing
 it.
 

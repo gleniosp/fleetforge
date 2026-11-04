@@ -7,5 +7,6 @@ Read the overview before the detailed component contracts.
 3. [Security](security.md) — Publisher trust, authorization, credentials and privilege boundaries.
 4. [Coordination](coordination.md) — Desired intent, observations, sessions and local execution ownership.
 5. [Future architecture](future.md) — Deferred capabilities that require explicit activation.
+6. [Agent delivery](agent-delivery.md) — Intended Pixi packaging, installation, services, upgrades and platform evidence.
 
 [Documentation map](../README.md)

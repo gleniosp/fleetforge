@@ -25,6 +25,13 @@ The service on a managed device that owns local execution, health and recovery.
 An agent process is distinct from the device's persistent identity. See
 [the deployment roles](../guides/releases-explained.md#publisher-authority-and-device-have-separate-powers).
 
+## Agent runtime environment
+
+The dedicated installed environment containing the prebuilt agent and its runtime
+dependencies. It is separate from contributor tooling and managed workload
+environments; persistent identity/state remains outside versioned environments.
+See [agent delivery](../architecture/agent-delivery.md).
+
 ## Asset
 
 The maintainable robot, identified by `asset_id`. It can keep its identity when

@@ -1,7 +1,7 @@
 # Agent identity and configuration
 
 **Status:** Implemented for the Linux x86_64 agent foundation in #15.
-SQLite persistence is owned by #16; runtime permissions and trust provisioning by
+SQLite persistence is implemented in #16; see the [storage specification](agent-storage.md); runtime permissions and trust provisioning by
 #87. [Identity](../architecture/identity.md) owns lifetimes and assignment rules.
 
 ## Provisioning and retention
@@ -62,12 +62,13 @@ The corresponding fields inside `[assignment]` identify the endpoint bound to
 that tenant/authority relationship. Both pairs must match; a mismatch rejects
 startup. Matching values establish local configuration consistency only. The
 parser cannot establish that an authority authorized the assignment, and changing
-both pairs together is not detected as a mismatch. Trusted provisioning and the
+both pairs together is not detected by the parser; the persistent store rejects
+changes to any stored binding on reopen. Trusted provisioning and the
 [security contract](../architecture/security.md) own authorization checks.
 
 Paths must be existing,
 absolute, canonical, non-root directories with neither containing the other.
-The agent neither creates nor modifies those directories in this slice.
+The agent creates its identity store beneath the state directory.
 Canonical-path validation is a startup consistency check; it does not enforce
 ownership, permissions or prevent concurrent filesystem replacement. Provision
 trusted local configuration and directories; #87 owns the OS security boundary.
@@ -75,7 +76,7 @@ trusted local configuration and directories; #87 owns the OS security boundary.
 Startup configuration I/O and instance allocation run on one blocking worker
 with a five-second deadline. Runtime shutdown waits at most one additional
 second for a stalled worker; the CLI exits and the OS reclaims remaining threads.
-This does not cancel a kernel filesystem operation. No state is written by startup.
+This does not cancel a kernel filesystem operation. Startup initializes or validates the durable identity store before liveness.
 
 ## Liveness and diagnostics
 

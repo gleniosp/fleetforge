@@ -1,6 +1,7 @@
 mod config;
 mod identity;
 mod runtime;
+mod storage;
 
 use std::ffi::OsStr;
 use std::io::{self, Write};

@@ -24,7 +24,7 @@ without public internet.
 ## Current state
 
 FleetForge currently provides a [configured Rust/Tokio agent foundation](docs/guides/agent.md)
-with typed identity, liveness diagnostics and a bootstrap diagnostic, a locked build/check
+with persisted SQLite identity, liveness diagnostics and a bootstrap diagnostic, a locked build/check
 toolchain and unsigned headless ROS 2 Jazzy A/B workload fixtures. The
 [workload demonstration](examples/ros-workloads/README.md) verifies real ROS
 behavior and isolated health on Linux x86_64. Host [release integrity checks and catalog provisioning](docs/guides/release-provisioning.md)

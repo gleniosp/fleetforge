@@ -4,6 +4,7 @@ Dated records of implementation, validation and limitations, newest first.
 Historical commands describe the checkout at their recorded revision; later
 entries document changes to paths and behavior.
 
+- [2026-11-04 — Agent identity storage](2026-11-04-agent-storage.md)
 - [2026-11-03 — Agent identity and configured liveness](2026-11-03-agent-identity.md)
 - [2026-10-31 — Container fixture inputs and launchers](2026-10-31-container-fixtures.md)
 - [2026-10-31 — Offline package cache](2026-10-31-offline-package-cache.md)

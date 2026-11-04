@@ -24,7 +24,8 @@ sudo apt install git curl ca-certificates
 
 This follows Ubuntu's [APT guidance](https://documentation.ubuntu.com/server/how-to/software/package-management/).
 It installs/upgrades the named host packages; a host Rust/C compiler is not
-needed because the pinned Linux Rust package brings its linker/sysroot.
+needed because the pinned Linux Rust package brings its compiler/linker/sysroot.
+The Linux x86_64 activation selects that compiler for bundled SQLite builds.
 
 On Apple Silicon macOS:
 

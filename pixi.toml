@@ -20,6 +20,10 @@ release-sign = "python -B -m tools.releases.trust"
 release-check = "python -B -m tools.releases.catalog check"
 release-provision = "python -B -m tools.releases.catalog provision"
 
+[target.linux-64.activation.env]
+# cc-rs builds bundled SQLite with the compiler already supplied by Rust.
+CC_x86_64_unknown_linux_gnu = "x86_64-conda-linux-gnu-cc"
+
 [target.linux-64.tasks]
 device-build = { depends-on = ["agent-build"] }
 agent-build = "cargo build --locked -p fleetforge-agent"

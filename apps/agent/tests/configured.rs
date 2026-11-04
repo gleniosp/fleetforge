@@ -194,18 +194,26 @@ fn real_liveness_and_graceful_signals_have_fresh_instance_identity() {
                 break;
             }
         }
-        // Output closure confirms the process finished within the deadline.
+        // The logging writer can close just before process exit.
         while receiver.recv_timeout(Duration::from_secs(3)).is_ok() {}
-        assert!(agent.0.try_wait().unwrap().unwrap().success());
+        let deadline = std::time::Instant::now() + Duration::from_secs(3);
+        let status = loop {
+            if let Some(status) = agent.0.try_wait().unwrap() {
+                break status;
+            }
+            assert!(std::time::Instant::now() < deadline);
+            std::thread::sleep(Duration::from_millis(10));
+        };
+        assert!(status.success());
         reader.join().unwrap();
     }
     assert_ne!(instances[0], instances[1]);
     assert_eq!(std::fs::read_to_string(path).unwrap(), fixture.config());
     assert!(
-        std::fs::read_dir(fixture.0.join("state"))
-            .unwrap()
-            .next()
-            .is_none()
+        fixture
+            .0
+            .join("state/identity-store/identity.sqlite3")
+            .is_file()
     );
 }
 
@@ -230,4 +238,203 @@ fn stalled_startup_has_a_deadline() {
             .unwrap()
             .contains("startup exceeded")
     );
+}
+
+fn start_and_kill(fixture: &Fixture) {
+    let mut agent = Agent(
+        binary()
+            .arg("--config")
+            .arg(fixture.write(&fixture.config()))
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap(),
+    );
+    let stderr = agent.0.stderr.take().unwrap();
+    let (sender, receiver) = std::sync::mpsc::channel();
+    let reader = std::thread::spawn(move || {
+        for line in BufReader::new(stderr).lines() {
+            if sender.send(line.unwrap()).is_err() {
+                break;
+            }
+        }
+    });
+    let started = receiver.recv_timeout(Duration::from_secs(10)).unwrap();
+    assert!(started.contains("agent_started"), "{started}");
+    agent.0.kill().unwrap();
+    agent.0.wait().unwrap();
+    drop(receiver);
+    reader.join().unwrap();
+}
+
+#[test]
+fn abrupt_restart_preserves_identity_and_rejects_every_binding_change() {
+    let fixture = Fixture::new();
+    start_and_kill(&fixture);
+    start_and_kill(&fixture);
+    let database = fixture.0.join("state/identity-store/identity.sqlite3");
+    let db = rusqlite::Connection::open(&database).unwrap();
+    assert_eq!(
+        db.query_row("PRAGMA user_version", [], |r| r.get::<_, i64>(0))
+            .unwrap(),
+        1
+    );
+    assert_eq!(
+        db.query_row("PRAGMA journal_mode", [], |r| r.get::<_, String>(0))
+            .unwrap(),
+        "wal"
+    );
+    for id in [
+        "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+        "01ARZ3NDEKTSV4RRFFQ69G5FAW",
+        "01ARZ3NDEKTSV4RRFFQ69G5FAX",
+        "01ARZ3NDEKTSV4RRFFQ69G5FAY",
+        "01ARZ3NDEKTSV4RRFFQ69G5FAZ",
+    ] {
+        let changed = fixture.config().replace(id, "01ARZ3NDEKTSV4RRFFQ69G5FB0");
+        let output = bounded_output(binary().arg("--config").arg(fixture.write(&changed)));
+        assert_eq!(output.status.code(), Some(1));
+        assert!(String::from_utf8_lossy(&output.stderr).contains("identity/assignment mismatch"));
+    }
+    assert_eq!(
+        db.query_row("SELECT count(*) FROM assignments", [], |r| r
+            .get::<_, i64>(0))
+            .unwrap(),
+        1
+    );
+}
+
+#[test]
+fn missing_corrupt_empty_and_future_databases_are_preserved() {
+    for failure in ["missing", "corrupt", "empty", "future", "lost-row"] {
+        let fixture = Fixture::new();
+        start_and_kill(&fixture);
+        let database = fixture.0.join("state/identity-store/identity.sqlite3");
+        match failure {
+            "missing" => std::fs::remove_file(&database).unwrap(),
+            "corrupt" => std::fs::write(&database, b"corrupt database").unwrap(),
+            "empty" => std::fs::write(&database, []).unwrap(),
+            "future" => rusqlite::Connection::open(&database)
+                .unwrap()
+                .execute_batch("PRAGMA user_version=999")
+                .unwrap(),
+            _ => rusqlite::Connection::open(&database)
+                .unwrap()
+                .execute_batch("DELETE FROM identity")
+                .unwrap(),
+        }
+        let before = std::fs::read(&database).ok();
+        let output = bounded_output(
+            binary()
+                .arg("--config")
+                .arg(fixture.write(&fixture.config())),
+        );
+        assert_eq!(output.status.code(), Some(1), "{failure}");
+        assert!(String::from_utf8_lossy(&output.stderr).contains("identity store"));
+        assert_eq!(std::fs::read(&database).ok(), before, "{failure}");
+    }
+}
+
+#[test]
+fn locked_database_and_unwritable_store_fail_before_liveness() {
+    let fixture = Fixture::new();
+    start_and_kill(&fixture);
+    let db = rusqlite::Connection::open(fixture.0.join("state/identity-store/identity.sqlite3"))
+        .unwrap();
+    db.execute_batch("BEGIN IMMEDIATE").unwrap();
+    let started = std::time::Instant::now();
+    let output = bounded_output(
+        binary()
+            .arg("--config")
+            .arg(fixture.write(&fixture.config())),
+    );
+    assert_eq!(output.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&output.stderr).contains("locked"));
+    assert!(started.elapsed() < Duration::from_secs(3));
+    db.execute_batch("ROLLBACK").unwrap();
+
+    let fixture = Fixture::new();
+    std::fs::write(fixture.0.join("state/identity-store"), b"occupied").unwrap();
+    let output = bounded_output(
+        binary()
+            .arg("--config")
+            .arg(fixture.write(&fixture.config())),
+    );
+    assert_eq!(output.status.code(), Some(1));
+    assert_eq!(
+        std::fs::read(fixture.0.join("state/identity-store")).unwrap(),
+        b"occupied"
+    );
+}
+
+#[test]
+fn interrupted_initialization_is_not_retried_as_new_identity() {
+    let fixture = Fixture::new();
+    let store = fixture.0.join("state/identity-store");
+    std::fs::create_dir(&store).unwrap();
+    let output = bounded_output(
+        binary()
+            .arg("--config")
+            .arg(fixture.write(&fixture.config())),
+    );
+    assert_eq!(output.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&output.stderr).contains("identity store"));
+    assert!(!store.join("identity.sqlite3").exists());
+}
+
+#[test]
+fn nonregular_database_paths_are_rejected_without_following_them() {
+    for kind in ["symlink", "directory", "fifo"] {
+        let fixture = Fixture::new();
+        let store = fixture.0.join("state/identity-store");
+        std::fs::create_dir(&store).unwrap();
+        let database = store.join("identity.sqlite3");
+        let target = fixture.0.join("untouched");
+        std::fs::write(&target, b"retain this").unwrap();
+        match kind {
+            "symlink" => std::os::unix::fs::symlink(&target, &database).unwrap(),
+            "directory" => std::fs::create_dir(&database).unwrap(),
+            _ => assert!(
+                Command::new("mkfifo")
+                    .arg(&database)
+                    .status()
+                    .unwrap()
+                    .success()
+            ),
+        }
+        let output = bounded_output(
+            binary()
+                .arg("--config")
+                .arg(fixture.write(&fixture.config())),
+        );
+        assert_eq!(output.status.code(), Some(1), "{kind}");
+        assert!(String::from_utf8_lossy(&output.stderr).contains("invalid database path"));
+        assert_eq!(std::fs::read(&target).unwrap(), b"retain this");
+    }
+}
+
+#[test]
+fn unreadable_database_is_preserved() {
+    use std::os::unix::fs::PermissionsExt;
+    // Root bypasses ordinary Unix read permissions; this check requires an
+    // unprivileged test user. Container privilege isolation belongs to #87.
+    if Command::new("id").arg("-u").output().unwrap().stdout == b"0\n" {
+        eprintln!("unreadable-database permission check requires a non-root test user");
+        return;
+    }
+    let fixture = Fixture::new();
+    start_and_kill(&fixture);
+    let database = fixture.0.join("state/identity-store/identity.sqlite3");
+    let before = std::fs::read(&database).unwrap();
+    std::fs::set_permissions(&database, std::fs::Permissions::from_mode(0o0)).unwrap();
+    let output = bounded_output(
+        binary()
+            .arg("--config")
+            .arg(fixture.write(&fixture.config())),
+    );
+    std::fs::set_permissions(&database, std::fs::Permissions::from_mode(0o600)).unwrap();
+    assert_eq!(output.status.code(), Some(1));
+    let error = String::from_utf8_lossy(&output.stderr);
+    assert!(error.contains("identity store"));
+    assert!(!error.contains("agent_started"));
+    assert_eq!(std::fs::read(database).unwrap(), before);
 }

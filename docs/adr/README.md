@@ -14,6 +14,8 @@ behavior.
 | [0005](0005-authenticated-push-transport.md)          | Direct mutually authenticated WebSocket push                                    |
 | [0006](0006-signed-trust-and-privilege-boundaries.md) | Signed releases/instructions and MVP privilege/trust boundaries                 |
 | [0007](0007-repository-formatting.md)                 | Centralized dprint formatting, fallback EditorConfig and Prek autofixes         |
+| [0008](0008-agent-sqlite-storage.md)                  | SQLite agent identity storage and startup ownership                             |
+| [0009](0009-pixi-agent-delivery.md)                   | Intended Pixi agent delivery and staged installation/update validation          |
 
 The [release specification](../specs/releases.md) owns the version 1 descriptor,
 signed bytes, schemas and input limits. Instruction encodings, SQLite settings
