@@ -12,6 +12,7 @@ pub fn run(path: std::path::PathBuf) -> Result<(), String> {
             Duration::from_secs(5),
             tokio::task::spawn_blocking(move || {
                 let config = Config::load(&path)?;
+                crate::storage::initialize(&config)?;
                 Ok::<_, String>((config, CanonicalId::generate()?))
             }),
         )

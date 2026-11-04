@@ -1,7 +1,7 @@
 # Provisioning identity and running the agent
 
 The agent is the FleetForge process that runs on a managed computer. Today it
-can read its identity and assignment, validate configuration, report that its
+can persist and validate its identity and assignment in SQLite, report that its
 event loop is alive, and stop cleanly. You can try this on a Linux x86_64
 contributor host without a robot or authority server.
 
@@ -32,8 +32,8 @@ The intended workflow is:
 1. **Prepare identity and assignment.** An operator allocates IDs where needed,
    checks them against their inventory, and writes the device configuration.
    The current CLI supports local ID allocation and configuration checks.
-2. **Persist and protect the device records.** Planned M2 work adds SQLite
-   persistence, credentials, trusted keys and workload/agent file permissions.
+2. **Persist and protect the device records.** Startup persists identity in SQLite. Planned M2 work adds
+   credentials, trusted keys and workload/agent file permissions.
    Identity records alone do not establish these protections.
 3. **Prepare approved software inputs.** Release tooling signs and provisions
    release files and dependency bytes. See [release provisioning](release-provisioning.md).
@@ -50,6 +50,18 @@ The intended workflow is:
 The steps above explain the operational flow, not the order in which project
 issues must be implemented. The [project README](../../README.md#current-state)
 owns the current capability summary.
+
+## Diagnostic versus configured execution
+
+With no arguments, `agent-run` prints the bootstrap diagnostic and exits:
+
+```sh
+pixi run --locked -e device agent-run
+```
+
+This mode does not read configuration or create identity state. The demonstration
+below uses `--new-id` to provision ID files, then `--config` to run the agent and
+initialize or validate its SQLite store.
 
 ## Try it locally
 
@@ -110,8 +122,10 @@ pixi run --locked -e device agent-run -- --config "$demo_dir/agent.toml"
 
 No server needs to listen on port 8443. The endpoint is checked for valid `wss`
 syntax but is not contacted. The state and runtime directories must exist and be
-separate; this slice does not write to them. The [specification](../specs/agent.md)
-owns the full validation rules and startup limits.
+separate. First configured startup creates the identity store beneath the state
+directory; subsequent startups validate it. The current agent creates no files
+in the runtime directory. The [specification](../specs/agent.md) owns the full
+validation rules and startup limits.
 
 ## Read the output and stop the process
 
@@ -120,7 +134,7 @@ The agent writes JSON diagnostic events to stderr. Look for these values in
 
 | Event            | What you should observe                                        |
 | ---------------- | -------------------------------------------------------------- |
-| `agent_started`  | Startup completed and the event loop is running                |
+| `agent_started`  | Identity storage succeeded and the event loop is running       |
 | `agent_liveness` | A heartbeat appears immediately, then about every five seconds |
 | `agent_stopped`  | Ctrl-C or SIGTERM caused a normal shutdown                     |
 
@@ -139,9 +153,56 @@ the sink stalls, so it is not durable history.
 
 Press **Ctrl-C** to stop the process, then run the same command again. The
 configured IDs should remain unchanged and `agent_instance` should change.
-Identity is retained today because you reuse the configuration; SQLite-backed
-retention is subsequent work. For a real device, preserve its configuration and
-inventory records beyond this temporary demonstration.
+Stop the agent again before inspecting the files below.
+Startup now persists identity and assignment in SQLite and rejects changes to
+stored bindings. Preserve the configuration, inventory records and complete
+state directory beyond this temporary demonstration; see
+[storage recovery](../specs/agent-storage.md#creation-and-reopening).
+
+## Inspect the generated files
+
+After successful configured startup, the demonstration directory contains:
+
+```text
+$demo_dir/
+├── agent.toml
+├── asset.id
+├── device.id
+├── tenant.id
+├── authority.id
+├── assignment.id
+├── state/
+│   └── identity-store/
+│       └── identity.sqlite3
+└── runtime/
+```
+
+The ID files and configuration are inputs created by the earlier provisioning
+commands. Configured execution leaves their contents intact and creates the
+SQLite store. The database records schema version, asset/device IDs and the
+tenant/authority/assignment binding. The schema migration is embedded in the
+executable; no SQL file is generated here.
+
+Inspect the state and runtime directories without installing a SQLite CLI:
+
+```sh
+ls -la "$demo_dir/state/identity-store" "$demo_dir/runtime"
+```
+
+SQLite may also create `identity.sqlite3-wal` and `identity.sqlite3-shm` sidecars
+during startup. The agent closes its database connection before entering the
+liveness loop, so these normally disappear after successful initialization;
+they may remain after interruption. Preserve the whole state directory during
+recovery, including any sidecars.
+
+On restart, the existing store must match configuration. A missing database
+inside `identity-store/`, an incomplete initialization or damaged state rejects
+startup before `agent_started`. The retained directory marks prior initialization;
+do not delete it merely to retry. See
+[storage recovery](../specs/agent-storage.md#creation-and-reopening).
+
+JSON diagnostics go to stderr; the agent does not create a log file. The runtime
+directory remains empty in this slice.
 
 ## Check failure behavior
 
@@ -154,14 +215,15 @@ printf '%s\n' "$demo_dir/agent.toml"
 Try one change at a time, run the agent again, and restore the file before the
 next change:
 
-| Change                                                                     | Expected result                      |
-| -------------------------------------------------------------------------- | ------------------------------------ |
-| Replace only the top-level `device_id` with the existing `tenant_id` value | `identity does not match assignment` |
-| Change one ID to lowercase                                                 | `invalid configuration schema or ID` |
-| Change `wss://` to `ws://`                                                 | Endpoint validation fails            |
-| Set `runtime_dir` to the same value as `state_dir`                         | Directory validation fails           |
+| Change                                                                     | Expected result                       |
+| -------------------------------------------------------------------------- | ------------------------------------- |
+| Replace only the top-level `device_id` with the existing `tenant_id` value | `identity does not match assignment`  |
+| Change `device_id` in both locations to the existing `tenant_id` value     | Stored `identity/assignment mismatch` |
+| Change one ID to lowercase                                                 | `invalid configuration schema or ID`  |
+| Change `wss://` to `ws://`                                                 | Endpoint validation fails             |
+| Set `runtime_dir` to the same value as `state_dir`                         | Directory validation fails            |
 
-Configuration failures exit with status 1. Check the status immediately after
+Configuration or identity-store failures exit with status 1. Check the status immediately after
 the command with `echo $?`.
 
 You can also check that provisioning preserves an existing identity file:
@@ -173,8 +235,9 @@ cat "$demo_dir/device.id"
 
 The command should report a provisioning conflict; the ID should be unchanged.
 When finished, the temporary directory printed by `printf '%s\n' "$demo_dir"`
-contains only this demonstration's configuration, ID files and empty directories.
-You can remove it when you no longer need it.
+contains this demonstration's configuration, ID files and SQLite store. Remove
+this disposable example only when you no longer need its records; retain the
+complete state directory for any identity you intend to reuse.
 
 ## Run the automated checks
 
@@ -184,6 +247,16 @@ pixi run --locked -e device agent-check
 ```
 
 The tests cover ID parsing, configuration rejection, provisioning conflicts,
-real signal shutdown, fresh process instance identity and a stalled startup.
-The [delivery journal](../journal/2026-11-03-agent-identity.md) records results
-and verification limits.
+real signal shutdown, fresh process instance identity, durable restart, damaged
+state rejection and a stalled startup.
+The [foundation journal](../journal/2026-11-03-agent-identity.md) and
+[storage journal](../journal/2026-11-04-agent-storage.md) record results and
+verification limits.
+
+Retain configuration and the complete state directory across restarts. The
+[storage specification](../specs/agent-storage.md) explains mismatch and damaged-store
+recovery. Changing configured identity requires explicit recovery/provisioning.
+
+The [agent delivery contract](../architecture/agent-delivery.md) describes the
+intended dedicated Pixi runtime. Its packaging validation is #145; the commands
+in this guide currently build/run the agent from source.

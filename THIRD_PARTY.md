@@ -29,8 +29,9 @@ development tools from code and libraries shipped in an executable or runtime;
 packaging an environment can also redistribute its tools. Package metadata
 helps locate upstream terms but does not replace reviewing them.
 
-The current Rust diagnostic uses the standard library and has no external Cargo
-dependencies. Pixi provisions development/build tools and their transitive
+The Rust agent uses external Cargo dependencies, including bundled SQLite.
+The [identity storage evidence](docs/journal/2026-11-04-agent-storage.md#dependency-provenance)
+records the added driver/build dependencies and their license obligations. Pixi provisions development/build tools and their transitive
 packages. Their presence in an installed environment does not relicense them
 under Apache-2.0 or constitute a completed redistribution audit. The current
 dependency identities are in `Cargo.lock` and `pixi.lock`.

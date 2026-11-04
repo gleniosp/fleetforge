@@ -32,6 +32,11 @@ visibility with M6. Each milestone tests its own failures. M7 integrates
 resilience; M8 audits the complete result. Issue-level blocker links define the
 exact sequence and supersede assumptions from milestone numbering.
 
+The [agent delivery contract](architecture/agent-delivery.md) records the intended
+Pixi/pixi-pack agent runtime and staged validation. M2 issue #145 validates the
+reference packaging path before #87 runtime permissions; full native installation,
+service boot and agent upgrades remain FUT-08.
+
 ## Future platform
 
 These milestones remain deferred until deliberately activated. Their numbering

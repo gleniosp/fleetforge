@@ -66,5 +66,16 @@ preserve dated evidence; this file does not track completion percentages or
 production readiness.
 
 Typed identity, configuration and agent liveness evidence for #15 is recorded in
-the [agent foundation journal](journal/2026-11-03-agent-identity.md). Persistence,
-protected runtime and workload supervision remain subsequent M2 deliveries.
+the [agent foundation journal](journal/2026-11-03-agent-identity.md). Protected
+runtime and workload supervision remain subsequent M2 deliveries; persistence
+evidence is linked below.
+
+The [agent storage evidence](journal/2026-11-04-agent-storage.md) records the
+implemented #16 subset of MVP-03: identity migration, restart and damaged-store
+rejection. Supervision, deployment recovery and runtime trust remain with their
+respective issue owners above.
+
+[Agent delivery](architecture/agent-delivery.md) maps MVP-01/MVP-03 packaging
+validation to [M2-06 (#145)](https://github.com/gleniosp/fleetforge/issues/145),
+then #87 runtime privileges and #31/#32 simulated-fleet provisioning. Native
+installation, service boot and agent-upgrade recovery retain FUT-08 ownership.

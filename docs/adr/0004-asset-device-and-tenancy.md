@@ -1,6 +1,6 @@
 # ADR 0004 — Asset/device identity and tenancy context
 
-- **Status:** Accepted; typed IDs/configuration implemented in #15, persistence pending in #16.
+- **Status:** Accepted; typed IDs/configuration implemented in #15, persistence implemented in #16.
 - **Date:** 2026-10-20
 - **Delivery:** [M2-01](https://github.com/gleniosp/fleetforge/issues/15) and
   [M2-02](https://github.com/gleniosp/fleetforge/issues/16).
@@ -40,8 +40,8 @@ history.
 The [ULID specification](https://github.com/ulid/spec) defines the
 format/overflow boundary. FleetForge chooses stricter uppercase canonical input.
 Parser, configuration and local provisioning conflict evidence is recorded in
-the [agent foundation journal](../journal/2026-11-03-agent-identity.md). Registry
-uniqueness and migration evidence remain pending. Require
+the [agent foundation journal](../journal/2026-11-03-agent-identity.md). Device migration evidence is recorded in the [storage journal](../journal/2026-11-04-agent-storage.md).
+Authority registry uniqueness remains pending. Require
 malformed/overflow/collision, restart, replacement/clone and assignment-mismatch
 tests with implementation. Revisit representation only for demonstrated
 compatibility needs while preserving identity lifetime and ownership separation.
