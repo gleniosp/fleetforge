@@ -13,7 +13,7 @@ acceptance.
 | [Security](security.md)                       | Initial threat model, signatures, credentials and workload privilege boundary                           |
 | [Release specification](../specs/releases.md) | Immutable descriptor bytes, local catalog, publisher keyring and ROS health interface                   |
 | This overview                                 | Components, release preparation, local lifecycle, persistence and simulation                            |
-| [Future architecture](future.md)              | All twelve deferred capability constraints and scale evidence                                           |
+| [Future architecture](future.md)              | Deferred capability constraints and scale evidence                                                      |
 
 Rust/Tokio owns agent and logical authority services; SvelteKit/TypeScript owns
 the console. These framework choices and the direct authenticated push transport

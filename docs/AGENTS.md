@@ -9,7 +9,8 @@ Inherit [root agent guidance](../AGENTS.md). Use the
 - Keep the [glossary](product/glossary.md) up to date when documentation introduces
   or changes shared terms and actor responsibilities. Reuse existing definitions,
   add concise entries for new concepts, and link to their owning contracts or
-  explanatory guides rather than duplicating detailed rules.
+  explanatory guides rather than duplicating detailed rules. Keep glossary
+  entries alphabetically ordered by their headings.
 - Write concise, natural prose that explains what the reader needs to do and
   why. Explain purpose, main commands and non-obvious constraints; link to code
   and configuration instead of restating settings or task definitions. Keep

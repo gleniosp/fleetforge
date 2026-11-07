@@ -37,25 +37,37 @@ Pixi/pixi-pack agent runtime and staged validation. M2 issue #145 validates the
 reference packaging path before #87 runtime permissions; full native installation,
 service boot and agent upgrades remain FUT-08.
 
+[FND-01 — Dual-target Agent and independent lifecycle foundations](https://github.com/gleniosp/fleetforge/milestone/23)
+is an active early contract/native AMD64 and ARM64 evidence gate under approved
+Option A. [#147](https://github.com/gleniosp/fleetforge/issues/147) owns its
+repository contract adoption. [Maintenance](https://github.com/gleniosp/fleetforge/milestone/22)
+tracks focused repairs outside capability sequencing.
+
 ## Future platform
 
 These milestones remain deferred until deliberately activated. Their numbering
 is thematic. They are not dependencies of the MVP or robot-local execution.
 
-| Milestone                                                                                              | Decision/dependency boundary                                                                                          |
-| ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
-| [FUT-01 — Advanced P2P networking](https://github.com/gleniosp/fleetforge/milestone/10)                | Extend secure direct WSS with authenticated discovery/membership, justified transports, NAT and optional relays       |
-| [FUT-02 — Distributed synchronization](https://github.com/gleniosp/fleetforge/milestone/11)            | Signed/authorized selected-state sharing, per-type conflicts and device-fenced authority transfer                     |
-| [FUT-03 — Distributed artifacts and edge caching](https://github.com/gleniosp/fleetforge/milestone/12) | Authorized content-addressed resumable delivery and protected peer/edge caches                                        |
-| [FUT-04 — Advanced rollout orchestration](https://github.com/gleniosp/fleetforge/milestone/13)         | Durable admissions/fresh-health gates, partition-safe concurrency, scheduling and pause/resume UI                     |
-| [FUT-05 — Robotics integration](https://github.com/gleniosp/fleetforge/milestone/14)                   | Extend MVP ROS 2 with selected Gazebo/advanced robotics and approved physical pilots                                  |
-| [FUT-06 — Production security and identity](https://github.com/gleniosp/fleetforge/milestone/15)       | Production enrollment/credential/signing lifecycle, incident response and independent review beyond MVP controls      |
-| [FUT-07 — Advanced observability](https://github.com/gleniosp/fleetforge/milestone/16)                 | Optional bounded telemetry export/storage, dashboards and alerts independent of execution                             |
-| [FUT-08 — Production device support](https://github.com/gleniosp/fleetforge/milestone/17)              | Validated native/ARM64 matrix, boot supervision, compatible agent/schema upgrades and recovery                        |
-| [FUT-09 — Multi-tenancy](https://github.com/gleniosp/fleetforge/milestone/18)                          | Organizations/roles, complete boundary isolation, quotas and ownership transfer with historical privacy               |
-| [FUT-10 — Optional central management](https://github.com/gleniosp/fleetforge/milestone/19)            | Tenant-aware PostgreSQL from first migration, explicit local/hosted authority placement and safe projections/restores |
-| [FUT-11 — Cloud infrastructure and IaC](https://github.com/gleniosp/fleetforge/milestone/20)           | Service-driven provider/IaC, isolated environments/resources, delivery, secrets/teardown and backup drills            |
-| [FUT-12 — Production cloud architecture](https://github.com/gleniosp/fleetforge/milestone/21)          | Decoupled API/jobs/gateways/ingestion/blobs, pooled DB, tenant placement/cells and measured reliability/cost          |
+| Milestone                                                                                                | Decision/dependency boundary                                                                                          |
+| -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| [FUT-01 — Advanced P2P networking](https://github.com/gleniosp/fleetforge/milestone/10)                  | Extend secure direct WSS with authenticated discovery/membership, justified transports, NAT and optional relays       |
+| [FUT-02 — Distributed synchronization](https://github.com/gleniosp/fleetforge/milestone/11)              | Signed/authorized selected-state sharing, per-type conflicts and device-fenced authority transfer                     |
+| [FUT-03 — Distributed artifacts and edge caching](https://github.com/gleniosp/fleetforge/milestone/12)   | Authorized content-addressed resumable delivery and protected peer/edge caches                                        |
+| [FUT-04 — Advanced rollout orchestration](https://github.com/gleniosp/fleetforge/milestone/13)           | Durable admissions/fresh-health gates, partition-safe concurrency, scheduling and pause/resume UI                     |
+| [FUT-05 — Robotics integration](https://github.com/gleniosp/fleetforge/milestone/14)                     | Extend MVP ROS 2 with selected Gazebo/advanced robotics and approved physical pilots                                  |
+| [FUT-06 — Production security and identity](https://github.com/gleniosp/fleetforge/milestone/15)         | Production enrollment/credential/signing lifecycle, incident response and independent review beyond MVP controls      |
+| [FUT-07 — Advanced observability](https://github.com/gleniosp/fleetforge/milestone/16)                   | Optional bounded telemetry export/storage, dashboards and alerts independent of execution                             |
+| [FUT-08 — Production device support](https://github.com/gleniosp/fleetforge/milestone/17)                | Validated native/ARM64 matrix, boot supervision, compatible agent/schema upgrades and recovery                        |
+| [FUT-09 — Multi-tenancy](https://github.com/gleniosp/fleetforge/milestone/18)                            | Organizations/roles, complete boundary isolation, quotas and ownership transfer with historical privacy               |
+| [FUT-10 — Optional central management](https://github.com/gleniosp/fleetforge/milestone/19)              | Tenant-aware PostgreSQL from first migration, explicit local/hosted authority placement and safe projections/restores |
+| [FUT-11 — Cloud infrastructure and IaC](https://github.com/gleniosp/fleetforge/milestone/20)             | Service-driven provider/IaC, isolated environments/resources, delivery, secrets/teardown and backup drills            |
+| [FUT-12 — Production cloud architecture](https://github.com/gleniosp/fleetforge/milestone/21)            | Decoupled API/jobs/gateways/ingestion/blobs, pooled DB, tenant placement/cells and measured reliability/cost          |
+| [FUT-13 — Independent Bootstrap and Agent recovery](https://github.com/gleniosp/fleetforge/milestone/24) | Local VM proof, independent Agent update/recovery and later remote repair; no OS/workload updater or shell            |
+| [FUT-14 — Enrollment and device lifecycle](https://github.com/gleniosp/fleetforge/milestone/25)          | Deployment-operated enrollment, claim, quarantine, retirement and recovery with fenced ownership                      |
+| [FUT-15 — Robotics model supply chain](https://github.com/gleniosp/fleetforge/milestone/26)              | Signed/offline-verifiable model release and measured lineage, delta and optimization research                         |
+| [FUT-16 — Scoped maintenance access](https://github.com/gleniosp/fleetforge/milestone/27)                | Bounded audited actions and evaluated exceptional interactive access                                                  |
+| [FUT-17 — Robotics data and training integration](https://github.com/gleniosp/fleetforge/milestone/28)   | Optional authorized capture, dataset lineage and external training/evaluation handoff                                 |
+| [FUT-18 — Optional commercial platform services](https://github.com/gleniosp/fleetforge/milestone/29)    | Tenant-scoped usage/entitlements and service boundaries without robot-control authority                               |
 
 The [future architecture](architecture/future.md) owns guarantees, exclusions
 and evidence gates for every deferred capability. Millions of assets/devices are
@@ -67,6 +79,14 @@ Future issues start with contract/decision gates and carry native blockers for
 security, platform, and service prerequisites. Reassess their scope against real
 needs before implementation; creating an issue does not authorize speculative
 research, paid resources, or hardware operations.
+
+The [optional platform reference](architecture/platform-evolution.md),
+[release lifecycle](architecture/release-supply-chain.md),
+[messaging evaluation](architecture/connectivity-and-messaging.md) and
+[data/model lifecycle](architecture/data-and-model.md) explain the proposed
+future paths. [#169](https://github.com/gleniosp/fleetforge/issues/169) owns
+their documentation review. The later milestones do not change the MVP exit
+criteria or activate their implementation issues.
 
 ## Find work
 

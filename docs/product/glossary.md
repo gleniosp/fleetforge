@@ -6,6 +6,9 @@ Use this page to look up a term; the
 one connected example. [Requirements](requirements.md) specify required behavior;
 architecture and specifications own the detailed rules linked from each entry.
 
+Entries are alphabetical by heading. Future terms describe planning boundaries,
+not implemented services.
+
 ## Acceptance
 
 The agent has validated and durably committed an instruction. Execution may
@@ -75,6 +78,12 @@ The computer used to develop and check FleetForge. The repository's `host` Pixi
 environment contains contributor tools; it is separate from the agent and
 application environments on managed devices. One computer can represent several
 roles in a fixture. See [provisioning roles](../guides/release-provisioning.md#who-does-what).
+
+## Dataset
+
+An immutable, access-controlled collection of selected recordings and metadata
+with source, transformation, version and retention lineage. It differs from
+bounded operational telemetry. See [data and model lifecycle](../architecture/data-and-model.md).
 
 ## Dependency, direct and transitive
 
@@ -179,6 +188,12 @@ records the resolved package versions and identities. Neither contains the
 dependency package bytes themselves. See
 [release inputs and environments](../guides/releases-explained.md#first-collect-one-software-version-into-a-release).
 
+## Model candidate
+
+An evaluated output from a training or conversion process. It has provenance
+and compatibility evidence but no automatic publisher approval or deployment
+authority. See [data and model lifecycle](../architecture/data-and-model.md).
+
 ## Nonce
 
 A fresh, unpredictable challenge value used for one health check. The workload
@@ -251,6 +266,12 @@ and the directories containing their files. See
 [finding a release on disk](../guides/releases-explained.md#find-b-on-disk-the-catalog).
 The [provisioning guide](../guides/release-provisioning.md#what-is-a-catalog)
 shows the current local fixture layout and integrity tooling.
+
+## Release registry
+
+A future metadata boundary for immutable release identity, compatibility and
+approval/promotion. A Conda package channel stores package bytes and does not
+grant deployment permission. See [release supply chain](../architecture/release-supply-chain.md).
 
 ## Request ID
 

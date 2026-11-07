@@ -33,6 +33,13 @@ blockers, priority and checklists; [milestones](https://github.com/gleniosp/flee
 own exit criteria and progress. Root policy files own licensing, provenance,
 security reporting and community conduct.
 
+The [optional hosted reference](architecture/platform-evolution.md),
+[connectivity evaluation](architecture/connectivity-and-messaging.md),
+[release lifecycle](architecture/release-supply-chain.md),
+[data/model lifecycle](architecture/data-and-model.md) and
+[security responsibilities](architecture/security-responsibilities.md) explain
+future trade-offs without changing the MVP contract.
+
 Specifications accompany the behavior they define.
 
 ## Reading design and evidence
