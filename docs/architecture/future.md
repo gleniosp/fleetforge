@@ -7,6 +7,12 @@ issue gates. The
 scope; this document owns future architectural constraints and required
 evidence.
 
+The sections below retain the original FUT-01–FUT-12 contracts. GitHub also
+tracks FUT-13–FUT-16 for independent Bootstrap/Agent recovery, enrollment,
+model supply chain and scoped maintenance; [#147](https://github.com/gleniosp/fleetforge/issues/147)
+owns their repository contract adoption. The new FUT-17/FUT-18 sections are
+optional extensions proposed for review in [#169](https://github.com/gleniosp/fleetforge/issues/169).
+
 ## FUT-01 — Peer reachability
 
 Extend the planned MVP secure direct protocol with authenticated
@@ -149,3 +155,27 @@ future measured target. Three real agents and bounded synthetic-peer tests
 establish MVP correctness and resource behavior, not production capacity.
 Prioritize hardened device operations and peer reachability/artifact delivery
 after MVP; SaaS remains optional.
+
+## FUT-17 — Robotics data and training integration
+
+Keep operational telemetry, diagnostic recordings and curated training data
+separate. Start with bounded, consented capture and immutable dataset lineage;
+only then integrate one external training/evaluation handoff. Neither data
+collection nor training becomes a device execution dependency. Use protected
+object transfer for large bytes; keep capture quotas and offline buffering
+below recovery resource budgets. Test tenant isolation, privacy/retention,
+corruption, interrupted upload, provenance and quality-evidence rejection.
+The [data/model architecture](data-and-model.md) and DATA-01/DATA-02/ML-01/
+FUT-NFR-01 own the detailed contract. FUT-15 remains the separate owner of
+model release identity, offline inference and model distribution research.
+
+## FUT-18 — Optional commercial platform services
+
+Only after an optional hosted management and tenant boundary is justified,
+evaluate public API products, entitlements, usage records, billing integration
+and customer support workflows. Derive usage from authorized, deduplicated
+records with explicit freshness; commercial outages must not stop accepted
+robot work. An entitlement cannot bypass publisher trust, deployment authority
+or robot-local safety. Test wrong-tenant access, stale/duplicated usage,
+entitlement expiry, unavailable billing and denied control-path attempts.
+COM-01 and FUT-NFR-01 own the requirement; no payment provider is selected.

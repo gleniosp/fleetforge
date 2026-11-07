@@ -310,7 +310,7 @@ millions of assets/devices require future measured evidence.
 
 ## Future capability boundaries
 
-All twelve IDs remain deferred until explicitly activated. The [future
+The IDs below remain deferred until explicitly activated. The [future
 architecture](../architecture/future.md) owns their constraints and evidence
 gates; the [roadmap](../roadmap.md#future-platform) links delivery milestones.
 
@@ -328,6 +328,31 @@ gates; the [roadmap](../roadmap.md#future-platform) links delivery milestones.
 | FUT-10 | Optional central API/PostgreSQL with tenant context from the first migration, administration, projections and explicit authority placement |
 | FUT-11 | Service-driven provider/IaC evaluation, isolated environments, managed resources, delivery, secrets/teardown and backup drills             |
 | FUT-12 | Measured hosted API/jobs/gateways/ingestion/blob architecture, tenant placement/cells, reliability and cost guardrails                     |
+
+## Optional data, model and commercial requirements
+
+These new IDs describe **planned** work and do not alter MVP-01–MVP-11 or
+NFR-01–NFR-07. Existing model artifact issues #160–#164 remain the owners of
+model packaging, inference, delta research and local variants. The
+[data/model architecture](../architecture/data-and-model.md) and
+[security responsibility map](../architecture/security-responsibilities.md)
+own the trust boundaries; [traceability](../traceability.md#optional-platform-requirements)
+maps delivery and verification.
+
+| ID         | Type | Contract and reason                                                                                                                                                                                                                                       | Required verification                                                                                                                                          |
+| ---------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DATA-01    | FR   | An authorized tenant may configure bounded robot capture by source, purpose, consent, time and storage budget; diagnostic capture and training collection are distinct. This makes recording deliberate.                                                  | Wrong tenant/topic/purpose rejects; capture stops at budget, privacy and offline retention limits without exhausting recovery space.                           |
+| DATA-02    | FR   | A tenant may upload and register immutable, integrity-checked datasets with source, version, transformation, access and retention lineage. This permits reproducible evaluation and controlled deletion.                                                  | Interrupted/resumed and corrupt upload, duplicate identity, wrong-tenant access, lineage conflict, retention/deletion tests.                                   |
+| ML-01      | FR   | An external training/evaluation service may submit a model candidate with dataset/version, method, quality and compatibility evidence for independent release approval. Training output grants no deployment authority.                                   | Forged/unknown producer, missing dataset, invalid metrics, wrong target and unapproved promotion reject; one reproducible evaluation handoff.                  |
+| COM-01     | FR   | Optional commercial services may expose tenant-scoped entitlements and usage derived from authorized, fresh records; they may not issue robot control or override safety. This supports a possible hosted offering without coupling billing to execution. | Wrong-tenant and stale/duplicate usage, entitlement expiry, service outage and denied command-path tests.                                                      |
+| FUT-NFR-01 | NFR  | Optional data, model and commercial workflows must preserve tenant isolation, consent where relevant, integrity, lineage, bounded retention and auditability across capture, transfer, jobs and outputs.                                                  | Threat review plus adversarial cross-tenant, provenance, deletion/retention, backpressure and restore fixtures; explicit offline limits.                       |
+| FUT-NFR-02 | NFR  | Hosted and self-hosted references must preserve signed intent, local recovery, idempotency and honest freshness. Capacity, reliability and cost targets require measured workloads, not invented numbers.                                                 | #82 declares load, latency, availability, RTO/RPO and cost budgets; #84/#113 test failure and placement; self-hosted conformance compares the same guarantees. |
+
+Security-sensitive controls also inherit existing NFR-05/NFR-06 where applicable;
+future hardening cannot defer MVP authentication, signatures or resource bounds.
+No training, data or commercial service is required to run a previously
+authorized workload. The product owner must set justified data-volume,
+retention, quality and service targets before production implementation.
 
 Hardened device operations and peer reachability/artifact delivery take priority
 after MVP; SaaS stays optional. Future numbering is thematic rather than an
