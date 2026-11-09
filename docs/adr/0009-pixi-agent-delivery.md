@@ -2,6 +2,7 @@
 
 - **Status:** Accepted direction; runtime adoption awaits #145 evidence.
 - **Date:** 2026-11-04
+- **Updated:** 2026-11-09 — #147 independent lifecycle contract.
 - **Delivery:** [#16](https://github.com/gleniosp/fleetforge/issues/16) records the
   boundary; [M2-06 (#145)](https://github.com/gleniosp/fleetforge/issues/145)
   validates packaging. Native installation/upgrades remain deferred FUT-08.
@@ -27,11 +28,20 @@ service/updater responsibilities, persistent state, compatibility, platform
 evidence and delivery sequencing. Ordinary startup uses an installed environment.
 No device compiler, startup solve or network dependency is introduced.
 
-First validate explicit installation commands. Later select service integration
-and compare maintained update engines with a narrowly scoped updater before
-introducing autonomous upgrades. Ansible is a provisioning candidate, not a
-requirement. Tooling itself needs versioning and an update owner; it can share
-FleetForge releases without being replaced through the failing agent environment.
+Select an independent FleetForge Bootstrap with an unprivileged manager and
+narrow OS-owned helper as the agent activation/recovery owner. It survives agent
+environment failure, has a separate protected journal and never updates itself
+or the OS. The agent retains workload lifecycle ownership. The
+[agent artifact specification](../specs/agent-releases.md) separates publisher
+approval from scoped activation, binds platform/tool/schema compatibility, and
+requires monotonic generations and security policy even during rollback.
+
+Adopt lifecycle contracts and native AMD64/ARM64 foundation evidence first
+(#147/#69/#148), complete M2–M8, then validate independent Bootstrap recovery in
+local VMs. Production enrollment, remote repair and OS updates retain separate
+activation gates. Bootstrap initially arrives and is repaired through trusted
+OS provisioning. The [maintenance handoff](../architecture/agent-delivery.md#exclusive-maintenance-and-replacement)
+coordinates agent replacement with workload shutdown and restart.
 
 ## Alternatives and consequences
 
@@ -44,7 +54,8 @@ and retained offline recovery inputs.
 An OS package may still provide bootstrap/service tooling around the Pixi
 runtime. Containers remain the MVP simulation boundary, not a claim of native
 device support. Ansible can repeat provisioning but does not establish local
-crash recovery. An established update framework may reduce custom update logic;
+crash recovery. An established update framework was an alternative to the selected independent
+Bootstrap owner and may still supply a bounded implementation component;
 its platform integration and SQLite/schema recovery still need evidence.
 Mender application Update Modules are one candidate for that comparison.
 Image updaters such as RAUC become relevant if the project owns complete device
@@ -72,5 +83,7 @@ and [Mender update modules](https://docs.mender.io/artifact-creation/create-a-cu
 and [RAUC basics](https://rauc.readthedocs.io/en/latest/basic.html).
 Current #16 configuration remains compatible with project Pixi 0.83.0; no pack
 tool/backend compatibility or operational platform expansion has been claimed.
-Revisit when the packaging experiment, target-platform constraints or updater
+Revisit the Bootstrap choice if its independent recovery/privilege boundary cannot
+be demonstrated, or a maintained engine meets the same contracts with lower
+maintenance cost. Also revisit when the packaging experiment, target-platform constraints or updater
 failure evidence contradict the intended model.

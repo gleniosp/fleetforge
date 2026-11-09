@@ -28,6 +28,12 @@ The service on a managed device that owns local execution, health and recovery.
 An agent process is distinct from the device's persistent identity. See
 [the deployment roles](../guides/releases-explained.md#publisher-authority-and-device-have-separate-powers).
 
+## Agent artifact
+
+Immutable publisher-signed metadata binding a prebuilt agent environment archive,
+platform, tool versions and schema compatibility. A separately authorized agent
+activation instruction selects it for a device. See [artifact v1](../specs/agent-releases.md).
+
 ## Agent runtime environment
 
 The dedicated installed environment containing the prebuilt agent and its runtime
@@ -58,6 +64,13 @@ separate from its host or process. See
 
 Restoring and verifying known-good software after a failed deployment. See
 [failure and recovery](../guides/releases-explained.md#what-can-fail-and-what-stays-running).
+
+## Bootstrap
+
+The independently installed owner of agent activation and recovery, with an
+unprivileged manager and narrow OS-owned helper. It preserves device identity
+and coordinates maintenance with the agent; OS provisioning repairs Bootstrap.
+See [agent delivery](../architecture/agent-delivery.md).
 
 ## Canonical encoding
 
@@ -180,6 +193,13 @@ and [publisher signatures](../guides/releases-explained.md#establish-approval-a-
 
 Software that previously passed workload health verification. See
 [deployment and recovery](../architecture/overview.md#deployment-and-recovery).
+
+## Maintenance lock
+
+An exclusive OS file lock shared by Bootstrap and the agent deployment coordinator.
+It prevents agent replacement from overlapping workload changes. A separate durable
+pause record blocks new work until replacement or recovery finishes. See the
+[maintenance handoff](../architecture/agent-delivery.md#exclusive-maintenance-and-replacement).
 
 ## Manifest and lockfile
 

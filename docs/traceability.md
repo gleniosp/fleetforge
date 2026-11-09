@@ -38,6 +38,18 @@ FUT-10 restore tests extend durability evidence beyond MVP. They are not
 prerequisites for MVP completion. Identity/assignment contract delivery starts
 in #15/#16; runtime trust in #87 is part of MVP-03/MVP-07 as well as NFR-06.
 
+## Independent lifecycle foundations
+
+| Requirement   | Contract and delivery                                                                                                                       | Required evidence                                                                                          |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| FND-LIFECYCLE | [Agent delivery](architecture/agent-delivery.md), [artifact v1](specs/agent-releases.md), [ADR 0009](adr/0009-pixi-agent-delivery.md); #147 | Schema/vector checks and manual failure/state review; runtime #145/#87 and deferred #149/#70/#103/#72/#104 |
+| FND-PLATFORM  | [Agent delivery](architecture/agent-delivery.md); #69/#148                                                                                  | Measured OS/ABI profiles, native AMD64/ARM64 builds and storage failures                                   |
+| OS-ADAPTER    | [Agent delivery](architecture/agent-delivery.md); #147 contract, deferred #155/#156                                                         | Selected-platform authority/boot boundary review and future adapter interruption evidence                  |
+
+#147 also extends MVP-01 and NFR-07 with artifact/schema compatibility and
+lifecycle contracts. [Contract evidence](journal/2026-11-09-agent-contracts.md)
+records static validation and its limits; it does not establish runtime recovery.
+
 ## Deferred capability ownership
 
 All future issues remain subject to explicit activation and their native

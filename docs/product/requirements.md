@@ -53,6 +53,35 @@ implementation.
 
 ## Functional requirements
 
+### FND-LIFECYCLE — Independent lifecycle ownership
+
+Separate device identity/provisioning, agent installation/recovery, workload
+execution and OS/boot ownership. An independent FleetForge Bootstrap must survive
+agent environment failure and use a narrow privileged helper with protected
+local authentication/policy. Agent artifacts and scoped activation instructions
+have separate signature domains and trust. Preserve identity, monotonic activation
+generations, security policy and compatible state through replacement/recovery.
+Require exclusive maintenance admission and explicit child-workload handling.
+[Agent delivery](../architecture/agent-delivery.md) and
+[artifact v1](../specs/agent-releases.md) own the detailed contract (#147).
+
+### FND-PLATFORM — Dual-target foundation evidence
+
+Establish native Linux AMD64 and ARM64 agent builds and storage failure evidence
+with explicit OS/ABI profiles (#69/#148). Packing or emulation alone does not
+establish native compatibility or expand the operational workload matrix.
+Complete these early foundations and M2–M8 before explicitly activating the
+local Bootstrap VM proof. Production platform support remains
+separately gated by FUT-08.
+
+### OS-ADAPTER — OS recovery boundary
+
+OS provisioning and any future update adapter own kernel, drivers, root filesystem,
+boot confirmation and Bootstrap installation/repair. Agent/Bootstrap activation
+cannot write OS images or take over OS recovery. A selected reference platform
+and bounded evidence are required before OS update implementation (#155/#156).
+This contract adoption does not activate deferred OS work.
+
 ### MVP-01 — Engineering foundation
 
 Provide root Pixi and virtual Cargo workspaces, one meaningful Rust executable,
@@ -65,8 +94,9 @@ through WSL2 for developer/maintainer workflows, subject to explicit dependency
 and host prerequisite limits. The current supported configuration and evidence
 live in the [development guide](../guides/development.md#host-prerequisites).
 Operational agents/workloads and MVP simulation remain Linux x86_64 only;
+FND-PLATFORM owns early native agent build/storage evidence;
 [FUT-08](../architecture/future.md#fut-08--production-device-platforms) owns
-future device-platform expansion. Native compilation/testing of shared code or
+operational device-platform expansion. Native compilation/testing of shared code or
 the bootstrap diagnostic does not establish device runtime support. Scope
 runtime-specific packages and tasks separately as components arrive.
 

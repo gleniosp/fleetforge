@@ -7,5 +7,6 @@ Read the walkthrough for context, then use the guides for the work you need to d
 3. [Release signing and provisioning](release-provisioning.md) — Sign disposable A/B copies, provision public trust and verify local catalogs.
 4. [Task reference](tasks.md) — Available commands, scopes and operational caveats.
 5. [Agent identity and startup](agent.md) — Provisioning roles, a local walkthrough, diagnostics and failure checks.
+6. [Understanding agent release examples](agent-releases-explained.md) — Read artifact/activation fixtures, apply their schemas and distinguish structural checks from trust.
 
 [Documentation map](../README.md)

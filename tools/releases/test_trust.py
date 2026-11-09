@@ -7,7 +7,8 @@ import shutil
 
 import pytest
 
-from tools.releases.catalog import ReleaseError, canonical, check, provision
+from tools.json_encoding import canonical
+from tools.releases.catalog import ReleaseError, check, provision
 from tools.releases.trust import generate, load_keyring, sign, signature_message
 
 REPO = Path(__file__).resolve().parents[2]

@@ -12,12 +12,12 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PublicKey,
 )
 
+from tools.json_encoding import canonical
 from tools.releases.catalog import (
     MAX_CATALOG_BYTES,
     MAX_DESCRIPTOR_BYTES,
     MAX_SIGNATURE_BYTES,
     ReleaseError,
-    canonical,
     directory,
     parse,
     read,

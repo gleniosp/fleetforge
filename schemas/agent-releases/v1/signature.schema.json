@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fleetforge.dev/schemas/agent-releases/v1/signature.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "document_digest", "signature"],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "document_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{128}$"
+    }
+  }
+}

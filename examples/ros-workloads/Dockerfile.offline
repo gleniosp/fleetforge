@@ -13,7 +13,7 @@ ENV PIXI_NO_CONFIG=true
 
 # Only these explicit source files enter the offline experiment image.
 COPY LICENSE pixi.toml pixi.lock /source/
-COPY tools/__init__.py /source/tools/
+COPY tools/__init__.py tools/json_encoding.py /source/tools/
 COPY tools/releases/__init__.py tools/releases/catalog.py tools/releases/trust.py /source/tools/releases/
 COPY schemas/releases/v1/catalog.schema.json schemas/releases/v1/common.schema.json schemas/releases/v1/keyring.schema.json schemas/releases/v1/release.schema.json schemas/releases/v1/signature.schema.json /source/schemas/releases/v1/
 COPY examples/releases/ros-counter-a-v1/pixi.toml examples/releases/ros-counter-a-v1/pixi.lock examples/releases/ros-counter-a-v1/release.json /source/examples/releases/ros-counter-a-v1/

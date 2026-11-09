@@ -108,3 +108,15 @@ API reads/writes by [#29](https://github.com/gleniosp/fleetforge/issues/29) and
 relevant rejection and real boundary tests. Production IAM, security-service
 availability, incident response and independent review remain future
 requirements; no production-security claim follows from this design.
+
+## Agent replacement boundary
+
+[Agent delivery](agent-delivery.md) defines the independent Bootstrap manager,
+OS-owned helper and maintenance handoff. [Agent artifact v1](../specs/agent-releases.md)
+requires separate publisher and scoped activation trust, monotonic generations,
+security policy floors and compatible recovery. The helper independently verifies
+local peer credentials and protected signature/scope policy; an authenticated
+manager cannot pass arbitrary commands or paths. Workload publisher/authority
+permissions grant no agent replacement permission. These are accepted controls,
+with runtime enforcement and hostile-input evidence still required by subsequent
+deliveries.
