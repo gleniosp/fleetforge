@@ -6,6 +6,8 @@ Inherit [root agent guidance](../AGENTS.md). Use the
 
 - Edit the owning requirements, architecture contract, or ADR and update its
   affected references and traceability together. Keep navigation pages brief.
+- Check whether new or changed contracts and examples require guide updates;
+  update relevant guides and their navigation together.
 - Keep the [glossary](product/glossary.md) up to date when documentation introduces
   or changes shared terms and actor responsibilities. Reuse existing definitions,
   add concise entries for new concepts, and link to their owning contracts or

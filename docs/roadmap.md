@@ -38,8 +38,7 @@ reference packaging path before #87 runtime permissions; full native installatio
 service boot and agent upgrades remain FUT-08.
 
 [FND-01 — Dual-target Agent and independent lifecycle foundations](https://github.com/gleniosp/fleetforge/milestone/23)
-is an active early contract/native AMD64 and ARM64 evidence gate under approved
-Option A. [#147](https://github.com/gleniosp/fleetforge/issues/147) owns its
+is an active early contract/native AMD64 and ARM64 evidence gate. [#147](https://github.com/gleniosp/fleetforge/issues/147) owns its
 repository contract adoption. [Maintenance](https://github.com/gleniosp/fleetforge/milestone/22)
 tracks focused repairs outside capability sequencing.
 

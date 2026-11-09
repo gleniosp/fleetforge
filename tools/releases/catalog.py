@@ -22,6 +22,8 @@ from typing import Any
 from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 
+from tools.json_encoding import CanonicalJSONError, canonical
+
 SCHEMAS = Path(__file__).resolve().parents[2] / "schemas/releases/v1"
 # Version 1 input policy; docs/specs/releases.md owns these limits.
 MAX_DESCRIPTOR_BYTES = 1024 * 1024
@@ -40,8 +42,6 @@ MAX_SNAPSHOT_BYTES = MAX_PAYLOAD_BYTES + MAX_DESCRIPTOR_BYTES + MAX_SIGNATURE_BY
 # Implementation budgets, independent of the release format.
 COPY_CHUNK_BYTES = 64 * 1024
 LOCK_CHECK_TIMEOUT_SECONDS = 60
-# Largest integer for which all consecutive values remain exact in IEEE-754 binary64.
-MAX_SAFE_JSON_INTEGER = 2**53 - 1
 PATH = re.compile(r"[A-Za-z0-9_][A-Za-z0-9._-]*(/[A-Za-z0-9_][A-Za-z0-9._-]*)*\Z")
 
 
@@ -63,32 +63,6 @@ def path(value: str) -> None:
         len(value) <= MAX_PATH_CHARS and PATH.fullmatch(value) is not None,
         "unsafe path",
     )
-
-
-def canonical(value: Any) -> bytes:
-    """JCS encoding for the contract's integer-only JSON domain.
-
-    Integers stay in the IEEE-754 exact range; keys sort by UTF-16 code units.
-    Floats and lone surrogates reject rather than receive approximate encoding.
-    """
-    if isinstance(value, dict):
-        value = dict(
-            sorted(value.items(), key=lambda item: item[0].encode("utf-16-be"))
-        )
-        return (
-            b"{"
-            + b",".join(canonical(k) + b":" + canonical(v) for k, v in value.items())
-            + b"}"
-        )
-    if isinstance(value, list):
-        return b"[" + b",".join(map(canonical, value)) + b"]"
-    require(not isinstance(value, float), "non-integer number")
-    if type(value) is int:
-        require(
-            abs(value) <= MAX_SAFE_JSON_INTEGER,
-            "integer outside interoperable JSON range",
-        )
-    return json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
 
 
 def parse(data: bytes) -> Any:
@@ -121,6 +95,8 @@ def parse(data: bytes) -> Any:
         result = json.loads(data.decode("utf-8"), object_pairs_hook=pairs)
         canonical(result)  # Reject invalid Unicode and non-integer numbers everywhere.
         return result
+    except CanonicalJSONError as error:
+        raise ReleaseError("release_invalid", str(error)) from error
     except (UnicodeError, ValueError, RecursionError) as error:
         if isinstance(error, ReleaseError):
             raise

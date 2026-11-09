@@ -7,9 +7,9 @@ import shutil
 
 import pytest
 
+from tools.json_encoding import canonical
 from tools.releases.catalog import (
     ReleaseError,
-    canonical,
     check,
     parse,
     provision,

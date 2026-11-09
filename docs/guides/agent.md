@@ -51,6 +51,10 @@ The steps above explain the operational flow, not the order in which project
 issues must be implemented. The [project README](../../README.md#current-state)
 owns the current capability summary.
 
+For the planned agent software replacement flow, read the
+[agent release examples](agent-releases-explained.md). They explain artifact
+approval and activation separately from the identity/startup steps above.
+
 ## Diagnostic versus configured execution
 
 With no arguments, `agent-run` prints the bootstrap diagnostic and exits:
